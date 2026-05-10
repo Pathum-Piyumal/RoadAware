@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, AlertTriangle, MapPin, Camera, CheckCircle2 } from 'lucide-react';
+import HazardTypeStep from '../../components/hazard-report/HazardTypeStep';
 
 const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    type: '',
+    location: null,
+    image: null,
+    description: ''
+  });
   const totalSteps = 4;
 
   const nextStep = () => {
+    if (currentStep === 1 && !formData.type) {
+      return; // Could add a toast here
+    }
     if (currentStep < totalSteps) setCurrentStep(prev => prev + 1);
   };
 
@@ -72,16 +82,10 @@ const ReportHazard = () => {
       <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 min-h-[400px] flex flex-col">
         <div className="flex-grow">
           {currentStep === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-xl font-semibold mb-4">What type of hazard did you see?</h2>
-              <p className="text-gray-500 mb-6">Select the category that best describes the issue.</p>
-              <div className="grid grid-cols-1 gap-4">
-                 {/* Placeholder for Chunk 2 */}
-                 <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-400">
-                    Hazard selection will be implemented in Step 2.
-                 </div>
-              </div>
-            </div>
+            <HazardTypeStep 
+              selectedType={formData.type} 
+              onSelect={(type) => setFormData(prev => ({ ...prev, type }))} 
+            />
           )}
           
           {currentStep === 2 && (
@@ -134,7 +138,9 @@ const ReportHazard = () => {
           
           <button
             onClick={nextStep}
-            className="flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95"
+            className={`flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 ${
+              currentStep === 1 && !formData.type ? 'opacity-50 cursor-not-allowed grayscale' : ''
+            }`}
           >
             {currentStep === totalSteps ? 'Submit Report' : 'Continue'}
             {currentStep !== totalSteps && <ChevronRight className="ml-2" size={20} />}
