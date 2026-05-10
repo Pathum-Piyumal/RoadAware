@@ -3,9 +3,12 @@ import { ChevronLeft, ChevronRight, AlertTriangle, MapPin, Camera, CheckCircle2 
 import HazardTypeStep from '../../components/hazard-report/HazardTypeStep';
 import LocationStep from '../../components/hazard-report/LocationStep';
 import DetailsStep from '../../components/hazard-report/DetailsStep';
+import ReviewStep from '../../components/hazard-report/ReviewStep';
 
 const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     type: '',
     location: null,
@@ -18,7 +21,20 @@ const ReportHazard = () => {
     if (currentStep === 1 && !formData.type) return;
     if (currentStep === 2 && !formData.location) return;
     
+    if (currentStep === totalSteps) {
+      handleSubmission();
+      return;
+    }
+    
     if (currentStep < totalSteps) setCurrentStep(prev => prev + 1);
+  };
+
+  const handleSubmission = async () => {
+    setIsSubmitting(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsSubmitting(false);
+    setIsSuccess(true);
   };
 
   const prevStep = () => {
@@ -107,41 +123,53 @@ const ReportHazard = () => {
           )}
 
           {currentStep === 4 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-xl font-semibold mb-4">Review and Submit</h2>
-              <p className="text-gray-500 mb-6">Please check the details before sending the report.</p>
-              <div className="bg-orange-50 p-6 rounded-xl border border-orange-100 text-orange-800">
-                Summary view will be implemented in Step 5.
-              </div>
-            </div>
+            <ReviewStep 
+              formData={formData} 
+              isSubmitting={isSubmitting} 
+              isSuccess={isSuccess} 
+            />
           )}
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-12 pt-6 border-t border-gray-100">
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className={`flex items-center px-6 py-2 rounded-lg font-medium transition-colors ${
-              currentStep === 1 
-                ? 'text-gray-300 cursor-not-allowed' 
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <ChevronLeft className="mr-2" size={20} />
-            Back
-          </button>
-          
-          <button
-            onClick={nextStep}
-            className={`flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 ${
-              (currentStep === 1 && !formData.type) || (currentStep === 2 && !formData.location) ? 'opacity-50 cursor-not-allowed grayscale' : ''
-            }`}
-          >
-            {currentStep === totalSteps ? 'Submit Report' : 'Continue'}
-            {currentStep !== totalSteps && <ChevronRight className="ml-2" size={20} />}
-          </button>
-        </div>
+        {!isSuccess && (
+          <div className="flex justify-between mt-12 pt-6 border-t border-gray-100">
+            <button
+              onClick={prevStep}
+              disabled={currentStep === 1 || isSubmitting}
+              className={`flex items-center px-6 py-2 rounded-lg font-medium transition-colors ${
+                currentStep === 1 || isSubmitting
+                  ? 'text-gray-300 cursor-not-allowed' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <ChevronLeft className="mr-2" size={20} />
+              Back
+            </button>
+            
+            <button
+              onClick={nextStep}
+              disabled={isSubmitting}
+              className={`flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 ${
+                (currentStep === 1 && !formData.type) || (currentStep === 2 && !formData.location) || isSubmitting ? 'opacity-50 cursor-not-allowed grayscale' : ''
+              }`}
+            >
+              {currentStep === totalSteps ? (isSubmitting ? 'Submitting...' : 'Submit Report') : 'Continue'}
+              {currentStep !== totalSteps && !isSubmitting && <ChevronRight className="ml-2" size={20} />}
+            </button>
+          </div>
+        )}
+
+        {isSuccess && (
+          <div className="mt-12 pt-6 border-t border-gray-100 flex justify-center">
+            <button
+              onClick={() => window.location.href = '/dashboard'}
+              className="px-8 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-black transition-all shadow-md"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
