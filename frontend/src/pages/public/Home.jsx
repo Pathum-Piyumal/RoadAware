@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  AlertTriangle, 
-  MapPin, 
-  CheckCircle2, 
-  ChevronRight, 
-  ShieldCheck, 
-  Users, 
+import {
+  AlertTriangle,
+  MapPin,
+  CheckCircle2,
+  ChevronRight,
+  ShieldCheck,
   Zap,
   Car,
   Truck,
@@ -15,204 +14,212 @@ import {
   Droplets,
   Lightbulb,
   Snowflake,
-  PawPrint
+  PawPrint,
+  Clock,
+  ThumbsUp,
+  Star,
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-
-// Fix for default marker icon in Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
 });
-
 L.Marker.prototype.options.icon = DefaultIcon;
 
+/* ─── NAVBAR ─────────────────────────────────────────────── */
 const Navbar = () => (
-  <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between h-16 items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <ShieldCheck className="text-white" size={20} />
-          </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-            RoadAware
-          </span>
+  <nav style={{
+    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
+    background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(16px)',
+    borderBottom: '1px solid rgba(255,255,255,0.06)',
+  }}>
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 34, height: 34, background: '#f97316', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <ShieldCheck size={18} color="#fff" />
         </div>
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="/" className="text-sm font-medium text-orange-600">Home</Link>
-          <Link to="/map" className="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors">Hazard Map</Link>
-          <Link to="/report-hazard" className="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors">Report</Link>
-          <Link to="/my-reports" className="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors">My Reports</Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="text-sm font-medium text-gray-700 hover:text-orange-600">Login</button>
-          <Link 
-            to="/report-hazard" 
-            className="bg-gray-900 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-black transition-all shadow-md"
-          >
-            Get Started
-          </Link>
-        </div>
+        <span style={{ fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '-0.5px' }}>RoadAware</span>
+      </div>
+
+      {/* Nav Links */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+        <Link to="/" style={{ fontSize: 13, fontWeight: 700, color: '#fff', textDecoration: 'none', borderBottom: '2px solid #f97316', paddingBottom: 2 }}>Home</Link>
+        <Link to="/map" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>Hazard Map</Link>
+        <Link to="/report-hazard" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>Report</Link>
+        <Link to="/my-reports" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>My Reports</Link>
+      </div>
+
+      {/* CTA */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        <button style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}>Login</button>
+        <Link to="/report-hazard" style={{
+          background: '#fff', color: '#111', padding: '9px 22px', borderRadius: 999,
+          fontSize: 13, fontWeight: 700, textDecoration: 'none', letterSpacing: '-0.2px',
+        }}>Get started</Link>
       </div>
     </div>
   </nav>
 );
 
+/* ─── HERO ────────────────────────────────────────────────── */
 const Hero = () => (
-  <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-    {/* Background Image with Overlay */}
-    <div className="absolute inset-0 z-0">
-      <img 
-        src="C:\Users\pathu\.gemini\antigravity\brain\c0f3b2c4-422e-4be7-8773-467b19b0186f\road_hero_bg_1778441419328.png" 
-        alt="Road background" 
-        className="w-full h-full object-cover grayscale-[0.3]"
+  <section style={{ position: 'relative', minHeight: '100vh', background: '#0a0a0a', overflow: 'hidden', paddingTop: 64 }}>
+    {/* Background Image */}
+    <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+      <img
+        src="/assets/hero-bg.png"
+        alt="Road background"
+        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/60 to-transparent" />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.85) 60%, #0a0a0a 100%)' }} />
     </div>
 
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 mb-6 backdrop-blur-sm">
-            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider">Live traffic safety monitoring</span>
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '80px 32px 80px', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+      {/* Left column */}
+      <div>
+        {/* Live badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Live traffic safety monitoring</span>
+        </div>
+
+        {/* Headline */}
+        <h1 style={{ fontSize: 68, fontWeight: 900, color: '#fff', lineHeight: 1.05, letterSpacing: '-2px', marginBottom: 24, margin: '0 0 24px 0' }}>
+          Safer roads,<br />
+          built by the<br />
+          <span style={{ color: '#fff' }}>people who use them.</span>
+        </h1>
+
+        {/* Subtext */}
+        <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, maxWidth: 440, margin: '0 0 36px 0' }}>
+          Report potholes, street flooding, broken lights and more. Your assistance helps
+          prioritize road repairs in your community.
+        </p>
+
+        {/* CTAs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 36 }}>
+          <Link to="/report-hazard" style={{
+            background: '#fff', color: '#111', padding: '14px 32px',
+            borderRadius: 12, fontWeight: 800, fontSize: 15, textDecoration: 'none',
+            boxShadow: '0 8px 32px rgba(255,255,255,0.1)',
+          }}>
+            Get started
+          </Link>
+          <button style={{ color: '#fff', fontWeight: 700, fontSize: 15, background: 'none', border: 'none', cursor: 'pointer', borderBottom: '2px solid rgba(255,255,255,0.25)', paddingBottom: 2 }}>
+            How it works
+          </button>
+        </div>
+
+        {/* Avatars + Rating */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36 }}>
+          <div style={{ display: 'flex' }}>
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} style={{
+                width: 38, height: 38, borderRadius: '50%',
+                background: `hsl(${i * 40 + 200},40%,40%)`,
+                border: '2px solid #0a0a0a', marginLeft: i === 0 ? 0 : -10,
+              }} />
+            ))}
           </div>
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-white leading-tight mb-6">
-            Safer roads,<br />
-            <span className="text-orange-500">built by the people</span><br />
-            who use them.
-          </h1>
-          <p className="text-xl text-gray-300 mb-10 max-w-lg leading-relaxed">
-            Report potholes, street flooding, broken lights and more. Your assistance helps 
-            prioritize road repairs in your community.
-          </p>
-          <div className="flex flex-wrap gap-4 mb-10">
-            <Link 
-              to="/report-hazard" 
-              className="bg-orange-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 flex items-center gap-2"
-            >
-              Get started <ChevronRight size={20} />
-            </Link>
-            <button className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-xl font-bold hover:bg-white/20 transition-all">
-              How it works
-            </button>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-gray-900 overflow-hidden">
-                  <img src={`https://i.pravatar.cc/100?u=${i}`} alt="User" />
-                </div>
-              ))}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {[1,2,3,4,5].map(s => <Star key={s} size={13} fill="#f97316" color="#f97316" />)}
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#fff', marginLeft: 4 }}>5.0</span>
             </div>
-            <div className="text-gray-300">
-              <div className="flex items-center gap-1 text-orange-400">
-                {'★'.repeat(5)}
-              </div>
-              <p className="text-sm font-medium">Joined by <span className="text-white font-bold">12k+ community active members</span></p>
-            </div>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+              Joined by <strong style={{ color: '#fff' }}>12k+ community active members</strong>
+            </p>
           </div>
         </div>
 
-        {/* Hero Map Overlay */}
-        <div className="hidden lg:block relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
-          <div className="relative h-[450px] bg-white rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-            <MapContainer 
-              center={[6.9271, 79.8612]} 
-              zoom={13} 
-              style={{ height: '100%', width: '100%' }}
-              zoomControl={false}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[6.9319, 79.8478]}>
-                <Popup>Pothole reported here</Popup>
-              </Marker>
-              <Marker position={[6.9150, 79.8700]}>
-                <Popup>Flooding reported here</Popup>
-              </Marker>
-            </MapContainer>
-            
-            {/* Map UI Elements */}
-            <div className="absolute top-6 right-6 bg-white shadow-lg rounded-xl p-3 border border-gray-100 animate-in fade-in slide-in-from-right-4 duration-1000 delay-500">
-               <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
-                    <AlertTriangle size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">Latest Hazard</p>
-                    <p className="text-sm font-bold text-gray-900">Pothole near Town Hall</p>
-                  </div>
-               </div>
+        {/* Stats pill */}
+        <div style={{
+          display: 'inline-flex', background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.1)', borderRadius: 999,
+          backdropFilter: 'blur(12px)', padding: '12px 4px',
+        }}>
+          {[{ val: '34', label: 'Reports' }, { val: '9', label: 'Resolved' }, { val: '5', label: 'Waiting' }].map((s, i) => (
+            <div key={i} style={{
+              padding: '0 28px', textAlign: 'center',
+              borderRight: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+            }}>
+              <p style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: 0 }}>{s.val}</p>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{s.label}</p>
             </div>
-            
-            <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md shadow-lg rounded-2xl p-4 border border-white/20">
-               <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-                      <CheckCircle2 size={24} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900">Active Monitoring</p>
-                      <p className="text-xs text-gray-500">Reporting is currently live in Colombo</p>
-                    </div>
-                  </div>
-                  <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-xs font-bold">View Full Map</button>
-               </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Stats Bar */}
-      <div className="grid grid-cols-3 gap-1 md:max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 mt-16 shadow-2xl">
-        <div className="text-center">
-          <p className="text-3xl font-extrabold text-white">34</p>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Reports</p>
+      {/* Right column — Map */}
+      <div style={{ position: 'relative', borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}>
+        <div style={{ height: 480 }}>
+          <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Marker position={[51.556, -0.297]}>
+              <Popup>Hazard Reported: A4006 Wembley</Popup>
+            </Marker>
+          </MapContainer>
         </div>
-        <div className="text-center border-x border-white/10">
-          <p className="text-3xl font-extrabold text-white">9</p>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Resolved</p>
+
+        {/* Top badge */}
+        <div style={{
+          position: 'absolute', top: 20, left: 20, background: '#fff',
+          borderRadius: 16, padding: '12px 16px', display: 'flex', alignItems: 'center',
+          gap: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+        }}>
+          <div style={{ width: 44, height: 44, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <AlertTriangle size={22} color="#ef4444" />
+          </div>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Live Warning</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#111', margin: 0 }}>Pothole: A4006 Wembley</p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="text-3xl font-extrabold text-white">5</p>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Waiting</p>
+
+        {/* Bottom badge */}
+        <div style={{
+          position: 'absolute', bottom: 20, right: 20, background: '#22c55e',
+          borderRadius: 12, padding: '8px 14px', display: 'flex', alignItems: 'center',
+          gap: 8, boxShadow: '0 4px 16px rgba(34,197,94,0.4)',
+        }}>
+          <CheckCircle2 size={15} color="#fff" />
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Live Updates</span>
         </div>
       </div>
     </div>
   </section>
 );
 
+/* ─── HOW IT WORKS ────────────────────────────────────────── */
 const HowItWorks = () => (
-  <section className="py-24 bg-white">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
-        <p className="text-orange-500 font-bold uppercase tracking-widest text-xs mb-4">How It Works</p>
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Three steps to a safer street</h2>
-        <p className="text-gray-500 max-w-2xl mx-auto">From reporting a hazard to getting it resolved — RoadAware keeps process flow transparent.</p>
-      </div>
+  <section style={{ padding: '96px 32px', background: '#fff' }}>
+    <div style={{ maxWidth: 1280, margin: '0 auto', textAlign: 'center' }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 12 }}>How it works</p>
+      <h2 style={{ fontSize: 38, fontWeight: 900, color: '#111', letterSpacing: '-1px', marginBottom: 12 }}>Three steps to a safer street</h2>
+      <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 64, maxWidth: 520, margin: '0 auto 64px' }}>
+        From reporting a hazard to getting it resolved — RoadAware keeps process flow transparent.
+      </p>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32, textAlign: 'left' }}>
         {[
-          { icon: MapPin, title: "1. Spot & Report", desc: "Identify a road issue, take a photo, and mark its location on the map.", color: "text-blue-500", bg: "bg-blue-50" },
-          { icon: Users, title: "2. Community Validates", desc: "Other users upvote and confirm your report to build credibility.", color: "text-orange-500", bg: "bg-orange-50" },
-          { icon: CheckCircle2, title: "3. Authorities Respond", desc: "Local authorities receive verified data and schedule repairs.", color: "text-green-500", bg: "bg-green-50" }
+          { icon: MapPin,     title: '1. Spot & Report',        desc: 'Identify a road issue, take a photo, and mark its location on the map.' },
+          { icon: Zap,        title: '2. Community Validates',  desc: 'Other users upvote and confirm your report to build credibility.' },
+          { icon: ShieldCheck,title: '3. Authorities Respond',  desc: 'Local authorities receive verified data and schedule repairs.' },
         ].map((step, i) => (
-          <div key={i} className="p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:shadow-xl transition-all group">
-            <div className={`w-14 h-14 ${step.bg} ${step.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-              <step.icon size={28} />
+          <div key={i} style={{ padding: '40px 36px', borderRadius: 28, border: '1px solid #f3f4f6', background: '#fff', cursor: 'default' }}>
+            <div style={{ width: 52, height: 52, background: '#3b82f6', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, boxShadow: '0 8px 24px rgba(59,130,246,0.25)' }}>
+              <step.icon size={24} color="#fff" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-            <p className="text-gray-500 leading-relaxed">{step.desc}</p>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111', marginBottom: 10 }}>{step.title}</h3>
+            <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
           </div>
         ))}
       </div>
@@ -220,33 +227,38 @@ const HowItWorks = () => (
   </section>
 );
 
+/* ─── WHAT YOU CAN REPORT ─────────────────────────────────── */
 const WhatYouCanReport = () => {
   const categories = [
-    { name: 'Pothole', icon: Car },
-    { name: 'Debris', icon: Truck },
+    { name: 'Pothole',      icon: Car },
+    { name: 'Debris',       icon: Truck },
     { name: 'Construction', icon: Construction },
-    { name: 'Flooding', icon: Droplets },
-    { name: 'Weather', icon: Wind },
-    { name: 'Streetlight', icon: Lightbulb },
-    { name: 'Snow/Ice', icon: Snowflake },
-    { name: 'Animal', icon: PawPrint }
+    { name: 'Streetlight',  icon: Lightbulb },
+    { name: 'Flooding',     icon: Droplets },
+    { name: 'Ice / Snow',   icon: Snowflake },
+    { name: 'Animal',       icon: PawPrint },
+    { name: 'Other',        icon: AlertTriangle },
   ];
 
   return (
-    <section className="py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-2">What you can report</h2>
-          <p className="text-gray-500">Every report makes a difference in road safety.</p>
-        </div>
+    <section style={{ padding: '80px 32px', background: '#f9fafb' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <h2 style={{ fontSize: 30, fontWeight: 900, color: '#111', marginBottom: 6 }}>What you can report</h2>
+        <p style={{ fontSize: 14, color: '#6b7280', marginBottom: 40 }}>Every report makes a difference in road safety.</p>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8,1fr)', gap: 16 }}>
           {categories.map((cat, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 flex flex-col items-center gap-3 hover:shadow-lg hover:border-orange-200 transition-all cursor-pointer group">
-              <div className="text-gray-400 group-hover:text-orange-500 transition-colors">
-                <cat.icon size={32} />
-              </div>
-              <span className="text-xs font-bold text-gray-700">{cat.name}</span>
+            <div key={i} style={{
+              background: '#fff', padding: '24px 12px', borderRadius: 20,
+              border: '1px solid #f3f4f6', display: 'flex', flexDirection: 'column',
+              alignItems: 'center', gap: 12, cursor: 'pointer',
+              transition: 'box-shadow 0.2s, transform 0.2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
+            >
+              <cat.icon size={30} color="#111" />
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'center' }}>{cat.name}</span>
             </div>
           ))}
         </div>
@@ -255,140 +267,171 @@ const WhatYouCanReport = () => {
   );
 };
 
-const FeaturedHazards = () => (
-  <section className="py-24 bg-white">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-end mb-12">
-        <div>
-          <p className="text-orange-500 font-bold uppercase tracking-widest text-xs mb-4">Latest Reports</p>
-          <h2 className="text-3xl font-extrabold text-gray-900">Most-upvoted hazards near you</h2>
+/* ─── HAZARD CARD ─────────────────────────────────────────── */
+const HazardCard = ({ title, location, status, upvotes }) => (
+  <div style={{ background: '#fff', borderRadius: 28, padding: '28px 28px 24px', border: '1px solid #f3f4f6', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+    {/* Badges */}
+    <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+      <span style={{
+        padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
+        background: status === 'Verified' ? '#dcfce7' : '#fff7ed',
+        color:      status === 'Verified' ? '#16a34a'  : '#ea580c',
+      }}>{status}</span>
+      <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#fee2e2', color: '#dc2626' }}>Pothole</span>
+    </div>
+
+    {/* Image placeholder */}
+    <div style={{ height: 152, borderRadius: 16, background: 'linear-gradient(135deg,#e5e7eb,#d1d5db)', marginBottom: 20 }} />
+
+    <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111', marginBottom: 6 }}>{title}</h3>
+    <p style={{ fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
+      <MapPin size={14} /> {location}
+    </p>
+
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: '1px solid #f9fafb' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 38, height: 38, background: '#f9fafb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <ThumbsUp size={16} color="#111" />
         </div>
-        <button className="text-sm font-bold text-orange-600 flex items-center gap-1 hover:underline">
-          View All <ChevronRight size={16} />
+        <span style={{ fontSize: 20, fontWeight: 900, color: '#111' }}>{upvotes}</span>
+      </div>
+      <button style={{ fontSize: 13, fontWeight: 700, color: '#111', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+        Details <ChevronRight size={15} />
+      </button>
+    </div>
+  </div>
+);
+
+/* ─── FEATURED HAZARDS ────────────────────────────────────── */
+const FeaturedHazards = () => (
+  <section style={{ padding: '96px 32px', background: '#fff' }}>
+    <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 52 }}>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 8 }}>Live feed</p>
+          <h2 style={{ fontSize: 36, fontWeight: 900, color: '#111', letterSpacing: '-1px', margin: 0 }}>Most-upvoted hazards near you</h2>
+        </div>
+        <button style={{ fontSize: 14, fontWeight: 700, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+          View all <ChevronRight size={18} />
         </button>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {[
-          { title: "Pothole near Kandy Road", location: "Kandy Road, Colombo 10", upvotes: 142, status: "Pending", type: "Pothole" },
-          { title: "Broken Streetlight", location: "Marine Drive, Kollupitiya", upvotes: 89, status: "Verified", type: "Light" },
-          { title: "Severe Flooding", location: "Main Street, Pettah", upvotes: 215, status: "Action Taken", type: "Flooding" }
-        ].map((hazard, i) => (
-          <div key={i} className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all">
-            <div className="h-48 bg-gray-200 animate-pulse" /> {/* Image Placeholder */}
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                  hazard.status === 'Verified' ? 'bg-blue-100 text-blue-600' : 
-                  hazard.status === 'Action Taken' ? 'bg-green-100 text-green-600' : 
-                  'bg-orange-100 text-orange-600'
-                }`}>
-                  {hazard.status}
-                </span>
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">{hazard.title}</h3>
-              <div className="flex items-center gap-1 text-gray-500 text-sm mb-6">
-                <MapPin size={14} /> {hazard.location}
-              </div>
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-700">
-                    <Zap size={14} />
-                  </div>
-                  <span className="font-bold text-gray-900">{hazard.upvotes}</span>
-                </div>
-                <button className="text-sm font-bold text-orange-600">Details</button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 28 }}>
+        <HazardCard title="Pothole: Main Street"      location="102 Main Road, Colombo"        status="Pending"  upvotes={122} />
+        <HazardCard title="Flooding: A1 Highway"      location="A1 Highway km 45, Kandy"       status="Pending"  upvotes={150} />
+        <HazardCard title="Hazardous Debris"          location="88 Galle Road, Bentota"         status="Verified" upvotes={98}  />
       </div>
     </div>
   </section>
 );
 
-const Footer = () => (
-  <footer className="bg-gray-900 text-white py-20">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid md:grid-cols-4 gap-12 mb-16 pb-16 border-b border-white/10">
-        <div className="col-span-2">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <ShieldCheck className="text-white" size={20} />
-            </div>
-            <span className="text-2xl font-bold">RoadAware</span>
+/* ─── CTA SECTION ─────────────────────────────────────────── */
+const CTASection = () => (
+  <section style={{ padding: '0 32px 80px' }}>
+    <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div style={{
+        background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+        borderRadius: 48, padding: '80px 40px', textAlign: 'center',
+        position: 'relative', overflow: 'hidden',
+        boxShadow: '0 32px 80px rgba(37,99,235,0.35)',
+      }}>
+        {/* Subtle grid texture */}
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.07, backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 40px)' }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ width: 60, height: 60, background: 'rgba(255,255,255,0.2)', borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+            <CheckCircle2 size={28} color="#fff" />
           </div>
-          <p className="text-gray-400 max-w-sm leading-relaxed">
-            Leading the way in community-driven road safety and infrastructure maintenance monitoring.
+          <h2 style={{ fontSize: 48, fontWeight: 900, color: '#fff', letterSpacing: '-1.5px', marginBottom: 16 }}>See something? Say something.</h2>
+          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.75)', marginBottom: 36, maxWidth: 520, margin: '0 auto 36px' }}>
+            Your report could prevent the next accident. Help build a better infrastructure for everyone in your community.
           </p>
-        </div>
-        <div>
-          <h4 className="font-bold mb-6">Company</h4>
-          <ul className="space-y-4 text-gray-400 text-sm">
-            <li><a href="#" className="hover:text-white">About Us</a></li>
-            <li><a href="#" className="hover:text-white">Contact</a></li>
-            <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="font-bold mb-6">Support</h4>
-          <ul className="space-y-4 text-gray-400 text-sm">
-            <li><a href="#" className="hover:text-white">Help Center</a></li>
-            <li><a href="#" className="hover:text-white">Safety Tips</a></li>
-            <li><a href="#" className="hover:text-white">Partner with us</a></li>
-          </ul>
+          <Link to="/report-hazard" style={{
+            display: 'inline-block', background: '#fff', color: '#1d4ed8',
+            padding: '16px 44px', borderRadius: 16, fontWeight: 900, fontSize: 16,
+            textDecoration: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+          }}>
+            Submit report here
+          </Link>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs">
-        <p>© 2026 RoadAware. All rights reserved.</p>
-        <div className="flex gap-8">
-          <a href="#" className="hover:text-white transition-colors">Twitter</a>
-          <a href="#" className="hover:text-white transition-colors">Facebook</a>
-          <a href="#" className="hover:text-white transition-colors">Instagram</a>
+    </div>
+  </section>
+);
+
+/* ─── FOOTER ──────────────────────────────────────────────── */
+const Footer = () => (
+  <footer style={{ background: '#050505', color: '#fff', padding: '72px 32px 32px' }}>
+    <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 64, marginBottom: 64 }}>
+        {/* Brand */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 36, height: 36, background: '#f97316', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ShieldCheck size={20} color="#fff" />
+            </div>
+            <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.5px' }}>RoadAware</span>
+          </div>
+          <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.8, maxWidth: 300 }}>
+            RoadAware is a community-driven platform dedicated to improving road safety through
+            transparent reporting and verified hazard data for local authorities.
+          </p>
+        </div>
+
+        {/* Links */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }}>
+          {[
+            { heading: 'Company', links: ['About Us', 'Features', 'Careers'] },
+            { heading: 'Support',  links: ['Help Center', 'Safety Tips', 'Contact'] },
+            { heading: 'Connect',  links: [] },
+          ].map((col, i) => (
+            <div key={i}>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#e5e7eb', marginBottom: 20 }}>{col.heading}</h4>
+              {col.links.length > 0 ? (
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {col.links.map((l, j) => (
+                    <li key={j} style={{ marginBottom: 12 }}>
+                      <a href="#" style={{ fontSize: 13, color: '#6b7280', textDecoration: 'none', fontWeight: 500 }}>{l}</a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div style={{ display: 'flex', gap: 10 }}>
+                  {[1,2,3].map(n => (
+                    <div key={n} style={{ width: 38, height: 38, borderRadius: 10, background: '#111', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: 0 }}>© 2026 ROADAWARE. ALL RIGHTS RESERVED.</p>
+        <div style={{ display: 'flex', gap: 32 }}>
+          <a href="#" style={{ fontSize: 11, fontWeight: 700, color: '#374151', textDecoration: 'none' }}>PRIVACY POLICY</a>
+          <a href="#" style={{ fontSize: 11, fontWeight: 700, color: '#374151', textDecoration: 'none' }}>TERMS OF SERVICE</a>
         </div>
       </div>
     </div>
   </footer>
 );
 
-const Home = () => {
-  return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main>
-        <Hero />
-        <HowItWorks />
-        <WhatYouCanReport />
-        <FeaturedHazards />
-        
-        {/* Final CTA Section */}
-        <section className="py-24 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[3rem] p-12 lg:p-20 text-center relative overflow-hidden shadow-2xl shadow-blue-500/20">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent)]" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-8">
-                  <ShieldCheck className="text-white" size={32} />
-                </div>
-                <h2 className="text-4xl lg:text-5xl font-extrabold text-white mb-6">See something? Say something.</h2>
-                <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-                  Your report could prevent the next accident. Help build a better infrastructure 
-                  for everyone in your community.
-                </p>
-                <Link 
-                  to="/report-hazard" 
-                  className="inline-block bg-white text-blue-700 px-10 py-4 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg"
-                >
-                  Submit report here
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+/* ─── PAGE ────────────────────────────────────────────────── */
+const Home = () => (
+  <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: '#fff' }}>
+    <Navbar />
+    <main>
+      <Hero />
+      <HowItWorks />
+      <WhatYouCanReport />
+      <FeaturedHazards />
+      <CTASection />
+    </main>
+    <Footer />
+  </div>
+);
 
 export default Home;
