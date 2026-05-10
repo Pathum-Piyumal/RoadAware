@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, AlertTriangle, MapPin, Camera, CheckCircle2 } from 'lucide-react';
 import HazardTypeStep from '../../components/hazard-report/HazardTypeStep';
 import LocationStep from '../../components/hazard-report/LocationStep';
+import DetailsStep from '../../components/hazard-report/DetailsStep';
 
 const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -97,15 +98,12 @@ const ReportHazard = () => {
           )}
 
           {currentStep === 3 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-xl font-semibold mb-4">Add photos and details</h2>
-              <p className="text-gray-500 mb-6">A clear photo helps our teams prioritize the fix.</p>
-              <div className="space-y-4">
-                <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-400">
-                  Media upload will be implemented in Step 4.
-                </div>
-              </div>
-            </div>
+            <DetailsStep 
+              image={formData.image} 
+              description={formData.description}
+              onImageChange={(image) => setFormData(prev => ({ ...prev, image }))}
+              onDescriptionChange={(description) => setFormData(prev => ({ ...prev, description }))}
+            />
           )}
 
           {currentStep === 4 && (
