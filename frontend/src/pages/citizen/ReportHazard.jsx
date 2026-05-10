@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, AlertTriangle, MapPin, Camera, CheckCircle2 } from 'lucide-react';
 import HazardTypeStep from '../../components/hazard-report/HazardTypeStep';
+import LocationStep from '../../components/hazard-report/LocationStep';
 
 const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -13,9 +14,9 @@ const ReportHazard = () => {
   const totalSteps = 4;
 
   const nextStep = () => {
-    if (currentStep === 1 && !formData.type) {
-      return; // Could add a toast here
-    }
+    if (currentStep === 1 && !formData.type) return;
+    if (currentStep === 2 && !formData.location) return;
+    
     if (currentStep < totalSteps) setCurrentStep(prev => prev + 1);
   };
 
@@ -89,13 +90,10 @@ const ReportHazard = () => {
           )}
           
           {currentStep === 2 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h2 className="text-xl font-semibold mb-4">Where is the hazard located?</h2>
-              <p className="text-gray-500 mb-6">Confirm the exact position on the map.</p>
-              <div className="h-64 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200">
-                Map interface will be implemented in Step 3.
-              </div>
-            </div>
+            <LocationStep 
+              location={formData.location} 
+              onLocationChange={(location) => setFormData(prev => ({ ...prev, location }))} 
+            />
           )}
 
           {currentStep === 3 && (
@@ -139,7 +137,7 @@ const ReportHazard = () => {
           <button
             onClick={nextStep}
             className={`flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 ${
-              currentStep === 1 && !formData.type ? 'opacity-50 cursor-not-allowed grayscale' : ''
+              (currentStep === 1 && !formData.type) || (currentStep === 2 && !formData.location) ? 'opacity-50 cursor-not-allowed grayscale' : ''
             }`}
           >
             {currentStep === totalSteps ? 'Submit Report' : 'Continue'}
