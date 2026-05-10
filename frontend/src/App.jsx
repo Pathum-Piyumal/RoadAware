@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import ReportHazard from './pages/citizen/ReportHazard';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
           <Route path="/login" element={<div className="p-8 text-center text-2xl">Login Page</div>} />
           <Route path="/dashboard" element={<div className="p-8 text-center text-2xl">Citizen Dashboard</div>} />
           <Route path="/admin" element={<div className="p-8 text-center text-2xl">Admin Dashboard</div>} />
+          <Route path="/report-hazard" element={<ReportHazard />} />
         </Routes>
         <Toaster position="top-right" />
       </div>
