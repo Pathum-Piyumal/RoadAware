@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from '../../components/common/Navbar/Navbar';
 import {
   AlertTriangle,
   MapPin,
@@ -33,41 +34,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-/* ─── NAVBAR ─────────────────────────────────────────────── */
-const Navbar = () => (
-  <nav style={{
-    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-    background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(16px)',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
-  }}>
-    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 34, height: 34, background: '#f97316', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <ShieldCheck size={18} color="#fff" />
-        </div>
-        <span style={{ fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '-0.5px' }}>RoadAware</span>
-      </div>
 
-      {/* Nav Links */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-        <Link to="/" style={{ fontSize: 13, fontWeight: 700, color: '#fff', textDecoration: 'none', borderBottom: '2px solid #f97316', paddingBottom: 2 }}>Home</Link>
-        <Link to="/map" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>Hazard Map</Link>
-        <Link to="/report-hazard" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>Report</Link>
-        <Link to="/my-reports" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>My Reports</Link>
-      </div>
-
-      {/* CTA */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-        <button style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}>Login</button>
-        <Link to="/report-hazard" style={{
-          background: '#fff', color: '#111', padding: '9px 22px', borderRadius: 999,
-          fontSize: 13, fontWeight: 700, textDecoration: 'none', letterSpacing: '-0.2px',
-        }}>Get started</Link>
-      </div>
-    </div>
-  </nav>
-);
 
 /* ─── HERO ────────────────────────────────────────────────── */
 const Hero = () => (
@@ -422,7 +389,7 @@ const Footer = () => (
 /* ─── PAGE ────────────────────────────────────────────────── */
 const Home = () => (
   <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: '#fff' }}>
-    <Navbar />
+    <Navbar variant="homepage" />
     <main>
       <Hero />
       <HowItWorks />
