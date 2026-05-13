@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../../components/common/Navbar/Navbar';
-import { Search, ChevronDown, Map, Grid, Filter, Flame } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -22,8 +22,24 @@ const hazards = [
   { id: 3, lat: 51.545, lng: -0.305, title: "Debris: Ealing Road" }
 ];
 
+const gridHazards = [
+  { id: 1, type: "Pothole", severity: "Low", title: "Widespread Pothole Area", location: "102 Main Road, Colombo", time: "15 days ago by User A", upvotes: 28 },
+  { id: 2, type: "Flooding", severity: "High", title: "Central station fully submerged", location: "15 Station Rd, Kandy", time: "2 days ago by User B", upvotes: 112 },
+  { id: 3, type: "Pothole", severity: "High", title: "Massive Pothole...", location: "28 Galle Road, Bentota", time: "18 days ago by User C", upvotes: 14 },
+  { id: 4, type: "Debris", severity: "Critical", title: "Hazardous debris on road", location: "44 Temple St, Anuradhapura", time: "12 days ago by User D", upvotes: 82 },
+  { id: 5, type: "Pothole", severity: "Low", title: "Minor potholes near bridge", location: "Bridge Ave, Galle", time: "20 days ago by User E", upvotes: 34 },
+  { id: 6, type: "Construction", severity: "Medium", title: "Unmarked construction zone", location: "40 Kandy Road, Kurunegala", time: "25 days ago by User F", upvotes: 71 },
+  { id: 7, type: "Flooding", severity: "High", title: "Multiple flooding points in center", location: "Center St, Jaffna", time: "22 days ago by User G", upvotes: 18 },
+  { id: 8, type: "Debris", severity: "Critical", title: "Boulder blocking mountain road", location: "Mountain Pass, Nuwara Eliya", time: "15 days ago by User H", upvotes: 140 },
+  { id: 9, type: "Streetlight", severity: "Low", title: "Broken streetlight series", location: "Park Lane, Negombo", time: "5 days ago by User I", upvotes: 42 },
+  { id: 10, type: "Animal", severity: "Medium", title: "Stray dog pack on highway", location: "Highway A1 exit, Kelaniya", time: "1 day ago by User J", upvotes: 56 },
+  { id: 11, type: "Construction", severity: "High", title: "Open manhole left unattended", location: "700 South St, Matara", time: "6 days ago by User K", upvotes: 97 },
+  { id: 12, type: "Pothole", severity: "Critical", title: "Deep pothole near junction", location: "88 Junction, Badulla", time: "10 days ago by User L", upvotes: 130 },
+];
+
+
 export default function HazardMap() {
-  const [viewMode, setViewMode] = useState('map'); // 'map' or 'grid'
+  const [viewMode, setViewMode] = useState('grid'); // Default to 'grid' to match design step 2
 
   return (
     <div className={styles.pageContainer}>
@@ -98,25 +114,52 @@ export default function HazardMap() {
             </button>
           </div>
 
-          {/* Map Container */}
-          <div className={styles.mapWrapper}>
-            <MapContainer 
-              center={[51.556, -0.297]} 
-              zoom={13} 
-              className={styles.map}
-              zoomControl={false}
-            >
-              <TileLayer 
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              {hazards.map(hazard => (
-                <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
-                  <Popup>{hazard.title}</Popup>
-                </Marker>
+          {/* Content Area (Map or Grid) */}
+          {viewMode === 'map' ? (
+            <div className={styles.mapWrapper}>
+              <MapContainer 
+                center={[51.556, -0.297]} 
+                zoom={13} 
+                className={styles.map}
+                zoomControl={false}
+              >
+                <TileLayer 
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                {hazards.map(hazard => (
+                  <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
+                    <Popup>{hazard.title}</Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+          ) : (
+            <div className={styles.gridWrapper}>
+              {gridHazards.map(hazard => (
+                <div key={hazard.id} className={styles.hazardCard}>
+                  <div className={styles.cardBadges}>
+                    <span className={`${styles.badge} ${styles['badge' + hazard.type]}`}>{hazard.type}</span>
+                    <span className={`${styles.badge} ${styles['badge' + hazard.severity]}`}>{hazard.severity}</span>
+                  </div>
+                  <div className={styles.cardImagePlaceholder} />
+                  <h3 className={styles.cardTitle}>{hazard.title}</h3>
+                  <div className={styles.cardMeta}>
+                    <MapPin size={12} /> {hazard.location}
+                  </div>
+                  <div className={styles.cardMeta}>
+                    <Clock size={12} /> {hazard.time}
+                  </div>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.upvoteSection}>
+                      <ThumbsUp size={14} /> {hazard.upvotes}
+                    </div>
+                    <a href="#" className={styles.detailsLink}>Details &gt;</a>
+                  </div>
+                </div>
               ))}
-            </MapContainer>
-          </div>
+            </div>
+          )}
 
         </div>
       </main>
