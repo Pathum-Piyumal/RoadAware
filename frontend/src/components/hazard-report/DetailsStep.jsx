@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { Camera, X, FileText, Upload } from 'lucide-react';
 
 const DetailsStep = ({ image, description, onImageChange, onDescriptionChange }) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertOctagon, Car, Truck, Construction, Wind, Droplets } from 'lucide-react';
 
 const HAZARD_TYPES = [

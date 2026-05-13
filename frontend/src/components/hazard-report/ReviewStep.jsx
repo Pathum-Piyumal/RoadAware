@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, MapPin, Camera, FileText, CheckCircle2 } from 'lucide-react';
 
 const ReviewStep = ({ formData, isSubmitting, isSuccess }) => {
