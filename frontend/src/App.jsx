@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ReportHazard from './pages/citizen/ReportHazard';
+import MyReports from './pages/citizen/MyReports';
 import Home from './pages/public/Home';
+import HazardMap from './pages/public/HazardMap';
 
 function App() {
   return (
@@ -9,10 +11,12 @@ function App() {
       <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/hazard-map" element={<HazardMap />} />
           <Route path="/login" element={<div className="p-8 text-center text-2xl">Login Page</div>} />
           <Route path="/dashboard" element={<div className="p-8 text-center text-2xl">Citizen Dashboard</div>} />
           <Route path="/admin" element={<div className="p-8 text-center text-2xl">Admin Dashboard</div>} />
           <Route path="/report-hazard" element={<ReportHazard />} />
+          <Route path="/my-reports" element={<MyReports />} />
         </Routes>
         <Toaster position="top-right" />
       </div>
