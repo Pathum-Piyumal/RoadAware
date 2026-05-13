@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import Navbar from '../../components/common/Navbar/Navbar';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Search, ChevronDown, LayoutGrid, Map as MapIcon, ThumbsUp, MapPin, Clock } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import styles from './HazardMap.module.css';
 
+// Fix Leaflet icon
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -16,188 +16,101 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const hazards = [
-  { id: 1, lat: 51.556, lng: -0.297, title: "Pothole: A4006 Wembley" },
-  { id: 2, lat: 51.565, lng: -0.285, title: "Flooding: High Road" },
-  { id: 3, lat: 51.545, lng: -0.305, title: "Debris: Ealing Road" }
+const MOCK_HAZARDS = [
+  { id: 1, title: 'Wide pothole in bus lane', location: '124 Hackney Rd, Shoreditch', timeAgo: '2h ago', type: 'Pothole', severity: 'LOW', status: 'REPORTED', upvotes: 45, lat: 51.528, lng: -0.076 },
+  { id: 2, title: 'Construction debris on road', location: '98 Bethnal Green Rd', timeAgo: '4h ago', type: 'Debris', severity: 'MEDIUM', status: 'REPORTED', upvotes: 22, lat: 51.525, lng: -0.065 },
+  { id: 3, title: 'Flooded underpass', location: '155 Victoria Pk, Hackney', timeAgo: '5h ago', type: 'Flooding', severity: 'HIGH', status: 'IN PROGRESS', upvotes: 77, lat: 51.538, lng: -0.045 },
+  { id: 4, title: 'Flickering traffic signal', location: 'Shoreditch High St', timeAgo: '6h ago', type: 'Signal', severity: 'CRITICAL', status: 'REPORTED', upvotes: 104, lat: 51.526, lng: -0.078 },
+  { id: 5, title: 'Missing speed limit sign', location: '232 Kingsland Rd', timeAgo: '1d ago', type: 'Signage', severity: 'LOW', status: 'REPORTED', upvotes: 12, lat: 51.532, lng: -0.075 },
+  { id: 6, title: 'Unmarked construction zone', location: 'Mile End Rd, Stepney', timeAgo: '1d ago', type: 'Construction', severity: 'HIGH', status: 'REPORTED', upvotes: 89, lat: 51.522, lng: -0.045 },
+  { id: 7, title: 'Sinkhole forming on shoulder', location: 'Cambridge Heath Rd', timeAgo: '2d ago', type: 'Pothole', severity: 'CRITICAL', status: 'REPORTED', upvotes: 156, lat: 51.533, lng: -0.055 },
+  { id: 8, title: 'Cluster of potholes on main road', location: 'Old Ford Rd, Bow', timeAgo: '2d ago', type: 'Pothole', severity: 'MEDIUM', status: 'REPORTED', upvotes: 34, lat: 51.535, lng: -0.030 },
+  { id: 9, title: 'Severe flooding after rain', location: 'Mare St, Hackney', timeAgo: '3d ago', type: 'Flooding', severity: 'HIGH', status: 'REPORTED', upvotes: 112, lat: 51.545, lng: -0.055 },
+  { id: 10, title: 'Missing pedestrian sign', location: 'Commercial St', timeAgo: '3d ago', type: 'Signage', severity: 'LOW', status: 'REPORTED', upvotes: 8, lat: 51.520, lng: -0.075 },
 ];
 
-const gridHazards = [
-  { id: 1, type: "Pothole", severity: "Low", title: "Widespread Pothole Area", location: "102 Main Road, Colombo", time: "15 days ago by User A", upvotes: 28 },
-  { id: 2, type: "Flooding", severity: "High", title: "Central station fully submerged", location: "15 Station Rd, Kandy", time: "2 days ago by User B", upvotes: 112 },
-  { id: 3, type: "Pothole", severity: "High", title: "Massive Pothole...", location: "28 Galle Road, Bentota", time: "18 days ago by User C", upvotes: 14 },
-  { id: 4, type: "Debris", severity: "Critical", title: "Hazardous debris on road", location: "44 Temple St, Anuradhapura", time: "12 days ago by User D", upvotes: 82 },
-  { id: 5, type: "Pothole", severity: "Low", title: "Minor potholes near bridge", location: "Bridge Ave, Galle", time: "20 days ago by User E", upvotes: 34 },
-  { id: 6, type: "Construction", severity: "Medium", title: "Unmarked construction zone", location: "40 Kandy Road, Kurunegala", time: "25 days ago by User F", upvotes: 71 },
-  { id: 7, type: "Flooding", severity: "High", title: "Multiple flooding points in center", location: "Center St, Jaffna", time: "22 days ago by User G", upvotes: 18 },
-  { id: 8, type: "Debris", severity: "Critical", title: "Boulder blocking mountain road", location: "Mountain Pass, Nuwara Eliya", time: "15 days ago by User H", upvotes: 140 },
-  { id: 9, type: "Streetlight", severity: "Low", title: "Broken streetlight series", location: "Park Lane, Negombo", time: "5 days ago by User I", upvotes: 42 },
-  { id: 10, type: "Animal", severity: "Medium", title: "Stray dog pack on highway", location: "Highway A1 exit, Kelaniya", time: "1 day ago by User J", upvotes: 56 },
-  { id: 11, type: "Construction", severity: "High", title: "Open manhole left unattended", location: "700 South St, Matara", time: "6 days ago by User K", upvotes: 97 },
-  { id: 12, type: "Pothole", severity: "Critical", title: "Deep pothole near junction", location: "88 Junction, Badulla", time: "10 days ago by User L", upvotes: 130 },
-];
-
-
-export default function HazardMap() {
-  const [viewMode, setViewMode] = useState('grid'); // Default to 'grid' to match design step 2
+const HazardMap = () => {
+  const [view, setView] = useState('grid'); // 'map' or 'grid'
 
   return (
     <div className={styles.pageContainer}>
-      {/* We use the homepage variant to show "Log in" and "Get started" as in the design */}
-      <Navbar variant="homepage" />
+      <div className={styles.header}>
+        <div className={styles.liveBadge}>LIVE MAP</div>
+        <h1 className={styles.title}>Hazards in your area</h1>
+        <p className={styles.subtitle}>Browse newly reported hazards. Filter by type, status, or severity. Click any pin for details.</p>
+      </div>
 
-      {/* Header Section */}
-      <header className={styles.headerSection}>
-        <div className={styles.container}>
-          <span className={styles.liveBadge}>LIVE MAP</span>
-          <h1 className={styles.title}>Hazards in your area</h1>
-          <p className={styles.subtitle}>
-            Browse every reported hazard. Filter by type, status, or severity. Click any pin for details.
-          </p>
+      <div className={styles.controlsContainer}>
+        <div className={styles.searchBar}>
+          <Search size={18} className={styles.searchIcon} />
+          <input type="text" placeholder="Search address, area, or ID..." className={styles.searchInput} />
         </div>
-      </header>
-
-      <main className={styles.mainContent}>
-        <div className={styles.container}>
+        <div className={styles.filters}>
+          <button className={styles.filterBtn}>All types <ChevronDown size={14}/></button>
+          <button className={styles.filterBtn}>All statuses <ChevronDown size={14}/></button>
+          <button className={styles.filterBtn}>All severities <ChevronDown size={14}/></button>
           
-          {/* Filters Bar */}
-          <div className={styles.filterBar}>
-            <div className={styles.searchContainer}>
-              <Search size={18} className={styles.searchIcon} />
-              <input 
-                type="text" 
-                placeholder="Search address, area, or ID..." 
-                className={styles.searchInput}
-              />
-            </div>
-
-            <div className={styles.dropdownsContainer}>
-              <div className={styles.dropdown}>
-                <span>All types</span>
-                <ChevronDown size={16} />
-              </div>
-              <div className={styles.dropdown}>
-                <span>All statuses</span>
-                <ChevronDown size={16} />
-              </div>
-              <div className={styles.dropdown}>
-                <span>All severities</span>
-                <ChevronDown size={16} />
-              </div>
-            </div>
-
-            <div className={styles.viewToggle}>
-              <button 
-                className={`${styles.toggleBtn} ${viewMode === 'map' ? styles.activeToggle : ''}`}
-                onClick={() => setViewMode('map')}
-              >
-                <Map size={16} />
-              </button>
-              <button 
-                className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.activeToggle : ''}`}
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid size={16} />
-              </button>
-            </div>
-          </div>
-
-          {/* Map Info Bar */}
-          <div className={styles.mapInfoBar}>
-            <div className={styles.hazardCount}>
-              <Filter size={14} />
-              <strong>32</strong> of 32 hazards
-            </div>
-            <button className={styles.heatmapToggle}>
-              <Flame size={14} />
-              Heatmap OFF
+          <div className={styles.viewToggle}>
+            <button className={`${styles.toggleBtn} ${view === 'map' ? styles.active : ''}`} onClick={() => setView('map')}>
+              <MapIcon size={18} />
+            </button>
+            <button className={`${styles.toggleBtn} ${view === 'grid' ? styles.active : ''}`} onClick={() => setView('grid')}>
+              <LayoutGrid size={18} />
             </button>
           </div>
-
-          {/* Content Area (Map or Grid) */}
-          {viewMode === 'map' ? (
-            <div className={styles.mapWrapper}>
-              <MapContainer 
-                center={[51.556, -0.297]} 
-                zoom={13} 
-                className={styles.map}
-                zoomControl={false}
-              >
-                <TileLayer 
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                {hazards.map(hazard => (
-                  <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
-                    <Popup>{hazard.title}</Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
-            </div>
-          ) : (
-            <div className={styles.gridWrapper}>
-              {gridHazards.map(hazard => (
-                <div key={hazard.id} className={styles.hazardCard}>
-                  <div className={styles.cardBadges}>
-                    <span className={`${styles.badge} ${styles['badge' + hazard.type]}`}>{hazard.type}</span>
-                    <span className={`${styles.badge} ${styles['badge' + hazard.severity]}`}>{hazard.severity}</span>
-                  </div>
-                  <div className={styles.cardImagePlaceholder} />
-                  <h3 className={styles.cardTitle}>{hazard.title}</h3>
-                  <div className={styles.cardMeta}>
-                    <MapPin size={12} /> {hazard.location}
-                  </div>
-                  <div className={styles.cardMeta}>
-                    <Clock size={12} /> {hazard.time}
-                  </div>
-                  <div className={styles.cardFooter}>
-                    <div className={styles.upvoteSection}>
-                      <ThumbsUp size={14} /> {hazard.upvotes}
-                    </div>
-                    <a href="#" className={styles.detailsLink}>Details &gt;</a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
         </div>
-      </main>
+      </div>
 
-      {/* Footer (Simplified matching design) */}
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <div className={styles.footerGrid}>
-            <div>
-              <div className={styles.footerLogo}>
-                <div className={styles.footerLogoIcon}>
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    <path d="M12 8v4" />
-                    <path d="M12 16h.01" />
-                  </svg>
+      <div className={styles.resultsCount}>
+        <span className={styles.countText}>{MOCK_HAZARDS.length} items</span>
+      </div>
+
+      {view === 'map' ? (
+        <div className={styles.mapWrapper}>
+          <MapContainer center={[51.53, -0.06]} zoom={13} style={{ height: '100%', width: '100%' }}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {MOCK_HAZARDS.map(hazard => (
+              <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
+                <Popup>
+                  <div style={{ padding: '4px' }}>
+                    <div style={{ fontWeight: 800, fontSize: '14px', marginBottom: '4px' }}>{hazard.title}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>{hazard.type} • {hazard.severity} Severity</div>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </div>
+      ) : (
+        <div className={styles.gridWrapper}>
+          {MOCK_HAZARDS.map(hazard => (
+            <div key={hazard.id} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.tags}>
+                  <span className={`${styles.tag} ${styles[`tagStatus_${hazard.status.replace(' ', '')}`]}`}>{hazard.status}</span>
+                  <span className={`${styles.tag} ${styles[`tagSeverity_${hazard.severity}`]}`}>{hazard.severity}</span>
                 </div>
-                <span className={styles.footerBrand}>RoadAware</span>
               </div>
-              <p className={styles.footerDesc}>
-                A civic platform connecting communities with road authorities.
-              </p>
+              <h3 className={styles.cardTitle}>{hazard.title}</h3>
+              <div className={styles.cardMeta}>
+                <span className={styles.location}><MapPin size={12} /> {hazard.location}</span>
+                <span className={styles.timeAgo}><Clock size={12} /> {hazard.timeAgo} • By User</span>
+              </div>
+              <div className={styles.cardFooter}>
+                <div className={styles.upvotes}>
+                  <ThumbsUp size={14} /> {hazard.upvotes}
+                </div>
+                <button className={styles.detailsBtn}>Details →</button>
+              </div>
             </div>
-            <div>
-              <h4 className={styles.footerHeading}>Emergency</h4>
-              <p className={styles.footerText}>
-                For life-threatening hazards, always call <strong>911</strong> first.
-                <br />support@roadsafe.com
-                <br />+65 1234 5678
-              </p>
-            </div>
-          </div>
-          <div className={styles.footerBottom}>
-            <p>© 2026 RoadAware. All rights reserved.</p>
-            <p>Report hazards. Stay informed. Save lives.</p>
-          </div>
+          ))}
         </div>
-      </footer>
+      )}
     </div>
   );
-}
+};
+
+export default HazardMap;

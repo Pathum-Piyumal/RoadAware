@@ -1,22 +1,16 @@
-.page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #f8fafc;
-}
-
-/* ── Header Area ─────────────────────────────────────── */
-.header {
-  background: #f8fafc;
-  padding: 48px 32px 32px;
-}
-
-.headerInner {
-  max-width: 1080px;
+.pageContainer {
+  max-width: 1280px;
   margin: 0 auto;
+  padding: 40px 32px 80px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 64px);
+}
+
+.headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+  margin-bottom: 32px;
 }
 
 .headerText {
@@ -24,34 +18,34 @@
   flex-direction: column;
 }
 
-.headerTag {
+.badge {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-blue);
-  margin: 0 0 8px;
+  margin-bottom: 8px;
 }
 
-.headerTitle {
+.title {
   font-size: 32px;
   font-weight: 800;
-  color: var(--color-navy);
-  margin: 0 0 8px;
+  color: #0f172a;
+  margin: 0 0 8px 0;
   letter-spacing: -0.5px;
 }
 
-.headerSub {
+.subtitle {
   font-size: 15px;
-  color: var(--color-muted);
+  color: #64748b;
   margin: 0;
 }
 
-.btnNewReport {
-  background: var(--color-navy);
+.newReportBtn {
+  background: #0f172a;
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 600;
@@ -62,114 +56,43 @@
   transition: background 0.2s;
 }
 
-.btnNewReport:hover {
-  background: var(--color-blue);
+.newReportBtn:hover {
+  background: #1e293b;
 }
 
-/* ── Content Area ────────────────────────────────────── */
-.contentArea {
-  flex-grow: 1;
-  padding: 0 32px 80px;
-}
-
-.contentInner {
-  max-width: 1080px;
-  margin: 0 auto;
-}
-
-.emptyCard {
+.contentWrapper {
   background: #fff;
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 80px 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 80px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.emptyIcon {
-  color: #64748b;
-  margin-bottom: 20px;
+.emptyIconWrapper {
+  width: 64px;
+  height: 64px;
+  background: #f1f5f9;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
 .emptyTitle {
   font-size: 20px;
-  font-weight: 800;
-  color: var(--color-navy);
-  margin: 0 0 10px;
-}
-
-.emptySub {
-  font-size: 14px;
-  color: var(--color-muted);
-  margin: 0 0 24px;
-}
-
-.btnReportHazard {
-  background: var(--color-navy);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 10px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btnReportHazard:hover {
-  background: var(--color-blue);
-}
-
-/* ── Footer ──────────────────────────────────────────── */
-.footer {
-  background: #111827;
-  color: #fff;
-  padding: 48px 32px 24px;
-  margin-top: auto;
-}
-.footerInner {
-  max-width: 1080px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-.footerBrand {
-  font-size: 14px;
-  color: #9ca3af;
-  line-height: 1.7;
-}
-.footerBrandName {
-  font-weight: 800;
-  font-size: 16px;
-  color: #fff;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.footerRight h4 {
-  font-size: 13px;
   font-weight: 700;
-  color: #e5e7eb;
-  margin: 0 0 8px;
+  color: #0f172a;
+  margin: 0 0 12px 0;
 }
-.footerRight p {
-  font-size: 13px;
-  color: #9ca3af;
-  margin: 0;
-  line-height: 1.6;
-}
-.footerBottom {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding-top: 20px;
-  margin-top: 32px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #6b7280;
+
+.emptySubtitle {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0 0 32px 0;
+  text-align: center;
 }

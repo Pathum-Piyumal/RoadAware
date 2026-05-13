@@ -1,84 +1,146 @@
 import { useState } from 'react';
-import { ReportProvider } from '../../context/ReportContext';
-import Navbar from '../../components/common/Navbar/Navbar';
-import Step1Details from './steps/Step1Details';
-import Step2Location from './steps/Step2Location';
-import Step3Review from './steps/Step3Review';
-import styles from './ReportPage.module.css';
+import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import Step1Details from '../../components/hazard-report/Step1Details';
+import Step2Location from '../../components/hazard-report/Step2Location';
+import Step3Review from '../../components/hazard-report/Step3Review';
 
-function ReportStepper() {
-  const [step, setStep] = useState(1);
+const ReportHazard = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    type: '',
+    severity: 'Medium',
+    title: '',
+    description: '',
+    location: null,
+    address: '',
+    city: '',
+    image: null,
+  });
 
-  const next = () => setStep(s => Math.min(s + 1, 3));
-  const back = () => setStep(s => Math.max(s - 1, 1));
+  const totalSteps = 3;
+
+  const updateData = (newData) => {
+    setFormData(prev => ({ ...prev, ...newData }));
+  };
+
+  const nextStep = () => {
+    // Basic validation
+    if (currentStep === 1 && (!formData.type || !formData.title)) return;
+    if (currentStep === 2 && !formData.address) return;
+    
+    if (currentStep === totalSteps) {
+      handleSubmission();
+      return;
+    }
+    if (currentStep < totalSteps) setCurrentStep(prev => prev + 1);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(prev => prev - 1);
+  };
+
+  const handleSubmission = async () => {
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSubmitting(false);
+    setIsSuccess(true);
+  };
 
   return (
-    <>
-      {/* Stepper indicator */}
-      <div className={styles.stepper}>
-        {[1, 2, 3].map((n, i) => (
-          <span key={n} style={{ display: 'contents' }}>
-            <span
-              className={`${styles.stepDot} ${step === n ? styles.active : ''} ${step > n ? styles.done : ''}`}
+    <div className="min-h-[calc(100vh-64px)] bg-gray-50 flex flex-col w-full">
+      {/* Full-width Colored Header */}
+      {!isSuccess && (
+        <div className="bg-[#f0f4f8] w-full pt-16 pb-28 border-b border-gray-200">
+          <div className="max-w-3xl mx-auto px-4">
+            <div className="mb-10 text-center md:text-left">
+              <span className="text-blue-600 font-bold text-[10px] tracking-widest uppercase mb-2 block">Submit a report</span>
+              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Report a road hazard</h1>
+              <p className="text-gray-500 text-sm">Help authorities respond faster. The more detail and accuracy, the quicker the fix.</p>
+            </div>
+
+            {/* Progress Indicator */}
+            <div className="flex justify-center items-center gap-4 mt-12">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center">
+                  <div 
+                    className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all ${
+                      currentStep === step 
+                        ? 'bg-[#0f172a] text-white shadow-md' 
+                        : currentStep > step 
+                          ? 'bg-[#0f172a] text-white' 
+                          : 'bg-white border-2 border-gray-200 text-gray-400'
+                    }`}
+                  >
+                    {currentStep > step ? <CheckCircle2 size={16} /> : step}
+                  </div>
+                  {step < 3 && (
+                    <div className={`w-12 h-[2px] mx-2 ${currentStep > step ? 'bg-[#0f172a]' : 'bg-gray-200'}`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Form Card */}
+      <div className={`max-w-3xl mx-auto px-4 w-full ${!isSuccess ? '-mt-16 mb-20 relative z-10' : 'py-20'} flex-grow flex flex-col`}>
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-8 flex-grow flex flex-col">
+        {!isSuccess ? (
+          <>
+            <div className="flex-grow">
+              {currentStep === 1 && <Step1Details formData={formData} updateData={updateData} />}
+              {currentStep === 2 && <Step2Location formData={formData} updateData={updateData} />}
+              {currentStep === 3 && <Step3Review formData={formData} updateData={updateData} />}
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-between mt-10 pt-6 border-t border-gray-100">
+              <button
+                onClick={prevStep}
+                disabled={currentStep === 1 || isSubmitting}
+                className={`flex items-center px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors ${
+                  currentStep === 1 || isSubmitting
+                    ? 'text-gray-300 cursor-not-allowed opacity-0' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <ChevronLeft className="mr-1" size={18} /> Back
+              </button>
+              
+              <button
+                onClick={nextStep}
+                disabled={isSubmitting || (currentStep === 1 && (!formData.type || !formData.title)) || (currentStep === 2 && !formData.address)}
+                className={`flex items-center px-6 py-2.5 bg-[#0f172a] text-white rounded-xl font-semibold text-sm shadow-sm transition-all hover:bg-[#1e293b] ${
+                  isSubmitting ? 'opacity-70 cursor-wait' : ''
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {currentStep === totalSteps ? (isSubmitting ? 'Submitting...' : 'Submit Report') : (
+                  <>Next: {currentStep === 1 ? 'Location' : 'Details'} <ChevronRight className="ml-1" size={18} /></>
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 size={40} />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Report Submitted!</h2>
+            <p className="text-gray-500 mb-8 max-w-md mx-auto">Thank you for reporting this hazard. Local authorities have been notified and will review it shortly.</p>
+            <button
+              onClick={() => window.location.href = '/my-reports'}
+              className="px-8 py-3 bg-[#0f172a] text-white rounded-xl font-bold shadow-md hover:bg-[#1e293b] transition-all"
             >
-              {step > n ? '✓' : n}
-            </span>
-            {i < 2 && (
-              <span className={`${styles.stepLine} ${step > n ? styles.filled : ''}`} />
-            )}
-          </span>
-        ))}
-      </div>
-
-      {/* Step content */}
-      {step === 1 && <Step1Details onNext={next} />}
-      {step === 2 && <Step2Location onNext={next} onBack={back} />}
-      {step === 3 && <Step3Review onBack={back} />}
-    </>
-  );
-}
-
-export default function ReportHazard() {
-  return (
-    <ReportProvider>
-      <div className={styles.page}>
-        <Navbar />
-
-        {/* Dark header banner */}
-        <header className={styles.header}>
-          <div className={styles.headerInner}>
-            <p className={styles.headerTag}>Submit a report</p>
-            <h1 className={styles.headerTitle}>Report a road hazard</h1>
-            <p className={styles.headerSub}>
-              Help authorities respond faster. The more detail and accuracy, the quicker the fix.
-            </p>
-          </div>
-        </header>
-
-        <ReportStepper />
-
-        {/* Footer */}
-        <footer className={styles.footer}>
-          <div className={styles.footerInner}>
-            <div className={styles.footerBrand}>
-              <div className={styles.footerBrandName}>🛡 RoadAware</div>
-              <p>A civic platform connecting communities with road authorities.</p>
-            </div>
-            <div className={styles.footerRight}>
-              <h4>Emergency</h4>
-              <p>
-                For life-threatening hazards, always call <strong>911</strong> first.<br />
-                support@roadsafe.com<br />
-                +65 1234 5678
-              </p>
-            </div>
-          </div>
-          <div className={styles.footerBottom}>
-            <span>© 2026 RoadAware. All rights reserved.</span>
-            <span>Report hazards. Stay informed. Save lives.</span>
+              View My Reports
+            </button>
           </div>
         </footer>
       </div>
-    </ReportProvider>
+    </div>
+    </div>
   );
 }
