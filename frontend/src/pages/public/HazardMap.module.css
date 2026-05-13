@@ -193,6 +193,102 @@
   height: 100%;
 }
 
+/* Grid View */
+.gridWrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.hazardCard {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f3f4f6;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardBadges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Badge colors based on design */
+.badgePothole { background: #e0f2fe; color: #0284c7; }
+.badgeLow { background: #f1f5f9; color: #64748b; }
+.badgeFlooding { background: #dbeafe; color: #1e40af; }
+.badgeHigh { background: #fef08a; color: #ca8a04; }
+.badgeDebris { background: #dcfce7; color: #16a34a; }
+.badgeCritical { background: #fee2e2; color: #dc2626; }
+.badgeMedium { background: #fed7aa; color: #ea580c; }
+.badgeStreetlight { background: #f3e8ff; color: #7e22ce; }
+.badgeConstruction { background: #ffedd5; color: #c2410c; }
+.badgeAnimal { background: #fce7f3; color: #be185d; }
+
+.cardImagePlaceholder {
+  height: 120px;
+  border-radius: 8px;
+  background: #f8fafc;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.cardFooter {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upvoteSection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.detailsLink {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 /* Footer (Simplified for this page based on design) */
 .footer {
   background-color: #0f172a; /* Very dark slate */
