@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ReportHazard from './pages/citizen/ReportHazard';
+import MyReports from './pages/citizen/MyReports';
 import Home from './pages/public/Home';
 import HazardMap from './pages/public/HazardMap';
 import MyReports from './pages/citizen/MyReports';

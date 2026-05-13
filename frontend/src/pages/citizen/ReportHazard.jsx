@@ -138,11 +138,9 @@ const ReportHazard = () => {
               View My Reports
             </button>
           </div>
-        )}
+        </footer>
       </div>
     </div>
     </div>
   );
-};
-
-export default ReportHazard;
+}
