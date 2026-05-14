@@ -27,42 +27,38 @@ const ForgotPassword = () => {
       toast.success('Password reset link sent!');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to process request.');
-      // Simulating success
-      // setTimeout(() => {
-      //   setIsSuccess(true);
-      // }, 1000);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] py-12 px-4 sm:px-6 lg:px-8 text-white">
+      <div className="max-w-md w-full bg-[#111] p-8 rounded-3xl shadow-xl shadow-black/50 border border-white/10">
         <div className="flex justify-center mb-6">
           <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30">
             <ShieldCheck size={28} color="#fff" />
           </div>
         </div>
 
-        <h2 className="text-center text-2xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-center text-2xl font-bold text-white tracking-tight">
           Reset Password
         </h2>
 
         {!isSuccess ? (
           <>
-            <p className="mt-2 text-center text-sm text-gray-500 mb-8">
+            <p className="mt-2 text-center text-sm text-gray-400 mb-8">
               Enter your email address and we'll send you a link to reset your password.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-300">
                   Email address
                 </label>
                 <div className="mt-2 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="email"
@@ -70,8 +66,9 @@ const ForgotPassword = () => {
                     type="email"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                    className={`block w-full pl-10 pr-3 py-3 border ${error ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                      } rounded-xl text-sm placeholder-gray-400 bg-gray-50/50`}
+                    className={`block w-full pl-10 pr-3 py-3 border ${
+                      error ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 bg-[#0a0a0a] text-white focus:outline-none focus:ring-2 transition-colors`}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -81,7 +78,7 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] focus:ring-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <Loader2 className="animate-spin h-5 w-5" />
@@ -93,18 +90,18 @@ const ForgotPassword = () => {
           </>
         ) : (
           <div className="mt-8 text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-500/20 border border-green-500/30 mb-4">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900">Check your email</h3>
-            <p className="mt-2 text-sm text-gray-500">
-              We've sent a password reset link to <strong>{email}</strong>.
+            <h3 className="text-lg font-medium text-white">Check your email</h3>
+            <p className="mt-2 text-sm text-gray-400">
+              We've sent a password reset link to <strong className="text-gray-200">{email}</strong>.
             </p>
           </div>
         )}
 
         <div className="mt-8 text-center">
-          <Link to="/login" className="inline-flex items-center text-sm font-semibold text-gray-600 hover:text-gray-900">
+          <Link to="/login" className="inline-flex items-center text-sm font-semibold text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to sign in
           </Link>

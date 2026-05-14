@@ -12,7 +12,6 @@ const Login = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Clear error when typing
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: '' });
     }
@@ -33,24 +32,18 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      // API Call via Service
       await AuthService.login(formData.email, formData.password);
       toast.success('Successfully logged in!');
       navigate('/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed. Please check your credentials.');
-      // For demonstration purposes, if backend is not connected, simulate success:
-      // setTimeout(() => {
-      //   toast.success('Simulated Login Success!');
-      //   navigate('/dashboard');
-      // }, 1000);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-[#0a0a0a] text-white">
       {/* Left side - Form */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
@@ -58,23 +51,23 @@ const Login = () => {
             <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30">
               <ShieldCheck size={24} color="#fff" />
             </div>
-            <span className="text-2xl font-black tracking-tight text-gray-900">RoadAware</span>
+            <span className="text-2xl font-black tracking-tight text-white">RoadAware</span>
           </div>
 
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <h2 className="text-3xl font-bold text-white tracking-tight">Welcome back</h2>
+          <p className="mt-2 text-sm text-gray-400">
             Please enter your details to sign in to your account.
           </p>
 
           <div className="mt-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-300">
                   Email address
                 </label>
                 <div className="mt-2 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="email"
@@ -84,8 +77,8 @@ const Login = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-xl text-sm placeholder-gray-400 transition-colors bg-white`}
+                      errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 transition-colors bg-[#111] text-white focus:outline-none focus:ring-2`}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -93,12 +86,12 @@ const Login = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-300">
                   Password
                 </label>
                 <div className="mt-2 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="password"
@@ -108,8 +101,8 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-xl text-sm placeholder-gray-400 transition-colors bg-white`}
+                      errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 transition-colors bg-[#111] text-white focus:outline-none focus:ring-2`}
                     placeholder="••••••••"
                   />
                 </div>
@@ -122,15 +115,15 @@ const Login = () => {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-white/10 rounded bg-[#111] accent-orange-500"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
                     Remember me
                   </label>
                 </div>
 
                 <div className="text-sm">
-                  <Link to="/forgot-password" className="font-semibold text-blue-600 hover:text-blue-500">
+                  <Link to="/forgot-password" className="font-semibold text-orange-500 hover:text-orange-400">
                     Forgot your password?
                   </Link>
                 </div>
@@ -140,7 +133,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] focus:ring-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <Loader2 className="animate-spin h-5 w-5" />
@@ -154,9 +147,9 @@ const Login = () => {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 Don't have an account?{' '}
-                <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-500">
+                <Link to="/register" className="font-semibold text-orange-500 hover:text-orange-400">
                   Sign up for free
                 </Link>
               </p>
@@ -166,16 +159,16 @@ const Login = () => {
       </div>
 
       {/* Right side - Image/Branding */}
-      <div className="hidden lg:block relative w-0 flex-1 bg-gray-900">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-10" />
+      <div className="hidden lg:block relative w-0 flex-1 bg-gray-900 border-l border-white/10">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-10" />
         <img
-          className="absolute inset-0 h-full w-full object-cover opacity-60"
+          className="absolute inset-0 h-full w-full object-cover opacity-50"
           src="https://images.unsplash.com/photo-1449844908441-8829872d2607?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
           alt="City traffic at night"
         />
         <div className="absolute bottom-0 left-0 right-0 z-20 p-12 text-white">
           <h3 className="text-4xl font-bold mb-4 tracking-tight">Making streets safer.</h3>
-          <p className="text-lg text-gray-300 max-w-lg">
+          <p className="text-lg text-gray-400 max-w-lg">
             Join the community of thousands reporting road hazards and ensuring quicker resolutions by local authorities.
           </p>
         </div>

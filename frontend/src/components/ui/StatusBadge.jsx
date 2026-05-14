@@ -9,23 +9,23 @@ const StatusBadge = ({ status }) => {
   switch (status.toLowerCase()) {
     case 'pending':
     case 'submitted':
-      badgeColor = 'bg-orange-100 text-orange-800 border-orange-200';
+      badgeColor = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
       Icon = Clock;
       text = 'Pending';
       break;
     case 'in progress':
     case 'in-progress':
-      badgeColor = 'bg-blue-100 text-blue-800 border-blue-200';
+      badgeColor = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       Icon = Wrench;
       text = 'In Progress';
       break;
     case 'resolved':
-      badgeColor = 'bg-green-100 text-green-800 border-green-200';
+      badgeColor = 'bg-green-500/20 text-green-400 border-green-500/30';
       Icon = CheckCircle2;
       text = 'Resolved';
       break;
     default:
-      badgeColor = 'bg-gray-100 text-gray-800 border-gray-200';
+      badgeColor = 'bg-gray-800 text-gray-300 border-gray-700';
       Icon = Clock;
       text = status;
   }

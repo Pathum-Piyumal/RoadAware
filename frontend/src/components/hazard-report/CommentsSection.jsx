@@ -31,10 +31,6 @@ const CommentsSection = ({ hazardId }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        // const data = await HazardService.getComments(hazardId);
-        // setComments(data);
-        
-        // Simulating API response
         await new Promise(resolve => setTimeout(resolve, 800));
         setComments(DUMMY_COMMENTS);
       } catch (error) {
@@ -59,9 +55,6 @@ const CommentsSection = ({ hazardId }) => {
 
     setIsSubmitting(true);
     try {
-      // await HazardService.addComment(hazardId, newComment);
-      
-      // Simulating API response
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const createdComment = {
@@ -88,20 +81,20 @@ const CommentsSection = ({ hazardId }) => {
   };
 
   if (isLoading) {
-    return <div className="py-8 flex justify-center"><Loader2 className="animate-spin text-blue-500" /></div>;
+    return <div className="py-8 flex justify-center"><Loader2 className="animate-spin text-orange-500" /></div>;
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl shadow-gray-200/40 border border-gray-100 mt-8">
-      <h3 className="text-xl font-bold text-gray-900 mb-6">Community Discussion ({comments.length})</h3>
+    <div className="bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-black/50 border border-white/10 mt-8">
+      <h3 className="text-xl font-bold text-white mb-6">Community Discussion ({comments.length})</h3>
 
       {/* Add Comment Form */}
       <div className="mb-8 flex gap-4">
         {currentUser?.avatar ? (
-          <img src={currentUser.avatar} alt="You" className="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-200" />
+          <img src={currentUser.avatar} alt="You" className="w-10 h-10 rounded-full object-cover shadow-sm border border-white/10" />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-            <UserCircle2 className="text-gray-400" size={24} />
+          <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center border border-white/10">
+            <UserCircle2 className="text-gray-500" size={24} />
           </div>
         )}
         <form onSubmit={handleSubmit} className="flex-1 relative">
@@ -110,12 +103,12 @@ const CommentsSection = ({ hazardId }) => {
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={currentUser ? "Add a comment..." : "Sign in to comment..."}
             disabled={!currentUser || isSubmitting}
-            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-4 pr-12 text-sm focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors min-h-[80px] resize-y disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-[#0a0a0a] border border-white/10 text-white rounded-2xl py-3 px-4 pr-12 text-sm focus:ring-orange-500 focus:border-orange-500 transition-colors min-h-[80px] resize-y disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2"
           />
           <button
             type="submit"
             disabled={!newComment.trim() || isSubmitting || !currentUser}
-            className="absolute bottom-3 right-3 p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="absolute bottom-3 right-3 p-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
           >
             {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           </button>
@@ -127,18 +120,18 @@ const CommentsSection = ({ hazardId }) => {
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-4 group">
             {comment.user.avatar ? (
-              <img src={comment.user.avatar} alt={comment.user.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+              <img src={comment.user.avatar} alt={comment.user.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                <UserCircle2 className="text-gray-400" size={24} />
+              <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center border border-white/10">
+                <UserCircle2 className="text-gray-500" size={24} />
               </div>
             )}
-            <div className="flex-1 bg-gray-50 rounded-2xl p-4 border border-gray-100 group-hover:bg-gray-100 transition-colors">
+            <div className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5 group-hover:border-white/10 transition-colors">
               <div className="flex justify-between items-center mb-1">
-                <span className="font-bold text-gray-900 text-sm">{comment.user.name}</span>
+                <span className="font-bold text-white text-sm">{comment.user.name}</span>
                 <span className="text-xs text-gray-500 font-medium">{formatDate(comment.createdAt)}</span>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{comment.content}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">{comment.content}</p>
             </div>
           </div>
         ))}

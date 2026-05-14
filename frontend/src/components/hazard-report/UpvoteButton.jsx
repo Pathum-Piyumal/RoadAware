@@ -9,19 +9,13 @@ const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpvote = async () => {
-    // Optimistic UI update
     setHasUpvoted(!hasUpvoted);
     setUpvotes(prev => hasUpvoted ? prev - 1 : prev + 1);
     
     setIsLoading(true);
     try {
-      // Simulate API call or call actual API
-      // await HazardService.upvoteHazard(hazardId);
-      
-      // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
-      // Revert on failure
       setHasUpvoted(hasUpvoted);
       setUpvotes(initialUpvotes);
       toast.error('Failed to register upvote. Please try again.');
@@ -34,16 +28,16 @@ const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
     <button
       onClick={handleUpvote}
       disabled={isLoading}
-      className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm
+      className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm border
         ${hasUpvoted 
-          ? 'bg-blue-600 text-white shadow-blue-500/30 hover:bg-blue-700' 
-          : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-200 hover:bg-blue-50'}
+          ? 'bg-blue-600 text-white border-blue-500 shadow-blue-500/20 hover:bg-blue-700' 
+          : 'bg-[#1a1a1a] text-gray-300 border-white/10 hover:border-blue-500/50 hover:bg-[#222]'}
       `}
     >
-      <div className={`p-1.5 rounded-full ${hasUpvoted ? 'bg-blue-500' : 'bg-gray-100'}`}>
+      <div className={`p-1.5 rounded-full ${hasUpvoted ? 'bg-blue-500' : 'bg-[#0a0a0a]'}`}>
         <ThumbsUp 
           size={20} 
-          className={hasUpvoted ? 'fill-white text-white' : 'text-gray-500'} 
+          className={hasUpvoted ? 'fill-white text-white' : 'text-gray-400'} 
         />
       </div>
       <div className="flex flex-col items-start leading-tight">

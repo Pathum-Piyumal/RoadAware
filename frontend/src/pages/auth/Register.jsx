@@ -41,23 +41,18 @@ const Register = () => {
       navigate('/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
-      // Simulating success if backend not connected:
-      // setTimeout(() => {
-      //   toast.success('Simulated Registration Success!');
-      //   navigate('/dashboard');
-      // }, 1000);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-[#0a0a0a] text-white">
       {/* Left side - Branding */}
-      <div className="hidden lg:block relative w-0 flex-1 bg-gray-900">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/40 to-transparent z-10" />
+      <div className="hidden lg:block relative w-0 flex-1 bg-gray-900 border-r border-white/10">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-10" />
         <img
-          className="absolute inset-0 h-full w-full object-cover opacity-60"
+          className="absolute inset-0 h-full w-full object-cover opacity-50"
           src="https://images.unsplash.com/photo-1541888043690-3fb3e8d641ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
           alt="Road maintenance"
         />
@@ -69,7 +64,7 @@ const Register = () => {
             <span className="text-2xl font-black tracking-tight">RoadAware</span>
           </div>
           <h3 className="text-4xl font-bold mb-4 tracking-tight">Take action today.</h3>
-          <p className="text-lg text-gray-300 max-w-lg">
+          <p className="text-lg text-gray-400 max-w-lg">
             Create an account to start reporting issues, tracking progress, and making your community's roads safer for everyone.
           </p>
         </div>
@@ -78,20 +73,20 @@ const Register = () => {
       {/* Right side - Form */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-[400px]">
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Create an account</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <h2 className="text-3xl font-bold text-white tracking-tight">Create an account</h2>
+          <p className="mt-2 text-sm text-gray-400">
             Join the community and start reporting road hazards.
           </p>
 
           <div className="mt-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-300">
                   Full Name
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
+                    <User className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="name"
@@ -100,8 +95,8 @@ const Register = () => {
                     value={formData.name}
                     onChange={handleChange}
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.name ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-xl text-sm placeholder-gray-400 bg-white`}
+                      errors.name ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 bg-[#111] text-white focus:outline-none focus:ring-2 transition-colors`}
                     placeholder="John Doe"
                   />
                 </div>
@@ -109,12 +104,12 @@ const Register = () => {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-300">
                   Email address
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="email"
@@ -123,8 +118,8 @@ const Register = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-xl text-sm placeholder-gray-400 bg-white`}
+                      errors.email ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 bg-[#111] text-white focus:outline-none focus:ring-2 transition-colors`}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -132,12 +127,12 @@ const Register = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-300">
                   Password
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="password"
@@ -146,8 +141,8 @@ const Register = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-xl text-sm placeholder-gray-400 bg-white`}
+                      errors.password ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 bg-[#111] text-white focus:outline-none focus:ring-2 transition-colors`}
                     placeholder="••••••••"
                   />
                 </div>
@@ -155,12 +150,12 @@ const Register = () => {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-900">
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-300">
                   Confirm Password
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
                     id="confirmPassword"
@@ -169,8 +164,8 @@ const Register = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className={`block w-full pl-10 pr-3 py-3 border ${
-                      errors.confirmPassword ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
-                    } rounded-xl text-sm placeholder-gray-400 bg-white`}
+                      errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:ring-orange-500 focus:border-orange-500'
+                    } rounded-xl text-sm placeholder-gray-500 bg-[#111] text-white focus:outline-none focus:ring-2 transition-colors`}
                     placeholder="••••••••"
                   />
                 </div>
@@ -181,7 +176,7 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-gray-900 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] focus:ring-white transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <Loader2 className="animate-spin h-5 w-5" />
@@ -195,9 +190,9 @@ const Register = () => {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 Already have an account?{' '}
-                <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-500">
+                <Link to="/login" className="font-semibold text-orange-500 hover:text-orange-400">
                   Sign in
                 </Link>
               </p>
