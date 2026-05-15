@@ -1,10 +1,15 @@
 {
-  "name": "roadaware",
+  "name": "roadaware-root",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "RoadAware MERN Stack Project",
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "install-frontend": "npm install --prefix frontend",
+    "install-backend": "npm install --prefix backend",
+    "install-all": "npm run install-frontend && npm run install-backend"
   },
   "repository": {
     "type": "git",
@@ -13,19 +18,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Pathum-Piyumal/RoadAware/issues"
   },
   "homepage": "https://github.com/Pathum-Piyumal/RoadAware#readme"
-  "name": "roadaware-root",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "npm run dev --prefix frontend",
-    "build": "npm run build --prefix frontend",
-    "install-frontend": "npm install --prefix frontend",
-    "install-backend": "npm install --prefix backend",
-    "install-all": "npm run install-frontend && npm run install-backend"
-  }
 }
