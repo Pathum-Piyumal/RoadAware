@@ -4,22 +4,21 @@ import {
   LineChart, Line
 } from 'recharts';
 import { areaChartData, hazardTypeData } from '../../utils/dummyData';
-import '../../css/Reports.css'; 
 
 const Analytics = () => {
   return (
-    <div className="admin-reports-container">
-      <div className="admin-reports-header">
+    <div className="flex flex-col gap-6 p-4 lg:p-0 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
         <div>
-          <h1 className="admin-reports-title">Analytics Overview</h1>
-          <p className="admin-reports-subtitle">Deep dive into hazard resolution metrics.</p>
+          <h1 className="text-2xl font-bold text-admin-text tracking-tight m-0">Analytics Overview</h1>
+          <p className="text-admin-text-muted text-sm mt-1 mb-0">Deep dive into hazard resolution metrics.</p>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
-        <div className="admin-table-container" style={{ padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1rem', color: 'var(--admin-text)', marginBottom: '1rem' }}>Resolution Time Trend</h2>
-          <div style={{ height: '300px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-admin-text mb-4 mt-0">Resolution Time Trend</h2>
+          <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={areaChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
@@ -32,9 +31,9 @@ const Analytics = () => {
           </div>
         </div>
 
-        <div className="admin-table-container" style={{ padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1rem', color: 'var(--admin-text)', marginBottom: '1rem' }}>Hazards Distribution</h2>
-          <div style={{ height: '300px' }}>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-admin-text mb-4 mt-0">Hazards Distribution</h2>
+          <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hazardTypeData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />

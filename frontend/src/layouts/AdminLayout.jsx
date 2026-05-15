@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/admin/Sidebar';
 import Navbar from '../components/admin/Navbar';
-import '../css/AdminLayout.css';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,17 +20,17 @@ const AdminLayout = () => {
   }, [isDarkMode]);
 
   return (
-    <div className={`admin-layout-container ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col h-screen max-h-screen w-full flex-auto bg-admin-bg text-admin-text overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
       {/* Navbar (Full Width) */}
       <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       {/* Main Content Area */}
-      <div className="admin-layout-main-wrapper">
+      <div className="flex flex-1 flex-row min-w-0 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <Sidebar isOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Scrollable Content Area */}
-        <main className="admin-layout-content admin-scrollbar">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-admin-bg p-4 sm:p-6 lg:p-8 admin-scrollbar">
           <Outlet />
         </main>
       </div>
