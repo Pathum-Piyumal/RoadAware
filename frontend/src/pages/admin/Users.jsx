@@ -80,7 +80,7 @@ const Users = () => {
               <tr key={user.id}>
                 <td>
                   <div className="admin-table-report-cell">
-                    <div className="admin-user-avatar" style={{ backgroundColor: user.role === 'ADMIN' ? '#1E40AF' : '#3B82F6' }}>
+                    <div className="admin-user-avatar" style={{ backgroundColor: user.role === 'ADMIN' ? '#3B82F6' : '#3B82F6' }}>
                       {getInitials(user.name)}
                     </div>
                     <div>

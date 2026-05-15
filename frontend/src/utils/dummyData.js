@@ -26,7 +26,7 @@ export const hazardTypeData = [
   { name: 'Debris', value: 5, fill: '#6B7280' },
   { name: 'Flooding', value: 5, fill: '#3B82F6' },
   { name: 'Broken Light', value: 5, fill: '#0EA5E9' },
-  { name: 'Damaged Signage', value: 4, fill: '#1E40AF' },
+  { name: 'Damaged Signage', value: 4, fill: '#3B82F6' },
   { name: 'Construction', value: 4, fill: '#D97706' },
   { name: 'Other', value: 4, fill: '#4B5563' },
   { name: 'Ice / Snow', value: 0, fill: '#E5E7EB' },
