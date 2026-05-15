@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Navigation, Loader2 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -57,6 +57,7 @@ const LocationStep = ({ location, onLocationChange }) => {
         setLoading(false);
       },
       (err) => {
+        console.error(err);
         setError("Unable to retrieve your location. Please select it on the map.");
         setLoading(false);
       }
