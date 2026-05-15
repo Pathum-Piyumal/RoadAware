@@ -1,7 +1,7 @@
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Search, Moon, Sun, User, LogOut, Settings } from 'lucide-react';
+import { Search, Moon, Sun, User, LogOut, Settings } from 'lucide-react';
 import logoImg from '../../assets/logo.png';
 import '../../css/Navbar.css';
 

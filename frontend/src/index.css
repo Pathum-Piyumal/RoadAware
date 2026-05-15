@@ -13,20 +13,26 @@
     --admin-sidebar: #ffffff;
     --admin-sidebar-active: #f1f5f9;
     --admin-input-bg: #ffffff;
+    --admin-scrollbar: #94a3b8;
+    --admin-scrollbar-hover: #64748b;
   }
 
   .dark {
-    --admin-bg: #0F172A;
-    --admin-card: #1E293B;
+    --admin-bg: #020617;
+    --admin-card: #0F172A;
     --admin-text: #ffffff;
-    --admin-text-muted: #9ca3af;
-    --admin-border: #334155;
-    --admin-sidebar: #1E293B;
-    --admin-sidebar-active: #334155;
-    --admin-input-bg: #0F172A;
+    --admin-text-muted: #94A3B8;
+    --admin-border: #1E293B;
+    --admin-sidebar: #0F172A;
+    --admin-sidebar-active: rgba(59, 130, 246, 0.15);
+    --admin-input-bg: #0B1120;
+    --admin-scrollbar: #1E293B;
+    --admin-scrollbar-hover: #334155;
   }
 
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
     margin: 0;
     padding: 0;
@@ -47,13 +53,16 @@
   width: 6px;
   height: 6px;
 }
+
 .admin-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .admin-scrollbar::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: var(--admin-scrollbar);
   border-radius: 4px;
 }
+
 .admin-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: var(--admin-scrollbar-hover);
 }
