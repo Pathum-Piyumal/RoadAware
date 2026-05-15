@@ -13,7 +13,6 @@ import {
 import {
   areaChartData, statusData, hazardTypeData, hotspotData, recentActivity
 } from '../../utils/dummyData';
-import '../../css/Dashboard.css';
 
 const Dashboard = () => {
   // Helpers
@@ -28,85 +27,103 @@ const Dashboard = () => {
   };
 
   const getStatusClass = (status) => {
-    return status.toLowerCase().replace(' ', '-');
+    switch (status.toLowerCase().replace(' ', '-')) {
+      case 'resolved': return 'text-emerald-500 bg-emerald-500/10';
+      case 'reported': return 'text-blue-500 bg-blue-500/10';
+      case 'in-progress': return 'text-amber-500 bg-amber-500/10';
+      default: return '';
+    }
   };
 
   const getSeverityClass = (severity) => {
-    return severity.toLowerCase();
+    switch (severity.toLowerCase()) {
+      case 'critical': return 'text-red-500 bg-red-500/10';
+      case 'high': return 'text-amber-500 bg-amber-500/10';
+      case 'medium': return 'text-blue-500 bg-blue-500/10';
+      case 'low': return 'text-emerald-500 bg-emerald-500/10';
+      default: return '';
+    }
   };
 
   return (
-    <div className="admin-dashboard-container">
+    <div className="flex flex-col gap-6 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+      
       {/* Header */}
-      <div className="admin-dashboard-header">
-        <h1 className="admin-dashboard-title">Dashboard</h1>
-        <p className="admin-dashboard-subtitle">Real-time view of road hazard reports across the city.</p>
+      <div className="mb-2">
+        <h1 className="text-2xl font-bold text-admin-text tracking-tight m-0">Dashboard</h1>
+        <p className="text-admin-text-muted text-sm mt-1">Real-time view of road hazard reports across the city.</p>
       </div>
 
       {/* Row 1: Stats Grid */}
-      <div className="admin-dashboard-stats-grid">
-        <div className="admin-dashboard-stat-card">
-          <div className="admin-dashboard-stat-header">
-            <div className="admin-dashboard-stat-icon-wrapper" style={{ color: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.1)' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.1)' }}>
               <AlertTriangle size={20} />
             </div>
-            <div className="admin-dashboard-stat-trend up">
+            <div className="text-xs font-semibold flex items-center gap-1 text-emerald-500">
               <ArrowUpRight size={14} /> +12%
             </div>
           </div>
-          <p className="admin-dashboard-stat-value">32</p>
-          <p className="admin-dashboard-stat-label">Total reports</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">32</p>
+          <p className="text-sm text-admin-text-muted m-0">Total reports</p>
         </div>
 
-        <div className="admin-dashboard-stat-card">
-          <div className="admin-dashboard-stat-header">
-            <div className="admin-dashboard-stat-icon-wrapper" style={{ color: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)' }}>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)' }}>
               <CheckCircle2 size={20} />
             </div>
-            <div className="admin-dashboard-stat-trend up">
+            <div className="text-xs font-semibold flex items-center gap-1 text-emerald-500">
               <ArrowUpRight size={14} /> +5%
             </div>
           </div>
-          <p className="admin-dashboard-stat-value">28%</p>
-          <p className="admin-dashboard-stat-label">Resolution rate</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">28%</p>
+          <p className="text-sm text-admin-text-muted m-0">Resolution rate</p>
         </div>
 
-        <div className="admin-dashboard-stat-card">
-          <div className="admin-dashboard-stat-header">
-            <div className="admin-dashboard-stat-icon-wrapper" style={{ color: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.1)' }}>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.1)' }}>
               <Clock size={20} />
             </div>
-            <div className="admin-dashboard-stat-trend down">
+            <div className="text-xs font-semibold flex items-center gap-1 text-red-500">
               <ArrowDownRight size={14} /> -3%
             </div>
           </div>
-          <p className="admin-dashboard-stat-value">9</p>
-          <p className="admin-dashboard-stat-label">In progress</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">9</p>
+          <p className="text-sm text-admin-text-muted m-0">In progress</p>
         </div>
 
-        <div className="admin-dashboard-stat-card">
-          <div className="admin-dashboard-stat-header">
-            <div className="admin-dashboard-stat-icon-wrapper" style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)' }}>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)' }}>
               <AlertOctagon size={20} />
             </div>
-            <div className="admin-dashboard-stat-trend up" style={{ color: '#EF4444' }}>
+            <div className="text-xs font-semibold flex items-center gap-1 text-red-500">
               <ArrowUpRight size={14} /> +2
             </div>
           </div>
-          <p className="admin-dashboard-stat-value">5</p>
-          <p className="admin-dashboard-stat-label">Critical open</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">5</p>
+          <p className="text-sm text-admin-text-muted m-0">Critical open</p>
         </div>
       </div>
 
       {/* Row 2: Charts */}
-      <div className="admin-dashboard-row-2">
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
         {/* Area Chart */}
-        <div className="admin-dashboard-card">
-          <div className="admin-dashboard-card-header">
-            <h2 className="admin-dashboard-card-title">Reports vs resolutions</h2>
-            <p className="admin-dashboard-card-subtitle">Last 14 days</p>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-admin-text m-0">Reports vs resolutions</h2>
+            <p className="text-xs text-admin-text-muted mt-1 mb-0">Last 14 days</p>
           </div>
-          <div className="admin-dashboard-chart-container">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={areaChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -134,12 +151,12 @@ const Dashboard = () => {
         </div>
 
         {/* Donut Chart */}
-        <div className="admin-dashboard-card">
-          <div className="admin-dashboard-card-header">
-            <h2 className="admin-dashboard-card-title">Status breakdown</h2>
-            <p className="admin-dashboard-card-subtitle">All reports</p>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-admin-text m-0">Status breakdown</h2>
+            <p className="text-xs text-admin-text-muted mt-1 mb-0">All reports</p>
           </div>
-          <div className="admin-dashboard-chart-container" style={{ height: '14rem' }}>
+          <div className="h-[14rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -163,10 +180,10 @@ const Dashboard = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="admin-dashboard-pie-legend">
+          <div className="flex flex-wrap gap-4 mt-4 justify-center">
             {statusData.map((item) => (
-              <div key={item.name} className="admin-dashboard-pie-legend-item">
-                <div className="admin-dashboard-pie-legend-color" style={{ backgroundColor: item.color }}></div>
+              <div key={item.name} className="flex items-center gap-2 text-xs text-admin-text">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
                 <span>{item.name} <strong style={{ color: '#fff', marginLeft: '4px' }}>{item.value}</strong></span>
               </div>
             ))}
@@ -175,14 +192,14 @@ const Dashboard = () => {
       </div>
 
       {/* Row 3: Bar Chart & Hotspots */}
-      <div className="admin-dashboard-row-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Hazards by type */}
-        <div className="admin-dashboard-card">
-          <div className="admin-dashboard-card-header">
-            <h2 className="admin-dashboard-card-title">Hazards by type</h2>
-            <p className="admin-dashboard-card-subtitle">All time</p>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-admin-text m-0">Hazards by type</h2>
+            <p className="text-xs text-admin-text-muted mt-1 mb-0">All time</p>
           </div>
-          <div className="admin-dashboard-chart-container">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hazardTypeData} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
@@ -203,27 +220,27 @@ const Dashboard = () => {
         </div>
 
         {/* Top Hotspots */}
-        <div className="admin-dashboard-card">
-          <div className="admin-dashboard-card-header">
-            <h2 className="admin-dashboard-card-title">Top hotspots</h2>
-            <p className="admin-dashboard-card-subtitle">Areas with most reports</p>
+        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-base font-semibold text-admin-text m-0">Top hotspots</h2>
+            <p className="text-xs text-admin-text-muted mt-1 mb-0">Areas with most reports</p>
           </div>
-          <div className="admin-dashboard-hotspot-list">
+          <div className="flex flex-col gap-4">
             {hotspotData.map((spot, idx) => (
-              <div key={spot.id} className="admin-dashboard-hotspot-item">
-                <div className="admin-dashboard-hotspot-header">
+              <div key={spot.id} className="flex flex-col gap-1">
+                <div className="flex justify-between items-center text-sm text-admin-text">
                   <div>
-                    <span className="admin-dashboard-hotspot-rank">{idx + 1}</span>
+                    <span className="font-semibold text-admin-text-muted mr-2 inline-block w-4">{idx + 1}</span>
                     <span style={{ color: '#fff', fontSize: '0.875rem' }}>{spot.name}</span>
                   </div>
                   <div>
-                    <span className="admin-dashboard-hotspot-count">{spot.count}</span>
-                    <span className="admin-dashboard-hotspot-count-sub">reports</span>
+                    <span className="font-semibold text-admin-text">{spot.count}</span>
+                    <span className="text-admin-text-muted text-xs font-normal ml-1">reports</span>
                   </div>
                 </div>
-                <div className="admin-dashboard-hotspot-bar-bg">
+                <div className="h-1.5 w-full bg-admin-bg rounded-full overflow-hidden">
                   <div
-                    className="admin-dashboard-hotspot-bar-fill"
+                    className="h-full bg-blue-500 rounded-full"
                     style={{ width: `${(spot.count / spot.max) * 100}%` }}
                   ></div>
                 </div>
@@ -234,31 +251,31 @@ const Dashboard = () => {
       </div>
 
       {/* Row 4: Recent Activity */}
-      <div className="admin-dashboard-card">
-        <div className="admin-dashboard-activity-header">
-          <h2 className="admin-dashboard-card-title">Recent activity</h2>
-          <Link to="/admin/reports" className="admin-dashboard-activity-view-all">View all &rarr;</Link>
+      <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-base font-semibold text-admin-text m-0">Recent activity</h2>
+          <Link to="/admin/reports" className="text-sm text-blue-500 no-underline font-medium">View all &rarr;</Link>
         </div>
 
-        <div className="admin-dashboard-activity-list">
+        <div className="flex flex-col">
           {recentActivity.map((activity) => (
-            <div key={activity.id} className="admin-dashboard-activity-item">
-              <div className="admin-dashboard-activity-left">
-                <div className="admin-dashboard-activity-icon">
+            <div key={activity.id} className="flex items-start justify-between py-4 border-b border-admin-border last:border-0 last:pb-0">
+              <div className="flex gap-4">
+                <div className="text-amber-500 mt-1">
                   {getIcon(activity.type)}
                 </div>
                 <div>
-                  <h3 className="admin-dashboard-activity-title">{activity.title}</h3>
-                  <p className="admin-dashboard-activity-meta">
+                  <h3 className="text-sm font-medium text-admin-text m-0">{activity.title}</h3>
+                  <p className="text-xs text-admin-text-muted mt-1 mb-0">
                     {activity.id} &middot; {activity.location} &middot; {activity.time}
                   </p>
                 </div>
               </div>
-              <div className="admin-dashboard-activity-right">
-                <span className={`admin-badge status-${getStatusClass(activity.status)}`}>
+              <div className="flex gap-2 items-center">
+                <span className={`px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border border-current ${getStatusClass(activity.status)}`}>
                   {activity.status}
                 </span>
-                <span className={`admin-badge severity-${getSeverityClass(activity.severity)}`}>
+                <span className={`px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border border-current ${getSeverityClass(activity.severity)}`}>
                   {activity.severity}
                 </span>
               </div>

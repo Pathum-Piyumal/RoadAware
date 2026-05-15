@@ -9,7 +9,6 @@ import {
   Settings,
   Bell
 } from 'lucide-react';
-import '../../css/Sidebar.css';
 
 const Sidebar = ({ isOpen, setSidebarOpen }) => {
   const navigation = [
@@ -27,34 +26,42 @@ const Sidebar = ({ isOpen, setSidebarOpen }) => {
       {/* Mobile sidebar backdrop */}
       {isOpen && (
         <div 
-          className="admin-sidebar-backdrop"
+          className="fixed inset-0 top-16 bg-black/50 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`admin-sidebar-container ${isOpen ? 'open' : ''}`}>
+      <div className={`fixed top-16 bottom-0 left-0 z-30 w-64 bg-admin-sidebar transition-transform duration-300 ease-in-out border-r border-admin-border lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         
-        <div className="admin-sidebar-scroll-area">
-          <ul className="admin-sidebar-nav">
-            <li className="admin-sidebar-nav-title">
+        <div className="h-full flex flex-col">
+          <ul className="flex-1 py-6 flex flex-col gap-2 overflow-y-auto m-0 p-0 list-none admin-scrollbar">
+            <li className="px-6 pb-2 text-xs font-semibold uppercase tracking-wider text-admin-text-muted opacity-70">
               Menu
             </li>
             
             {navigation.map((item) => (
-              <li key={item.name} className="admin-sidebar-nav-item">
+              <li key={item.name} className="m-0 p-0">
                 <NavLink
                   to={item.to}
                   end={item.exact}
                   className={({ isActive }) =>
-                    `admin-sidebar-link ${isActive ? 'active' : ''}`
+                    `flex items-center px-6 py-3.5 no-underline transition-all duration-200 text-base group hover:bg-admin-sidebar-active ${
+                      isActive 
+                        ? 'bg-admin-sidebar-active text-blue-500 border-r-[3px] border-blue-500 font-medium' 
+                        : 'text-admin-text-muted font-normal hover:text-admin-text border-r-[3px] border-transparent'
+                    }`
                   }
                   onClick={() => setSidebarOpen(false)} // close sidebar on mobile after click
                 >
-                  <span className="admin-sidebar-link-icon-wrapper">
-                    <item.icon size={20} />
-                  </span>
-                  <span className="admin-sidebar-link-text">{item.name}</span>
+                  {({ isActive }) => (
+                    <>
+                      <span className={`mr-5 flex items-center transition-opacity duration-200 ${isActive ? 'opacity-100 text-blue-500' : 'opacity-80 group-hover:opacity-100 group-hover:text-admin-text'}`}>
+                        <item.icon size={20} />
+                      </span>
+                      <span className="flex-1">{item.name}</span>
+                    </>
+                  )}
                 </NavLink>
               </li>
             ))}
