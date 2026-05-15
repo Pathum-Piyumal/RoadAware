@@ -7,6 +7,8 @@ import ReportHazard from './pages/citizen/ReportHazard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
+import VerifyCode from './pages/auth/VerifyCode';
+import ResetPassword from './pages/auth/ResetPassword';
 import Profile from './pages/citizen/Profile';
 import Dashboard from './pages/citizen/Dashboard';
 import HazardDetails from './pages/public/HazardDetails';
@@ -20,6 +22,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-code" element={<VerifyCode />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile />} />
           
           <Route path="/dashboard" element={<Dashboard />} />
