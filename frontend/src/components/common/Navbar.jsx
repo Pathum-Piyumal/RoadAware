@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   const location = useLocation();
@@ -15,12 +15,10 @@ const Navbar = () => {
     }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 34, height: 34, background: '#f97316', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ShieldCheck size={18} color="#fff" />
-          </div>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <img src={logo} alt="RoadAware Logo" style={{ width: 34, height: 34, objectFit: 'contain', borderRadius: 8 }} />
           <span style={{ fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '-0.5px' }}>RoadAware</span>
-        </div>
+        </Link>
 
         {/* Nav Links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>

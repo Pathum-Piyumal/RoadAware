@@ -1,4 +1,5 @@
-import { ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 const Footer = () => (
   <footer style={{ background: '#050505', color: '#fff', padding: '72px 32px 32px' }}>
@@ -6,12 +7,10 @@ const Footer = () => (
       <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 64, marginBottom: 64 }}>
         {/* Brand */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 36, height: 36, background: '#f97316', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ShieldCheck size={20} color="#fff" />
-            </div>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, textDecoration: 'none', color: 'inherit' }}>
+            <img src={logo} alt="RoadAware Logo" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 10 }} />
             <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.5px' }}>RoadAware</span>
-          </div>
+          </Link>
           <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.8, maxWidth: 300 }}>
             RoadAware is a community-driven platform dedicated to improving road safety through
             transparent reporting and verified hazard data for local authorities.
