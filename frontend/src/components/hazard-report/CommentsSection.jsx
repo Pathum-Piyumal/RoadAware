@@ -36,13 +36,13 @@ const CommentsSection = ({ hazardId }) => {
   };
 
   return (
-    <div className="bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-black/50 border border-white/10">
-      <h3 className="text-xl font-bold text-white mb-6">Community Updates ({comments.length})</h3>
+    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
+      <h3 className="text-xl font-bold text-slate-900 mb-6">Community Updates ({comments.length})</h3>
       
       {/* Add Comment Input */}
       <form onSubmit={handleSubmit} className="mb-8 flex gap-3">
         <div className="flex-shrink-0">
-          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10">
+          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
             <UserCircle2 size={24} className="text-gray-400" />
           </div>
         </div>
@@ -52,12 +52,12 @@ const CommentsSection = ({ hazardId }) => {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Add an update or comment..."
-            className="w-full bg-[#1a1a1a] text-white rounded-xl px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-orange-500/50 border border-white/5 transition-all"
+            className="w-full bg-slate-50 text-slate-900 rounded-xl px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500/50 border border-gray-200 transition-all placeholder:text-gray-400"
           />
           <button 
             type="submit"
             disabled={!newComment.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:hover:bg-orange-500 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors"
           >
             <Send size={16} />
           </button>
@@ -71,14 +71,14 @@ const CommentsSection = ({ hazardId }) => {
             <img 
               src={comment.user.avatar} 
               alt={comment.user.name} 
-              className="w-10 h-10 rounded-full object-cover shadow-sm border border-white/10 flex-shrink-0" 
+              className="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-100 flex-shrink-0" 
             />
             <div className="flex-grow">
               <div className="flex items-baseline justify-between mb-1">
-                <span className="font-bold text-white/90">{comment.user.name}</span>
+                <span className="font-bold text-slate-900">{comment.user.name}</span>
                 <span className="text-xs text-gray-500 font-medium">{comment.timestamp}</span>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed bg-[#1a1a1a] p-3 rounded-2xl rounded-tl-none border border-white/5">
+              <p className="text-slate-600 text-sm leading-relaxed bg-slate-50 p-3 rounded-2xl rounded-tl-none border border-gray-100">
                 {comment.text}
               </p>
             </div>
