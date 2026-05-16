@@ -26,7 +26,7 @@ const Footer = () => (
                 { label: 'Careers', path: '/careers' }
             ] },
             { heading: 'Support',  links: [
-                { label: 'Help Center', path: '#' }, 
+                { label: 'Help Center', path: '/help-center' }, 
                 { label: 'Safety Tips', path: '#' }, 
                 { label: 'Contact', path: '#' }
             ] },
