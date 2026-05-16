@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-import Step1Details from '../../components/hazard-report/Step1Details';
-import Step2Location from '../../components/hazard-report/Step2Location';
-import Step3Review from '../../components/hazard-report/Step3Review';
+import Step1Details from '../../components/hazard-report/DetailsStep';
+import Step2Location from '../../components/hazard-report/LocationStep';
+import Step3Review from '../../components/hazard-report/ReviewStep';
 
 const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);

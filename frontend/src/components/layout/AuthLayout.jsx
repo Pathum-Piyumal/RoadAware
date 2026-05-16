@@ -25,7 +25,7 @@ const AuthLayout = ({ children }) => {
 
           {/* Right Visual Side */}
           <div className="hidden md:flex w-1/2 bg-gradient-to-br from-blue-900/40 to-black items-center justify-center relative">
-             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #3b82f6 1px, transparent 1px)', size: '20px 20px' }}></div>
+             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #3b82f6 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
              <div className="relative group">
                 <div className="absolute -inset-4 bg-cyan-500/30 rounded-full blur-2xl group-hover:bg-cyan-500/50 transition duration-500"></div>
                 <Shield size={180} className="text-cyan-400 relative drop-shadow-[0_0_25px_rgba(34,211,238,0.5)]" />
