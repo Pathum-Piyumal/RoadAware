@@ -26,7 +26,7 @@ const VerifyCode = () => {
         Verification code has been sent via email to E********@example.com
       </p>
 
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <input 
           type="text" 
           placeholder="Enter the Code" 
@@ -38,7 +38,18 @@ const VerifyCode = () => {
         </button>
 
         <p className="text-gray-400 text-center text-sm">
-          Didn't receive it? <span className="text-cyan-400 cursor-pointer hover:underline">Resend code in {formatTime(timeLeft)} (0/3)</span>
+          Didn't receive it?{' '}
+          {timeLeft > 0 ? (
+            <span className="text-cyan-400">Resend code in {formatTime(timeLeft)} (0/3)</span>
+          ) : (
+            <button 
+              type="button" 
+              onClick={() => setTimeLeft(179)} 
+              className="text-cyan-400 hover:underline font-bold"
+            >
+              Resend code now (0/3)
+            </button>
+          )}
         </p>
         <div className="text-center mt-4">
           <Link to="/login" className="text-gray-500 text-sm hover:text-white transition-colors">Back to Login</Link>
