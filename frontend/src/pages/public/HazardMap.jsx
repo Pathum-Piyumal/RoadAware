@@ -1,6 +1,4 @@
 import { useState, useMemo } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
-import { useState } from 'react';
 import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp, X, AlertTriangle, MessageCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -31,26 +29,7 @@ const initialHazards = [
   { id: 9, lat: 6.9050, lng: 79.8700, type: "Animal", severity: "Low", status: "Reported", title: "Stray Animal Warning", location: "Wellawatte, Colombo", time: "1 day ago by User I", upvotes: 18 },
   { id: 10, lat: 6.9320, lng: 79.8400, type: "Construction", severity: "High", status: "In Progress", title: "Unmarked Road Work Zone", location: "Baseline Road, Colombo", time: "6 hours ago by User J", upvotes: 71 },
   { id: 11, lat: 6.9550, lng: 79.8550, type: "Pothole", severity: "Critical", status: "Reported", title: "Deep Pothole near Bridge", location: "Orugodawatte, Colombo", time: "4 hours ago by User K", upvotes: 112 },
-  { id: 12, lat: 6.9230, lng: 79.8450, type: "Construction", severity: "Medium", status: "Reported", title: "Damaged Road Barrier", location: "Havelock Road, Colombo", time: "1 day ago by User L", upvotes: 56 },
-const hazards = [
-  { id: 1, lat: 51.556, lng: -0.297, title: "Pothole: A4006 Wembley" },
-  { id: 2, lat: 51.565, lng: -0.285, title: "Flooding: High Road" },
-  { id: 3, lat: 51.545, lng: -0.305, title: "Debris: Ealing Road" }
-];
-
-const gridHazards = [
-  { id: 1, type: "Pothole", severity: "Low", title: "Widespread Pothole Area", location: "102 Main Road, Colombo", time: "15 days ago by User A", upvotes: 28, description: "Multiple potholes spanning a 200m stretch. Very dangerous for motorcycles and smaller vehicles, especially during rain." },
-  { id: 2, type: "Flooding", severity: "High", title: "Central station fully submerged", location: "15 Station Rd, Kandy", time: "2 days ago by User B", upvotes: 112, description: "The central station underpass is completely flooded after yesterday's heavy rainfall. Water level is at knee height." },
-  { id: 3, type: "Pothole", severity: "High", title: "Massive Pothole near junction", location: "28 Galle Road, Bentota", time: "18 days ago by User C", upvotes: 14, description: "A deep pothole has formed near the main junction. It's almost invisible at night and has caused several flat tires." },
-  { id: 4, type: "Debris", severity: "Critical", title: "Hazardous debris on road", location: "44 Temple St, Anuradhapura", time: "12 days ago by User D", upvotes: 82, description: "Construction debris has been left on the road after building work. Includes nails, broken concrete, and metal rods." },
-  { id: 5, type: "Pothole", severity: "Low", title: "Minor potholes near bridge", location: "Bridge Ave, Galle", time: "20 days ago by User E", upvotes: 34, description: "Several small potholes have appeared near the old bridge. Not dangerous yet but getting worse after each rain." },
-  { id: 6, type: "Construction", severity: "Medium", title: "Unmarked construction zone", location: "40 Kandy Road, Kurunegala", time: "25 days ago by User F", upvotes: 71, description: "A construction zone on the main road has no proper signage or barriers. Especially dangerous at night." },
-  { id: 7, type: "Flooding", severity: "High", title: "Multiple flooding points in center", location: "Center St, Jaffna", time: "22 days ago by User G", upvotes: 18, description: "Three separate flooding points have appeared in the town center after the drainage system failed." },
-  { id: 8, type: "Debris", severity: "Critical", title: "Boulder blocking mountain road", location: "Mountain Pass, Nuwara Eliya", time: "15 days ago by User H", upvotes: 140, description: "A large boulder has rolled onto the mountain road after a landslide. Only one lane is passable." },
-  { id: 9, type: "Streetlight", severity: "Low", title: "Broken streetlight series", location: "Park Lane, Negombo", time: "5 days ago by User I", upvotes: 42, description: "A series of 5 streetlights along Park Lane have all gone out, making the road very dark and unsafe at night." },
-  { id: 10, type: "Animal", severity: "Medium", title: "Stray dog pack on highway", location: "Highway A1 exit, Kelaniya", time: "1 day ago by User J", upvotes: 56, description: "A large pack of stray dogs is congregating near the highway exit ramp, posing a danger to motorcyclists." },
-  { id: 11, type: "Construction", severity: "High", title: "Open manhole left unattended", location: "700 South St, Matara", time: "6 days ago by User K", upvotes: 97, description: "An open manhole has been left without a cover or barriers after maintenance work. Extremely dangerous." },
-  { id: 12, type: "Pothole", severity: "Critical", title: "Deep pothole near junction", location: "88 Junction, Badulla", time: "10 days ago by User L", upvotes: 130, description: "A very deep pothole has formed at a busy junction. Several vehicles have been damaged. Urgent repair needed." },
+  { id: 12, lat: 6.9230, lng: 79.8450, type: "Construction", severity: "Medium", status: "Reported", title: "Damaged Road Barrier", location: "Havelock Road, Colombo", time: "1 day ago by User L", upvotes: 56, description: "A very deep pothole has formed at a busy junction. Several vehicles have been damaged. Urgent repair needed." },
 ];
 
 
@@ -213,9 +192,6 @@ export default function HazardMap() {
               <MapContainer 
                 center={[6.9271, 79.8612]} 
                 zoom={13} 
-              <MapContainer
-                center={[51.556, -0.297]}
-                zoom={13}
                 className={styles.map}
                 zoomControl={false}
               >

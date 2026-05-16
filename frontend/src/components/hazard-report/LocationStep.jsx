@@ -36,7 +36,13 @@ const LocationPicker = ({ onLocationChange }) => {
   return null;
 };
 
-const LocationStep = ({ location, onLocationChange }) => {
+const LocationStep = ({ formData, updateData }) => {
+  const location = formData.location;
+  
+  const onLocationChange = (loc) => {
+    updateData({ location: loc, address: 'Map Location' });
+  };
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 

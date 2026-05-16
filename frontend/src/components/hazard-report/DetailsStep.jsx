@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import { Camera, X, FileText, Upload } from 'lucide-react';
+import { Camera, X, FileText, Upload, AlertTriangle, Type } from 'lucide-react';
 
-const DetailsStep = ({ image, description, onImageChange, onDescriptionChange }) => {
+const DetailsStep = ({ formData, updateData }) => {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -9,14 +9,14 @@ const DetailsStep = ({ image, description, onImageChange, onDescriptionChange })
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        onImageChange(reader.result);
+        updateData({ image: reader.result });
       };
       reader.readAsDataURL(file);
     }
   };
 
   const removeImage = () => {
-    onImageChange(null);
+    updateData({ image: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -24,10 +24,47 @@ const DetailsStep = ({ image, description, onImageChange, onDescriptionChange })
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h2 className="text-xl font-semibold mb-2">Add photos and details</h2>
-      <p className="text-gray-500 mb-8">A clear photo helps our teams prioritize the fix.</p>
+      <h2 className="text-xl font-semibold mb-2">Add details and photos</h2>
+      <p className="text-gray-500 mb-8">Provide clear information to help teams prioritize the fix.</p>
 
       <div className="space-y-6">
+        {/* Title Area */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <Type size={18} className="text-orange-500" />
+            Report Title <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.title}
+            onChange={(e) => updateData({ title: e.target.value })}
+            placeholder="e.g. Deep pothole on Main St"
+            className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all shadow-sm"
+          />
+        </div>
+
+        {/* Type Area */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <AlertTriangle size={18} className="text-orange-500" />
+            Hazard Type <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={formData.type}
+            onChange={(e) => updateData({ type: e.target.value })}
+            className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all shadow-sm appearance-none"
+          >
+            <option value="" disabled>Select a hazard type...</option>
+            <option value="Pothole">Pothole</option>
+            <option value="Flooding">Flooding</option>
+            <option value="Debris">Debris/Object</option>
+            <option value="Construction">Construction</option>
+            <option value="Streetlight">Broken Streetlight</option>
+            <option value="Animal">Animal</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
         {/* Image Upload Area */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -35,9 +72,9 @@ const DetailsStep = ({ image, description, onImageChange, onDescriptionChange })
             Hazard Photo
           </label>
           
-          {image ? (
+          {formData.image ? (
             <div className="relative rounded-2xl overflow-hidden border-2 border-orange-100 shadow-sm group">
-              <img src={image} alt="Hazard preview" className="w-full h-48 object-cover" />
+              <img src={formData.image} alt="Hazard preview" className="w-full h-48 object-cover" />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button
                   onClick={removeImage}
@@ -75,8 +112,8 @@ const DetailsStep = ({ image, description, onImageChange, onDescriptionChange })
             Additional Details (Optional)
           </label>
           <textarea
-            value={description}
-            onChange={(e) => onDescriptionChange(e.target.value)}
+            value={formData.description}
+            onChange={(e) => updateData({ description: e.target.value })}
             placeholder="Describe the hazard... (e.g. Depth of pothole, number of vehicles involved)"
             className="w-full h-32 p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all resize-none shadow-sm"
           />
