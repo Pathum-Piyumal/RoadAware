@@ -67,14 +67,14 @@ export default function HazardMap() {
 
       <main className={styles.mainContent}>
         <div className={styles.container}>
-          
+
           {/* Filters Bar */}
           <div className={styles.filterBar}>
             <div className={styles.searchContainer}>
               <Search size={18} className={styles.searchIcon} />
-              <input 
-                type="text" 
-                placeholder="Search address, area, or ID..." 
+              <input
+                type="text"
+                placeholder="Search address, area, or ID..."
                 className={styles.searchInput}
               />
             </div>
@@ -95,13 +95,13 @@ export default function HazardMap() {
             </div>
 
             <div className={styles.viewToggle}>
-              <button 
+              <button
                 className={`${styles.toggleBtn} ${viewMode === 'map' ? styles.activeToggle : ''}`}
                 onClick={() => setViewMode('map')}
               >
                 <Map size={16} />
               </button>
-              <button 
+              <button
                 className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.activeToggle : ''}`}
                 onClick={() => setViewMode('grid')}
               >
@@ -116,8 +116,8 @@ export default function HazardMap() {
               <Filter size={14} />
               <strong>32</strong> of 32 hazards
             </div>
-            <button 
-              className={styles.heatmapToggle} 
+            <button
+              className={styles.heatmapToggle}
               onClick={() => setIsHeatmap(!isHeatmap)}
               style={{ background: isHeatmap ? '#fee2e2' : 'transparent', color: isHeatmap ? '#ef4444' : 'inherit' }}
             >
@@ -129,22 +129,22 @@ export default function HazardMap() {
           {/* Content Area (Map or Grid) */}
           {viewMode === 'map' ? (
             <div className={styles.mapWrapper}>
-              <MapContainer 
-                center={[51.556, -0.297]} 
-                zoom={13} 
+              <MapContainer
+                center={[51.556, -0.297]}
+                zoom={13}
                 className={styles.map}
                 zoomControl={false}
               >
-                <TileLayer 
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 {hazards.map(hazard => (
                   isHeatmap ? (
-                    <CircleMarker 
-                      key={hazard.id} 
-                      center={[hazard.lat, hazard.lng]} 
-                      pathOptions={{ color: 'transparent', fillColor: '#ef4444', fillOpacity: 0.6 }} 
+                    <CircleMarker
+                      key={hazard.id}
+                      center={[hazard.lat, hazard.lng]}
+                      pathOptions={{ color: 'transparent', fillColor: '#ef4444', fillOpacity: 0.6 }}
                       radius={35}
                     >
                       <Popup>{hazard.title} (Heat Zone)</Popup>
@@ -175,8 +175,8 @@ export default function HazardMap() {
                   </div>
                   <div className={styles.cardFooter}>
                     <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} />
-                    <button 
-                      onClick={() => handleOpenPanel(hazard)} 
+                    <button
+                      onClick={() => handleOpenPanel(hazard)}
                       className={styles.detailsLink}
                     >
                       Details &gt;
@@ -194,14 +194,14 @@ export default function HazardMap() {
       {selectedHazard && (
         <>
           {/* Backdrop overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
             onClick={handleClosePanel}
           />
 
           {/* Panel */}
           <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-50 overflow-y-auto animate-slide-in-right flex flex-col">
-            
+
             {/* Panel Header */}
             <div className="sticky top-0 bg-white z-10 px-8 pt-8 pb-4 border-b border-gray-100">
               <div className="flex justify-between items-start">
@@ -216,7 +216,7 @@ export default function HazardMap() {
                   </div>
                   <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{selectedHazard.title}</h2>
                 </div>
-                <button 
+                <button
                   onClick={handleClosePanel}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -227,7 +227,7 @@ export default function HazardMap() {
 
             {/* Panel Body */}
             <div className="flex-1 px-8 py-6 space-y-6">
-              
+
               {/* Image Placeholder */}
               <div className="h-48 w-full bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
                 <span className="text-sm font-semibold">Attached Image (Placeholder)</span>
