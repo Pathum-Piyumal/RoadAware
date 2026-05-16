@@ -69,16 +69,16 @@ const Hero = () => (
 
         {/* CTAs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 36 }}>
-          <Link to="/report-hazard" style={{
+          <Link to="/login" style={{
             background: '#fff', color: '#111', padding: '14px 32px',
             borderRadius: 12, fontWeight: 800, fontSize: 15, textDecoration: 'none',
             boxShadow: '0 8px 32px rgba(255,255,255,0.1)',
           }}>
             Get started
           </Link>
-          <button style={{ color: '#fff', fontWeight: 700, fontSize: 15, background: 'none', border: 'none', cursor: 'pointer', borderBottom: '2px solid rgba(255,255,255,0.25)', paddingBottom: 2 }}>
-            How it works
-          </button>
+          <Link to="/map" style={{ color: '#fff', fontWeight: 700, fontSize: 15, background: 'none', border: 'none', cursor: 'pointer', borderBottom: '2px solid rgba(255,255,255,0.25)', paddingBottom: 2, textDecoration: 'none' }}>
+            Explore the map
+          </Link>
         </div>
 
         {/* Avatars + Rating */}
