@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -39,6 +39,7 @@ const gridHazards = [
 
 export default function HazardMap() {
   const [viewMode, setViewMode] = useState('grid'); // Default to 'grid' to match design step 2
+  const [isHeatmap, setIsHeatmap] = useState(false);
 
   return (
     <div className={styles.pageContainer}>
@@ -104,9 +105,13 @@ export default function HazardMap() {
               <Filter size={14} />
               <strong>32</strong> of 32 hazards
             </div>
-            <button className={styles.heatmapToggle}>
-              <Flame size={14} />
-              Heatmap OFF
+            <button 
+              className={styles.heatmapToggle} 
+              onClick={() => setIsHeatmap(!isHeatmap)}
+              style={{ background: isHeatmap ? '#fee2e2' : 'transparent', color: isHeatmap ? '#ef4444' : 'inherit' }}
+            >
+              <Flame size={14} color={isHeatmap ? '#ef4444' : 'currentColor'} />
+              Heatmap {isHeatmap ? 'ON' : 'OFF'}
             </button>
           </div>
 
@@ -124,9 +129,20 @@ export default function HazardMap() {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 {hazards.map(hazard => (
-                  <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
-                    <Popup>{hazard.title}</Popup>
-                  </Marker>
+                  isHeatmap ? (
+                    <CircleMarker 
+                      key={hazard.id} 
+                      center={[hazard.lat, hazard.lng]} 
+                      pathOptions={{ color: 'transparent', fillColor: '#ef4444', fillOpacity: 0.6 }} 
+                      radius={35}
+                    >
+                      <Popup>{hazard.title} (Heat Zone)</Popup>
+                    </CircleMarker>
+                  ) : (
+                    <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
+                      <Popup>{hazard.title}</Popup>
+                    </Marker>
+                  )
                 ))}
               </MapContainer>
             </div>
