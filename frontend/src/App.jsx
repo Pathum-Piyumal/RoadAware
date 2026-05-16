@@ -36,14 +36,16 @@ import Footer from './components/common/Footer';
 function AppContent() {
   const location = useLocation();
 
-  // Hide navbar and footer on admin pages
+  // Hide navbar and footer on admin and auth pages
   const isAdminPage = location.pathname.startsWith('/admin');
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/verify-code', '/reset-password'].includes(location.pathname);
+  const hideNavAndFooter = isAdminPage || isAuthPage;
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col">
 
-      {/* Show Navbar only on non-admin pages */}
-      {!isAdminPage && <Navbar />}
+      {/* Show Navbar conditionally */}
+      {!hideNavAndFooter && <Navbar />}
 
       <main className="flex-grow">
         <Routes>
@@ -82,8 +84,8 @@ function AppContent() {
         </Routes>
       </main>
 
-      {/* Show Footer only on non-admin pages */}
-      {!isAdminPage && <Footer />}
+      {/* Show Footer conditionally */}
+      {!hideNavAndFooter && <Footer />}
 
       <Toaster position="top-right" />
     </div>

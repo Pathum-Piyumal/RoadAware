@@ -32,11 +32,11 @@ const Navbar = () => {
 
         {/* CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <button style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}>Login</button>
-          <Link to="/report-hazard" style={{
+          <Link to="/login" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'none' }}>Login</Link>
+          <Link to="/register" style={{
             background: '#fff', color: '#111', padding: '9px 22px', borderRadius: 999,
             fontSize: 13, fontWeight: 700, textDecoration: 'none', letterSpacing: '-0.2px',
-          }}>Get started</Link>
+          }}>Register</Link>
         </div>
       </div>
     </nav>

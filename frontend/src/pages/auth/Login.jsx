@@ -1,5 +1,6 @@
 import React from 'react';
-import AuthLayout from '../components/AuthLayout';
+import { Link } from 'react-router-dom';
+import AuthLayout from '../../components/layout/AuthLayout';
 
 const Login = () => {
   return (
@@ -20,12 +21,12 @@ const Login = () => {
       <form className="space-y-4">
         <div>
           <label className="text-gray-400 text-sm mb-2 block">Email</label>
-          <input type="email" placeholder="you@example.com" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="email" placeholder="you@example.com" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" />
         </div>
         <div className="relative">
           <label className="text-gray-400 text-sm mb-2 block">Password</label>
-          <input type="password" placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <button type="button" className="absolute right-0 top-0 text-blue-500 text-xs font-semibold hover:underline">Forgot Password?</button>
+          <input type="password" placeholder="••••••••" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+          <Link to="/forgot-password" className="absolute right-0 top-0 text-cyan-400 text-xs font-semibold hover:underline">Forgot Password?</Link>
         </div>
         <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
           Sign in <span className="text-xl">→</span>
@@ -33,8 +34,10 @@ const Login = () => {
       </form>
 
       <p className="text-gray-400 text-sm mt-8 text-center">
-        Don't have an account? <a href="#" className="text-white font-bold hover:underline">Create an account</a>
+        Don't have an account? <Link to="/register" className="text-white font-bold hover:underline">Create an account</Link>
       </p>
     </AuthLayout>
   );
 };
+
+export default Login;
