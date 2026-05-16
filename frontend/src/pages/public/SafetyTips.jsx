@@ -1,145 +1,148 @@
-import { ShieldAlert, Car, CloudRain, Moon, Bike, Eye, PhoneCall } from 'lucide-react';
+import { AlertTriangle, CloudRain, Moon, Hammer, ShieldCheck, Heart, Info, ArrowRight, CheckCircle2, PhoneCall, AlertCircle, ShieldAlert, Bike, Car } from 'lucide-react';
 
 export default function SafetyTips() {
-  const tips = [
+  const safetyTips = [
     {
       title: "Rain & Flooding",
+      desc: "Turn on headlights, increase following distance, and avoid standing water. Hydroplaning can occur at speeds as low as 35mph.",
       icon: CloudRain,
       color: "text-blue-500",
       bg: "bg-blue-50",
-      border: "border-blue-100",
-      content: "Reduce speed significantly during heavy rain to prevent hydroplaning. Never attempt to drive through flooded roads—water depth is easily misjudged and can sweep vehicles away. Always use your headlights in low visibility."
+      severity: "High Alert"
     },
     {
       title: "Nighttime Driving",
+      desc: "Clean your windshield and headlights. Be extra vigilant for pedestrians and animals. Avoid looking directly at oncoming brights.",
       icon: Moon,
       color: "text-indigo-500",
       bg: "bg-indigo-50",
-      border: "border-indigo-100",
-      content: "Visibility is drastically reduced at night. Dim your dashboard lights to reduce glare, avoid looking directly at oncoming headlights, and increase your following distance. Watch carefully for unlit pedestrians or cyclists."
+      severity: "Vigilance"
     },
     {
-      title: "Navigating Construction Zones",
+      title: "Construction Zones",
+      desc: "Stay alert for sudden stops and workers. Strictly adhere to reduced speed limits and merge early when lanes are closed.",
       icon: ShieldAlert,
       color: "text-orange-500",
       bg: "bg-orange-50",
-      border: "border-orange-100",
-      content: "Stay alert for sudden stops, lane shifts, and workers on the road. Strictly adhere to reduced speed limits. Merge early when lanes are closed and avoid passing in construction zones."
+      severity: "Caution"
     },
     {
       title: "Sharing the Road",
+      desc: "Leave at least 3 feet of clearance when passing cyclists. Yield to pedestrians and check blind spots before opening doors.",
       icon: Bike,
       color: "text-green-500",
       bg: "bg-green-50",
-      border: "border-green-100",
-      content: "Always leave at least 3 feet of clearance when passing cyclists. Yield to pedestrians at crosswalks and intersections. Check your blind spots before opening car doors to avoid 'dooring' cyclists."
+      severity: "Community"
     },
     {
-      title: "Handling Potholes & Debris",
-      icon: Car,
+      title: "Pothole Awareness",
+      desc: "If you can't avoid a pothole, don't brake hard while driving over it. This can cause more damage to your suspension.",
+      icon: Hammer,
       color: "text-red-500",
       bg: "bg-red-50",
-      border: "border-red-100",
-      content: "Keep your eyes scanning the road ahead. If you cannot safely swerve to avoid a pothole, slow down as much as possible before hitting it, and release the brakes right before impact to lessen the shock."
-    },
-    {
-      title: "Distraction-Free Driving",
-      icon: Eye,
-      color: "text-purple-500",
-      bg: "bg-purple-50",
-      border: "border-purple-100",
-      content: "Taking your eyes off the road for just 5 seconds at 55 mph is like driving the length of a football field blindfolded. Put your phone on 'Do Not Disturb' mode while driving and program your GPS before starting your trip."
+      severity: "Risk"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-24">
+    <div className="min-h-screen bg-white font-sans text-gray-900 pb-24 selection:bg-orange-100 selection:text-orange-900">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 bg-white border-b border-gray-200 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-blue-50 opacity-40 pointer-events-none" />
-        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
-          <span className="text-green-600 font-bold text-xs tracking-widest uppercase mb-4 flex items-center justify-center gap-2">
-            <ShieldAlert size={16} /> RoadAware Guidelines
+      <section className="relative pt-40 pb-32 overflow-hidden bg-[#050505] text-white">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[120px] -mr-64 -mt-64" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-600/5 rounded-full blur-[100px] -ml-64 -mb-64" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold tracking-widest uppercase mb-8">
+            <ShieldCheck size={14} /> Drive Safe
           </span>
-          <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
-            Essential <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-400">Safety Tips</span>
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8">
+            Safety is our <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500">First Priority.</span>
           </h1>
-          <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-2xl mx-auto">
-            Your safety is our top priority. Review these expert guidelines to navigate hazards safely and protect yourself and others on the road.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-12">
+            Stay informed and prepared for any road condition. Our safety guidelines 
+            are designed to keep you and your community protected.
           </p>
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="max-w-6xl mx-auto px-6 -mt-8 relative z-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tips.map((tip, i) => {
-            const Icon = tip.icon;
-            return (
-              <div key={i} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-lg shadow-gray-200/40 hover:-translate-y-2 transition-transform duration-300">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${tip.bg} ${tip.border} border`}>
-                  <Icon className={tip.color} size={28} />
+      {/* Main Tips Grid */}
+      <section className="max-w-7xl mx-auto px-6 -mt-20 relative z-20">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {safetyTips.map((tip, i) => (
+            <div key={i} className="group bg-white rounded-[32px] p-10 border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl transition-all duration-500">
+              <div className="flex justify-between items-center mb-8">
+                <div className={`w-16 h-16 rounded-2xl ${tip.bg} ${tip.color} flex items-center justify-center border group-hover:scale-110 transition-transform`}>
+                  <tip.icon size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{tip.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
-                  {tip.content}
-                </p>
+                <span className="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-3 py-1 rounded-full">
+                  {tip.severity}
+                </span>
               </div>
-            );
-          })}
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{tip.title}</h3>
+              <p className="text-gray-500 leading-relaxed mb-8">{tip.desc}</p>
+              <div className="pt-6 border-t border-gray-50 flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-orange-500 transition-colors">
+                Read Detailed Guide <ArrowRight size={16} />
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Emergency Info Block */}
-      <section className="max-w-4xl mx-auto px-6 mt-24">
-        <div className="bg-[#0f172a] rounded-3xl p-10 shadow-xl overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <PhoneCall size={120} className="text-white" />
+      {/* Checklist Section */}
+      <section className="py-32 max-w-7xl mx-auto px-6">
+        <div className="bg-gray-50 rounded-[48px] p-12 md:p-20 grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-4xl font-black text-gray-900 mb-8 leading-tight">
+              The RoadAware <br />
+              <span className="text-orange-600">Pre-Drive Checklist.</span>
+            </h2>
+            <div className="space-y-6">
+              {[
+                "Check tire pressure and tread depth.",
+                "Verify all lights and signals are working.",
+                "Ensure your windshield is clean and clear.",
+                "Check fuel or battery levels before long trips.",
+                "Open the RoadAware map to check your route."
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                  <span className="text-gray-700 font-semibold">{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="relative z-10 md:w-2/3">
-            <h2 className="text-3xl font-extrabold text-white mb-4">In Case of Emergency</h2>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              If a road hazard has caused an accident with injuries, or poses an immediate, life-threatening danger, do not wait for a RoadAware report to be processed.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <div className="bg-red-500/20 border border-red-500/30 text-red-100 px-6 py-3 rounded-xl font-bold flex items-center gap-2">
-                <PhoneCall size={20} className="text-red-400" /> Dial 119 for Police
-              </div>
-              <div className="bg-orange-500/20 border border-orange-500/30 text-orange-100 px-6 py-3 rounded-xl font-bold flex items-center gap-2">
-                <PhoneCall size={20} className="text-orange-400" /> Dial 1990 for Ambulance
-              </div>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-orange-600/20 blur-[100px] -z-10 group-hover:bg-orange-600/30 transition-all" />
+            <div className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl">
+              <AlertCircle className="text-orange-500 mb-6" size={48} />
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">See a Hazard?</h3>
+              <p className="text-gray-500 mb-8 leading-relaxed">
+                If you encounter a road hazard, safely pull over and report it using the 
+                RoadAware app. Your report could prevent the next accident.
+              </p>
+              <button className="px-8 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all shadow-xl shadow-orange-900/20">
+                Report a Hazard
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Before You Drive Checklist */}
-      <section className="max-w-4xl mx-auto px-6 mt-20">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Quick Pre-Drive Checklist</h2>
-        <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
-          <ul className="space-y-6">
-            <li className="flex items-start gap-4">
-              <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center">1</div>
-              <div>
-                <strong className="text-gray-900 block mb-1 text-lg">Check the Hazard Map</strong>
-                <span className="text-gray-600 text-base">Open RoadAware before leaving to identify any reported blockages, flooding, or severe potholes on your route.</span>
-              </div>
-            </li>
-            <li className="flex items-start gap-4">
-              <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center">2</div>
-              <div>
-                <strong className="text-gray-900 block mb-1 text-lg">Check Tire Pressure & Lights</strong>
-                <span className="text-gray-600 text-base">Ensure your tires are properly inflated for optimal grip and all headlights/taillights are functioning.</span>
-              </div>
-            </li>
-            <li className="flex items-start gap-4">
-              <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-green-100 text-green-600 font-bold flex items-center justify-center">3</div>
-              <div>
-                <strong className="text-gray-900 block mb-1 text-lg">Secure Loose Items</strong>
-                <span className="text-gray-600 text-base">Loose items can become dangerous projectiles if you need to brake suddenly to avoid a hazard.</span>
-              </div>
-            </li>
-          </ul>
+      {/* Emergency Section */}
+      <section className="max-w-7xl mx-auto px-6">
+        <div className="bg-red-600 rounded-[48px] p-12 md:p-20 text-white relative overflow-hidden text-center">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+          <h2 className="text-4xl font-black mb-8">In Case of Emergency</h2>
+          <p className="text-red-100 max-w-2xl mx-auto mb-12 text-lg leading-relaxed">
+            If you've been involved in an accident or witness a life-threatening situation, 
+            contact emergency services immediately. Do not use this app for emergencies.
+          </p>
+          <div className="flex flex-wrap justify-center gap-6">
+            <a href="tel:119" className="px-10 py-5 bg-white text-red-600 font-black rounded-2xl hover:bg-red-50 transition-all flex items-center gap-3 shadow-2xl shadow-black/20">
+              <PhoneCall size={24} /> Call Emergency (119)
+            </a>
+          </div>
         </div>
       </section>
     </div>

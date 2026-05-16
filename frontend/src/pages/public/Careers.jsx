@@ -1,132 +1,173 @@
-import { Briefcase, MapPin, Clock, ArrowRight, Heart, Zap, Coffee, Globe } from 'lucide-react';
+import { Briefcase, MapPin, Clock, ArrowRight, Star, Heart, Coffee, Globe, Rocket, Users } from 'lucide-react';
 
 export default function Careers() {
   const jobs = [
     {
-      title: "Senior Full-Stack Engineer",
+      title: "Senior Full Stack Engineer",
       department: "Engineering",
-      location: "Remote (Global)",
+      location: "Colombo / Remote",
       type: "Full-time",
-      description: "Help build the scalable infrastructure that powers real-time hazard mapping for millions of users."
+      salary: "$60k - $90k",
+      tags: ["React", "Node.js", "PostgreSQL"]
     },
     {
       title: "Product Designer",
       department: "Design",
-      location: "Colombo, Sri Lanka",
-      type: "Full-time",
-      description: "Create intuitive, accessible, and beautiful experiences that encourage citizens to report hazards easily."
-    },
-    {
-      title: "Data Analyst",
-      department: "Data Science",
       location: "Remote",
       type: "Full-time",
-      description: "Analyze hazard patterns and community reporting behavior to provide actionable insights for local authorities."
+      salary: "$45k - $70k",
+      tags: ["Figma", "UI/UX", "User Research"]
     },
     {
-      title: "Community Manager",
+      title: "Data Scientist (Geospatial)",
+      department: "Data Science",
+      location: "Colombo, SL",
+      type: "Contract",
+      salary: "$40/hr - $60/hr",
+      tags: ["Python", "GIS", "Machine Learning"]
+    },
+    {
+      title: "Community Outreach Lead",
       department: "Marketing",
-      location: "Colombo, Sri Lanka",
-      type: "Part-time",
-      description: "Engage with our active user base and help build trust between citizens and local government bodies."
+      location: "Hybrid",
+      type: "Full-time",
+      salary: "$30k - $50k",
+      tags: ["Strategy", "Events", "Public Relations"]
     }
   ];
 
-  const benefits = [
-    { icon: Globe, title: "Work Anywhere", desc: "Remote-first culture with flexible hours." },
-    { icon: Heart, title: "Health & Wellness", desc: "Comprehensive premium health coverage." },
-    { icon: Zap, title: "Impactful Work", desc: "Build products that directly save lives." },
-    { icon: Coffee, title: "Growth Budget", desc: "Annual stipend for courses and conferences." }
+  const perks = [
+    { icon: Globe, title: "Remote First", desc: "Work from anywhere in the world." },
+    { icon: Heart, title: "Health & Wellness", desc: "Full medical coverage for you and your family." },
+    { icon: Coffee, title: "Work-Life Balance", desc: "Unlimited PTO and flexible working hours." },
+    { icon: Star, title: "Growth Budget", desc: "$2,000 annual budget for courses and books." }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-24">
+    <div className="min-h-screen bg-white font-sans text-gray-900 pb-24 selection:bg-orange-100 selection:text-orange-900">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 bg-white border-b border-gray-200">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-orange-100 opacity-30 pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
-          <span className="text-orange-600 font-bold text-xs tracking-widest uppercase mb-4 block">Careers at RoadAware</span>
-          <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
-            Build technology that <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">saves lives.</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
-            Join a passionate team dedicated to making our streets safer through transparency, 
-            technology, and community collaboration.
-          </p>
-          <a href="#open-roles" className="inline-flex items-center px-6 py-3 bg-[#0f172a] text-white font-semibold rounded-xl shadow-md hover:bg-[#1e293b] transition-all">
-            View Open Roles <ArrowRight className="ml-2" size={18} />
-          </a>
+      <section className="relative pt-40 pb-32 overflow-hidden bg-[#050505] text-white">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-[120px] -mr-32 -mt-32" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="max-w-3xl">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold tracking-widest uppercase mb-8">
+              <Rocket size={14} className="fill-current" /> Join the Revolution
+            </span>
+            <h1 className="text-6xl md:text-7xl font-black tracking-tighter leading-[1] mb-8">
+              Help us build the <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400 text-glow-orange">Future of Infrastructure.</span>
+            </h1>
+            <p className="text-xl text-gray-400 leading-relaxed mb-10">
+              We're a team of designers, engineers, and dreamers building the 
+              tools that keep cities moving and citizens safe.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Why work with us?</h2>
-          <p className="text-gray-500 max-w-2xl mx-auto">We believe in taking care of our people so they can focus on doing the best work of their lives.</p>
-        </div>
+      {/* Perks Section */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((b, i) => {
-            const Icon = b.icon;
-            return (
-              <div key={i} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-center">
-                <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Icon size={24} />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{b.title}</h3>
-                <p className="text-sm text-gray-500">{b.desc}</p>
+          {perks.map((perk, i) => (
+            <div key={i} className="p-8 rounded-[32px] bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                <perk.icon className="text-orange-500" size={24} />
               </div>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* Open Roles Section */}
-      <section id="open-roles" className="max-w-4xl mx-auto px-6">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Open Roles</h2>
-          <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold border border-orange-200">
-            {jobs.length} Positions
-          </span>
-        </div>
-
-        <div className="space-y-4">
-          {jobs.map((job, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6 cursor-pointer">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">{job.department}</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">{job.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed max-w-2xl">{job.description}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500 font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <MapPin size={16} /> {job.location}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock size={16} /> {job.type}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <button className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 text-gray-400 group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors">
-                  <ArrowRight size={20} />
-                </button>
-              </div>
+              <h3 className="font-bold text-gray-900 mb-2">{perk.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{perk.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="max-w-4xl mx-auto px-6 mt-32 text-center">
-        <div className="bg-[#0f172a] rounded-3xl p-12 shadow-xl">
-          <h2 className="text-3xl font-extrabold text-white mb-4">Don't see a fit?</h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            We are always looking for talented individuals. Send us your resume and we'll keep you in mind for future opportunities.
+      {/* Culture Section */}
+      <section className="py-24 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            <div className="space-y-8">
+              <h2 className="text-4xl font-black text-gray-900 tracking-tight">
+                Our culture is defined by <br />
+                <span className="text-orange-600">Impact & Transparency.</span>
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                At RoadAware, we don't just write code. We solve real-world problems 
+                that affect millions of people every day. We value ownership, 
+                radical candor, and the relentless pursuit of excellence.
+              </p>
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <div className="text-3xl font-black text-gray-900 mb-1">100%</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Distributed Team</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-black text-gray-900 mb-1">4.9/5</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Glassdoor Rating</div>
+                </div>
+              </div>
+            </div>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-orange-600/20 blur-[80px] -z-10 group-hover:bg-orange-600/30 transition-all" />
+              <div className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl relative overflow-hidden">
+                <Users className="text-orange-500/10 absolute -right-8 -bottom-8 w-64 h-64" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">"I joined RoadAware to build things that actually matter. The mission is what gets me up every morning."</h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full" />
+                  <div>
+                    <div className="font-bold text-gray-900">Sarah Jenkins</div>
+                    <div className="text-sm text-gray-500">Lead Product Designer</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Job List */}
+      <section className="py-32 max-w-5xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-black text-gray-900 mb-4">Current Openings</h2>
+          <p className="text-gray-500">Find your place in our growing team.</p>
+        </div>
+
+        <div className="space-y-6">
+          {jobs.map((job, idx) => (
+            <div key={idx} className="group bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                    {job.department}
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                    {job.type}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{job.title}</h3>
+                <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
+                  <div className="flex items-center gap-2"><MapPin size={16} className="text-gray-400" /> {job.location}</div>
+                  <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400" /> {job.salary}</div>
+                </div>
+              </div>
+              <button className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap">
+                Apply Now <ArrowRight size={18} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Spontaneous Application */}
+      <section className="max-w-7xl mx-auto px-6 mt-12">
+        <div className="bg-[#050505] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-orange-600/10 rounded-full blur-[80px] -ml-16 -mt-16" />
+          <h2 className="text-4xl font-black mb-6">Don't see a fit?</h2>
+          <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
+            We're always looking for talented individuals to join our journey. 
+            Send your resume to our talent team and we'll be in touch.
           </p>
-          <a href="mailto:careers@roadaware.com" className="inline-flex items-center justify-center px-8 py-3 bg-white text-[#0f172a] font-bold rounded-xl shadow-sm hover:bg-gray-100 transition-colors">
-            Email Resume
+          <a href="mailto:careers@roadaware.com" className="inline-flex items-center gap-2 px-10 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all shadow-xl shadow-orange-900/20">
+            Email Resume <ArrowRight size={18} />
           </a>
         </div>
       </section>
