@@ -23,8 +23,8 @@ const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
       onClick={handleUpvote}
       className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all duration-300 border ${
         hasUpvoted 
-          ? 'bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]' 
-          : 'bg-[#1a1a1a] text-gray-400 border-white/10 hover:bg-[#222] hover:text-white'
+          ? 'bg-orange-50 text-orange-600 border-orange-200 shadow-sm' 
+          : 'bg-white text-slate-500 border-gray-200 hover:bg-gray-50 hover:text-slate-900 shadow-sm'
       }`}
     >
       <ArrowBigUp 
