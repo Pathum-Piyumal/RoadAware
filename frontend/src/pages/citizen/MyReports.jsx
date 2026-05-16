@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { FileText } from 'lucide-react';
-import Navbar from '../../components/common/Navbar/Navbar';
 import styles from './MyReports.module.css';
 
 export default function MyReports() {
@@ -8,8 +7,6 @@ export default function MyReports() {
 
   return (
     <div className={styles.page}>
-      <Navbar />
-
       {/* Header Area */}
       <header className={styles.header}>
         <div className={styles.headerInner}>
@@ -50,28 +47,6 @@ export default function MyReports() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          <div className={styles.footerBrand}>
-            <div className={styles.footerBrandName}>🛡 RoadAware</div>
-            <p>A civic platform connecting communities with road authorities.</p>
-          </div>
-          <div className={styles.footerRight}>
-            <h4>Emergency</h4>
-            <p>
-              For life-threatening hazards, always call <strong>911</strong> first.<br />
-              support@roadsafe.com<br />
-              +65 1234 5678
-            </p>
-          </div>
-        </div>
-        <div className={styles.footerBottom}>
-          <span>© 2026 RoadAware. All rights reserved.</span>
-          <span>Report hazards. Stay informed. Save lives.</span>
-        </div>
-      </footer>
     </div>
   );
 }

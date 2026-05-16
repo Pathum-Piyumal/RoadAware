@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Navbar from '../../components/common/Navbar/Navbar';
 import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -43,9 +42,6 @@ export default function HazardMap() {
 
   return (
     <div className={styles.pageContainer}>
-      {/* We use the homepage variant to show "Log in" and "Get started" as in the design */}
-      <Navbar variant="homepage" />
-
       {/* Header Section */}
       <header className={styles.headerSection}>
         <div className={styles.container}>
@@ -163,41 +159,6 @@ export default function HazardMap() {
 
         </div>
       </main>
-
-      {/* Footer (Simplified matching design) */}
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <div className={styles.footerGrid}>
-            <div>
-              <div className={styles.footerLogo}>
-                <div className={styles.footerLogoIcon}>
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    <path d="M12 8v4" />
-                    <path d="M12 16h.01" />
-                  </svg>
-                </div>
-                <span className={styles.footerBrand}>RoadAware</span>
-              </div>
-              <p className={styles.footerDesc}>
-                A civic platform connecting communities with road authorities.
-              </p>
-            </div>
-            <div>
-              <h4 className={styles.footerHeading}>Emergency</h4>
-              <p className={styles.footerText}>
-                For life-threatening hazards, always call <strong>911</strong> first.
-                <br />support@roadsafe.com
-                <br />+65 1234 5678
-              </p>
-            </div>
-          </div>
-          <div className={styles.footerBottom}>
-            <p>© 2026 RoadAware. All rights reserved.</p>
-            <p>Report hazards. Stay informed. Save lives.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
