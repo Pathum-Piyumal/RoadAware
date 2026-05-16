@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp, X, AlertTriangle, MessageCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, AlertTriangle, MessageCircle } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -42,9 +40,8 @@ const gridHazards = [
 
 
 export default function HazardMap() {
-  const [viewMode, setViewMode] = useState('grid'); // Default to 'grid' to match design step 2
-  const [isHeatmap, setIsHeatmap] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
+  const [isHeatmap, setIsHeatmap] = useState(false);
   const [selectedHazard, setSelectedHazard] = useState(null);
 
   const handleOpenPanel = (hazard) => {
