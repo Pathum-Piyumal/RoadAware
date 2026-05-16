@@ -32,6 +32,9 @@ import Careers from './pages/public/Careers';
 import HelpCenter from './pages/public/HelpCenter';
 import SafetyTips from './pages/public/SafetyTips';
 import Contact from './pages/public/Contact';
+import PrivacyPolicy from './pages/public/PrivacyPolicy';
+import TermsOfService from './pages/public/TermsOfService';
+import Status from './pages/public/Status';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -75,6 +78,9 @@ function AppContent() {
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/safety-tips" element={<SafetyTips />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/status" element={<Status />} />
           <Route path="/hazard/:id" element={<HazardDetails />} />
           <Route path="/map" element={<ProtectedRoute><HazardMap /></ProtectedRoute>} />
 

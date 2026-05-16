@@ -3,98 +3,111 @@ import { FaFacebook, FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 
 const Footer = () => (
-  <footer style={{ background: '#050505', color: '#fff', padding: '72px 32px 32px' }}>
-    <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 64, marginBottom: 64 }}>
-        {/* Brand */}
-        <div>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, textDecoration: 'none', color: 'inherit' }}>
-            <img src={logo} alt="RoadAware Logo" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 10 }} />
-            <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.5px' }}>RoadAware</span>
-          </Link>
-          <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.8, maxWidth: 300 }}>
-            RoadAware is a community-driven platform dedicated to improving road safety through
-            transparent reporting and verified hazard data for local authorities.
+  <footer style={{ background: '#050505', color: '#94a3b8', padding: '100px 0 40px', borderTop: '1px solid rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
+    {/* Background Decorative Element */}
+    <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '400px', background: 'rgba(249, 115, 22, 0.03)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
+    
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 64, marginBottom: 80 }}>
+        
+        {/* Brand Section */}
+        <div style={{ gridColumn: 'span 2' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+            <img src={logo} alt="RoadAware Logo" style={{ height: 32, width: 'auto' }} />
+            <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em' }}>ROADAWARE</span>
+          </div>
+          <p style={{ fontSize: 15, lineHeight: 1.6, color: '#64748b', maxWidth: 320, marginBottom: 32 }}>
+            Building safer communities through real-time infrastructure intelligence and community vigilance.
           </p>
+          <div style={{ display: 'flex', gap: 16 }}>
+            {[
+              { Icon: FaFacebook, href: 'https://facebook.com' },
+              { Icon: FaLinkedin, href: 'https://linkedin.com' },
+              { Icon: FaTwitter, href: 'https://twitter.com' },
+              { Icon: FaGithub, href: 'https://github.com' }
+            ].map((social, idx) => (
+              <a 
+                key={idx} 
+                href={social.href} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ 
+                  width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.03)', 
+                  display: 'flex', alignItems: 'center', justifyCenter: 'center', color: '#94a3b8',
+                  transition: 'all 0.3s ease', border: '1px solid rgba(255,255,255,0.05)',
+                  display: 'flex', justifyContent: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(249, 115, 22, 0.1)';
+                  e.currentTarget.style.color = '#f97316';
+                  e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                  e.currentTarget.style.color = '#94a3b8';
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <social.Icon size={18} style={{ marginTop: 10 }} />
+              </a>
+            ))}
+          </div>
         </div>
 
-        {/* Links */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }}>
-          {[
-            { heading: 'Company', links: [
-                { label: 'About Us', path: '/about' }, 
-                { label: 'Features', path: '/features' }, 
-                { label: 'Careers', path: '/careers' }
-            ] },
-            { heading: 'Support',  links: [
-                { label: 'Help Center', path: '/help-center' }, 
-                { label: 'Safety Tips', path: '/safety-tips' }, 
-                { label: 'Contact', path: '/contact' }
-            ] },
-            { heading: 'Connect',  links: [] },
-          ].map((col, i) => (
-            <div key={i}>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#e5e7eb', marginBottom: 20 }}>{col.heading}</h4>
-              {col.links.length > 0 ? (
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {col.links.map((l, j) => (
-                    <li key={j} style={{ marginBottom: 12 }}>
-                      <Link to={l.path} style={{ fontSize: 13, color: '#6b7280', textDecoration: 'none', fontWeight: 500 }}>{l.label}</Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div style={{ display: 'flex', gap: 12 }}>
-                  {[
-                    { Icon: FaFacebook, href: 'https://facebook.com' },
-                    { Icon: FaLinkedin, href: 'https://linkedin.com' },
-                    { Icon: FaTwitter, href: 'https://twitter.com' },
-                    { Icon: FaGithub, href: 'https://github.com' }
-                  ].map((social, idx) => (
-                    <a 
-                      key={idx} 
-                      href={social.href} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        width: 40, 
-                        height: 40, 
-                        borderRadius: 12, 
-                        background: '#111', 
-                        border: '1px solid rgba(255,255,255,0.07)', 
-                        color: '#9ca3af',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = '#1f2937';
-                        e.currentTarget.style.color = '#fff';
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = '#111';
-                        e.currentTarget.style.color = '#9ca3af';
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-                      }}
-                    >
-                      <social.Icon size={18} />
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+        {/* Links Sections */}
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 28 }}>Company</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {[
+              { name: 'About Us', path: '/about' },
+              { name: 'Features', path: '/features' },
+              { name: 'Careers', path: '/careers' },
+              { name: 'Contact', path: '/contact' }
+            ].map((link) => (
+              <Link 
+                key={link.path} 
+                to={link.path} 
+                style={{ fontSize: 14, color: '#64748b', textDecoration: 'none', transition: 'all 0.2s', fontWeight: 500 }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'translateX(4px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#64748b'; e.currentTarget.style.transform = 'translateX(0)'; }}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 28 }}>Support</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {[
+              { name: 'Help Center', path: '/help-center' },
+              { name: 'Safety Tips', path: '/safety-tips' },
+              { name: 'FAQ', path: '/help-center' },
+              { name: 'Status', path: '/status' }
+            ].map((link) => (
+              <Link 
+                key={link.name} 
+                to={link.path} 
+                style={{ fontSize: 14, color: '#64748b', textDecoration: 'none', transition: 'all 0.2s', fontWeight: 500 }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'translateX(4px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#64748b'; e.currentTarget.style.transform = 'translateX(0)'; }}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#374151', margin: 0 }}>© 2026 ROADAWARE. ALL RIGHTS RESERVED.</p>
+      {/* Bottom Bar */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
+        <p style={{ fontSize: 13, color: '#475569', fontWeight: 500 }}>© 2026 RoadAware. All rights reserved.</p>
         <div style={{ display: 'flex', gap: 32 }}>
-          <a href="#" style={{ fontSize: 11, fontWeight: 700, color: '#374151', textDecoration: 'none' }}>PRIVACY POLICY</a>
-          <a href="#" style={{ fontSize: 11, fontWeight: 700, color: '#374151', textDecoration: 'none' }}>TERMS OF SERVICE</a>
+          <Link to="/privacy-policy" style={{ fontSize: 13, color: '#475569', textDecoration: 'none', fontWeight: 600, transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#94a3b8'} onMouseLeave={(e) => e.currentTarget.style.color = '#475569'}>Privacy Policy</Link>
+          <Link to="/terms-of-service" style={{ fontSize: 13, color: '#475569', textDecoration: 'none', fontWeight: 600, transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#94a3b8'} onMouseLeave={(e) => e.currentTarget.style.color = '#475569'}>Terms of Service</Link>
         </div>
       </div>
     </div>

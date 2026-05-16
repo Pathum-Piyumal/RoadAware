@@ -1,4 +1,5 @@
-import { Map, Camera, ThumbsUp, Activity, Bell, ShieldCheck } from 'lucide-react';
+import { Map, Camera, ThumbsUp, Activity, Bell, ShieldCheck, ArrowRight, Zap, Globe, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Features() {
   const features = [
@@ -8,100 +9,138 @@ export default function Features() {
       icon: Map,
       color: "text-blue-500",
       bg: "bg-blue-50",
-      border: "border-blue-100"
+      border: "border-blue-100",
+      tag: "Real-time"
     },
     {
-      title: "Real-time Reporting",
-      description: "Quickly submit reports with pinpoint GPS accuracy and photo evidence. Our streamlined 3-step process ensures hazards are logged in under a minute.",
+      title: "Precision Reporting",
+      description: "Quickly submit reports with pinpoint GPS accuracy and photo evidence. Our streamlined process ensures hazards are logged in under a minute.",
       icon: Camera,
       color: "text-orange-500",
       bg: "bg-orange-50",
-      border: "border-orange-100"
+      border: "border-orange-100",
+      tag: "Mobile Ready"
     },
     {
-      title: "Community Upvoting",
-      description: "See a pothole that someone else already reported? Upvote it! High-vote hazards are escalated to local authorities faster for priority repairs.",
+      title: "Community Consensus",
+      description: "Harness the power of the crowd. Upvote reports to increase visibility and help authorities prioritize critical repairs in your neighborhood.",
       icon: ThumbsUp,
       color: "text-green-500",
       bg: "bg-green-50",
-      border: "border-green-100"
+      border: "border-green-100",
+      tag: "Verified"
     },
     {
       title: "Authorities Dashboard",
-      description: "A dedicated portal for local governments and repair crews to track, manage, and resolve hazards efficiently with comprehensive analytics.",
+      description: "A professional portal for local governments to monitor, assign, and resolve hazards with deep analytics and resource management tools.",
       icon: Activity,
       color: "text-purple-500",
       bg: "bg-purple-50",
-      border: "border-purple-100"
+      border: "border-purple-100",
+      tag: "Enterprise"
     },
     {
-      title: "Instant Notifications",
-      description: "Receive updates when a hazard you reported gets assigned, is actively being worked on, or is successfully resolved by the authorities.",
+      title: "Smart Notifications",
+      description: "Stay in the loop. Get instant push and email updates as your reported hazards move from 'Submitted' to 'In Progress' and finally 'Resolved'.",
       icon: Bell,
       color: "text-amber-500",
       bg: "bg-amber-50",
-      border: "border-amber-100"
+      border: "border-amber-100",
+      tag: "Automated"
     },
     {
-      title: "Verified Data Integrity",
-      description: "Our system flags duplicate reports and uses community consensus to ensure that the data provided to authorities is clean, accurate, and reliable.",
+      title: "Data Integrity",
+      description: "Our AI-powered system flags duplicates and cross-references data to ensure that authorities receive the most accurate infrastructure insights.",
       icon: ShieldCheck,
       color: "text-cyan-500",
       bg: "bg-cyan-50",
-      border: "border-cyan-100"
+      border: "border-cyan-100",
+      tag: "AI Enhanced"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 pb-24">
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-24 selection:bg-blue-100 selection:text-blue-900">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-32 overflow-hidden bg-[#0f172a] text-white">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-orange-900/20 pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
-          <span className="text-blue-400 font-bold text-xs tracking-widest uppercase mb-4 block">Platform Features</span>
-          <h1 className="text-5xl font-extrabold tracking-tight mb-6">
-            Everything you need to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">drive safely.</span>
+      <section className="relative pt-40 pb-40 overflow-hidden bg-[#0a0a0a] text-white">
+        {/* Animated Background Mesh */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px]" />
+          <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-orange-600/10 rounded-full blur-[100px]" />
+          <div className="absolute -bottom-[10%] left-[20%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[140px]" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8">
+            <Zap size={14} className="fill-current" /> Empowering Cities
+          </div>
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8">
+            Infrastructure <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400">Intelligence.</span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            RoadAware isn't just a map. It's a comprehensive ecosystem designed to bridge the gap between 
-            everyday commuters and road maintenance authorities.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-12">
+            RoadAware combines community vigilance with enterprise-grade data management 
+            to create the world's most responsive road maintenance ecosystem.
           </p>
+          <div className="flex flex-wrap justify-center gap-6">
+            <Link to="/map" className="px-10 py-4 bg-white text-black font-bold rounded-2xl hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2 group">
+              View Live Map <Globe size={18} className="group-hover:rotate-12 transition-transform" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="max-w-6xl mx-auto px-6 -mt-16 relative z-20">
+      {/* Main Features Grid */}
+      <section className="max-w-7xl mx-auto px-6 -mt-20 relative z-20">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, idx) => {
             const Icon = feature.icon;
             return (
-              <div key={idx} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/40 hover:-translate-y-2 transition-transform duration-300">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${feature.bg} ${feature.border} border`}>
-                  <Icon className={feature.color} size={28} />
+              <div key={idx} className="group bg-white rounded-[32px] p-10 border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:border-blue-100 transition-all duration-500 flex flex-col items-start">
+                <div className="flex justify-between items-center w-full mb-8">
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${feature.bg} ${feature.border} border group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                    <Icon className={feature.color} size={32} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+                    {feature.tag}
+                  </span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">{feature.title}</h3>
+                <p className="text-gray-500 leading-relaxed mb-8 flex-grow">
                   {feature.description}
                 </p>
+                <div className="w-full pt-6 border-t border-gray-50 flex items-center justify-between text-sm font-bold text-gray-400 group-hover:text-blue-500 transition-colors">
+                  Learn more <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
             );
           })}
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="max-w-4xl mx-auto px-6 mt-32 text-center">
-        <div className="bg-orange-50 rounded-3xl p-12 border border-orange-100 hover:shadow-lg transition-shadow">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Ready to make a difference?</h2>
-          <p className="text-gray-600 mb-8 max-w-xl mx-auto">
-            Join thousands of users who are already improving their local communities. 
-            Report your first hazard today.
-          </p>
-          <a href="/report-hazard" className="inline-flex items-center justify-center px-8 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-md hover:bg-orange-700 transition-colors">
-            Start Reporting
-          </a>
+      {/* Secondary CTA */}
+      <section className="max-w-7xl mx-auto px-6 mt-32">
+        <div className="relative rounded-[48px] overflow-hidden bg-blue-600 p-12 md:p-20 text-white shadow-2xl shadow-blue-200">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+          <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-black/10 rounded-full blur-[60px] -ml-16 -mb-16" />
+          
+          <div className="relative z-10 max-w-2xl">
+            <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">
+              Are you a local government official?
+            </h2>
+            <p className="text-lg text-blue-100 mb-10 leading-relaxed">
+              Join dozens of cities already using RoadAware to optimize their public works 
+              departments. Get access to the full suite of analytics and dispatch tools.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link to="/contact" className="px-8 py-4 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all flex items-center gap-2 shadow-xl shadow-blue-900/20">
+                Partner with Us <Lock size={18} />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   );
 }
+

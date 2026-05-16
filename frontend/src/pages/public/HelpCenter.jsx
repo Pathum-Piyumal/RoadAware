@@ -1,71 +1,55 @@
-import { Search, ChevronDown, MessageCircle, AlertTriangle, Shield, CheckCircle2 } from 'lucide-react';
+import { Search, Book, Shield, User, MessageCircle, ChevronDown, ArrowRight, LifeBuoy, Zap, FileText } from 'lucide-react';
 import { useState } from 'react';
 
 export default function HelpCenter() {
-  const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFaq, setActiveFaq] = useState(null);
 
-  const categories = ['All', 'Reporting Hazards', 'Account & Privacy', 'Authorities & Actions'];
+  const categories = [
+    { title: "Getting Started", icon: Zap, count: 12, bg: "bg-blue-50", text: "text-blue-600" },
+    { title: "Reporting Hazards", icon: FileText, count: 8, bg: "bg-orange-50", text: "text-orange-600" },
+    { title: "Account & Safety", icon: Shield, count: 5, bg: "bg-green-50", text: "text-green-600" },
+    { title: "Authorities Portal", icon: User, count: 10, bg: "bg-purple-50", text: "text-purple-600" }
+  ];
 
   const faqs = [
     {
-      category: 'Reporting Hazards',
-      question: "How do I report a new road hazard?",
-      answer: "Click the 'Report Hazard' button on the homepage or in your dashboard. You will be guided through a simple 3-step process to provide the hazard details, select the exact location on the map, and optionally upload a photo. Once submitted, it will be visible to the community and local authorities."
+      q: "How do I report a road hazard?",
+      a: "Simply log in to your account, click the 'Report Hazard' button on the navigation bar, select the hazard type, pin the location on the map, and upload a photo if available."
     },
     {
-      category: 'Reporting Hazards',
-      question: "Can I report a hazard anonymously?",
-      answer: "Currently, you need to be logged into your RoadAware account to report a hazard. This helps us prevent spam and ensures the integrity of the data provided to local authorities. However, your personal details are kept private and are not publicly linked to the report."
+      q: "What happens after I submit a report?",
+      a: "Your report is instantly visible on the live map. Authorities are notified based on the severity and upvote count. You can track the progress (Submitted → In Progress → Resolved) in your dashboard."
     },
     {
-      category: 'Reporting Hazards',
-      question: "What happens after I submit a report?",
-      answer: "Your report is immediately added to the public Hazard Map. Other users can upvote it if they encounter the same issue. Local authorities use our dedicated dashboard to monitor these reports, assign repair crews, and update the status from 'Reported' to 'In Progress' and eventually 'Resolved'."
-    },
-    {
-      category: 'Authorities & Actions',
-      question: "How quickly are hazards fixed?",
-      answer: "Repair times depend entirely on the local authority's schedule, resources, and the severity of the hazard. RoadAware acts as the communication bridge. Highly upvoted and 'Critical' severity reports are often prioritized by maintenance crews."
-    },
-    {
-      category: 'Authorities & Actions',
-      question: "Who updates the status of a hazard?",
-      answer: "Only verified local authority accounts have the permission to update a hazard's status. They can mark it as 'In Progress' when a crew is dispatched, and 'Resolved' once the repair is complete."
-    },
-    {
-      category: 'Account & Privacy',
-      question: "How is my location data used?",
-      answer: "When you use the 'Use My Current Location' feature, your GPS coordinates are strictly used to pin the hazard on the map. We do not track your location continuously, and your location is never shared with third parties."
+      q: "Is my personal data visible to other users?",
+      a: "No. While your report location and images are public, your personal contact information (email, phone) is only accessible to verified authorities for follow-up if needed."
     }
   ];
 
-  const filteredFaqs = faqs.filter(faq => {
-    const matchesCategory = activeCategory === 'All' || faq.category === activeCategory;
-    const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) || faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 pb-24">
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 pb-24 selection:bg-blue-100 selection:text-blue-900">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 bg-[#0f172a] border-b border-gray-800 text-center px-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-orange-900/20 pointer-events-none" />
-        <div className="max-w-3xl mx-auto relative z-10">
-          <span className="text-orange-500 font-bold text-xs tracking-widest uppercase mb-4 block">Support & FAQs</span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-6">
-            How can we help you?
+      <section className="relative pt-40 pb-40 overflow-hidden bg-[#0a0a0a] text-white">
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
+          <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-orange-600/5 rounded-full blur-[100px]" />
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8">
+            <LifeBuoy size={14} /> Knowledge Base
+          </span>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-10">
+            How can we <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">help you?</span>
           </h1>
           
-          {/* Search Bar */}
-          <div className="relative max-w-2xl mx-auto mt-8">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="text-gray-400" size={20} />
-            </div>
+          <div className="relative max-w-2xl mx-auto group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={24} />
             <input
               type="text"
               placeholder="Search for articles, guides, or FAQs..."
-              className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white/20 transition-all backdrop-blur-sm"
+              className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/10 rounded-[24px] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white/10 transition-all text-lg placeholder:text-gray-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -73,100 +57,71 @@ export default function HelpCenter() {
         </div>
       </section>
 
-      {/* Quick Links / Topic Cards */}
-      <section className="max-w-5xl mx-auto px-6 -mt-10 relative z-20 mb-20">
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/40 flex items-start gap-4 hover:border-orange-200 transition-colors cursor-pointer group">
-            <div className="p-3 bg-orange-50 text-orange-600 rounded-xl group-hover:scale-110 transition-transform">
-              <AlertTriangle size={24} />
+      {/* Categories */}
+      <section className="max-w-7xl mx-auto px-6 -mt-16 relative z-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.map((cat, i) => (
+            <div key={i} className="group bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl hover:border-blue-100 transition-all duration-300">
+              <div className={`w-14 h-14 rounded-2xl ${cat.bg} ${cat.text} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                <cat.icon size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{cat.title}</h3>
+              <p className="text-sm text-gray-500 font-medium mb-4">{cat.count} Articles</p>
+              <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">
+                Explore <ArrowRight size={14} />
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold text-gray-900 mb-1">Reporting Guide</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Learn how to accurately report and categorize hazards.</p>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/40 flex items-start gap-4 hover:border-blue-200 transition-colors cursor-pointer group">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:scale-110 transition-transform">
-              <CheckCircle2 size={24} />
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 mb-1">Tracking Progress</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Understand hazard statuses and how updates work.</p>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/40 flex items-start gap-4 hover:border-green-200 transition-colors cursor-pointer group">
-            <div className="p-3 bg-green-50 text-green-600 rounded-xl group-hover:scale-110 transition-transform">
-              <Shield size={24} />
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 mb-1">Account Security</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Manage your profile, data, and privacy settings.</p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="max-w-4xl mx-auto px-6">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Frequently Asked Questions</h2>
+      {/* FAQs */}
+      <section className="max-w-3xl mx-auto px-6 py-32">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
+          <p className="text-gray-500">Everything you need to know about the RoadAware platform.</p>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                activeCategory === cat 
-                  ? 'bg-orange-100 text-orange-700 border-2 border-orange-200' 
-                  : 'bg-gray-50 text-gray-600 border-2 border-transparent hover:bg-gray-100'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* FAQ List */}
         <div className="space-y-4">
-          {filteredFaqs.length > 0 ? (
-            filteredFaqs.map((faq, i) => (
-              <details key={i} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50 transition-colors">
-                  <h3 className="font-semibold text-gray-900 pr-6 text-lg">{faq.question}</h3>
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-open:rotate-180 transition-transform duration-300">
-                    <ChevronDown size={18} className="text-gray-500" />
-                  </div>
-                </summary>
-                <div className="p-6 pt-0 text-gray-600 leading-relaxed">
-                  <div className="pt-4 border-t border-gray-100">
-                    {faq.answer}
-                  </div>
+          {faqs.map((faq, i) => (
+            <div key={i} className="bg-white rounded-[24px] border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <button 
+                onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                className="w-full px-8 py-6 flex items-center justify-between text-left group"
+              >
+                <span className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{faq.q}</span>
+                <ChevronDown 
+                  size={20} 
+                  className={`text-gray-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180 text-blue-500' : ''}`} 
+                />
+              </button>
+              <div className={`transition-all duration-300 ease-in-out ${activeFaq === i ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="px-8 pb-8 text-gray-500 leading-relaxed">
+                  {faq.a}
                 </div>
-              </details>
-            ))
-          ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-200">
-              <Search className="mx-auto text-gray-400 mb-4" size={32} />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">No results found</h3>
-              <p className="text-gray-500">We couldn't find any FAQs matching your search.</p>
+              </div>
             </div>
-          )}
+          ))}
         </div>
       </section>
 
       {/* Support CTA */}
-      <section className="max-w-4xl mx-auto px-6 mt-24">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-10 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Still need help?</h2>
-            <p className="text-gray-600 max-w-md">Our support team is always ready to assist you with any questions or technical issues.</p>
+      <section className="max-w-5xl mx-auto px-6">
+        <div className="bg-[#050505] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[80px] -mr-16 -mt-16" />
+          <h2 className="text-4xl font-black mb-6">Still need help?</h2>
+          <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
+            Our support team is available 24/7 to assist you with any questions or 
+            technical difficulties you might encounter.
+          </p>
+          <div className="flex flex-wrap justify-center gap-6">
+            <button className="px-10 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all flex items-center gap-2 shadow-xl shadow-blue-900/20">
+              <MessageCircle size={20} /> Chat with Support
+            </button>
+            <a href="/contact" className="px-10 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2">
+              Send an Email <ArrowRight size={20} />
+            </a>
           </div>
-          <a href="mailto:support@roadaware.com" className="whitespace-nowrap flex items-center px-6 py-3 bg-[#0f172a] text-white font-semibold rounded-xl shadow-md hover:bg-[#1e293b] transition-all">
-            <MessageCircle size={18} className="mr-2" /> Contact Support
-          </a>
         </div>
       </section>
     </div>
