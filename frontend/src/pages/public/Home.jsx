@@ -15,6 +15,8 @@ import {
   PawPrint,
   ThumbsUp,
   Star,
+  ArrowRight,
+  Map as MapIcon,
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -68,16 +70,45 @@ const Hero = () => (
         </p>
 
         {/* CTAs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 36 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36 }}>
           <Link to="/login" style={{
-            background: '#fff', color: '#111', padding: '14px 32px',
-            borderRadius: 12, fontWeight: 800, fontSize: 15, textDecoration: 'none',
-            boxShadow: '0 8px 32px rgba(255,255,255,0.1)',
-          }}>
-            Get started
+            background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+            color: '#fff',
+            padding: '16px 36px',
+            borderRadius: 999,
+            fontWeight: 800,
+            fontSize: 15,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: '0 8px 24px rgba(249,115,22,0.3)',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(249,115,22,0.4)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(249,115,22,0.3)'; }}
+          >
+            Get started <ArrowRight size={18} strokeWidth={2.5} />
           </Link>
-          <Link to="/map" style={{ color: '#fff', fontWeight: 700, fontSize: 15, background: 'none', border: 'none', cursor: 'pointer', borderBottom: '2px solid rgba(255,255,255,0.25)', paddingBottom: 2, textDecoration: 'none' }}>
-            Explore the map
+          <Link to="/map" style={{
+            background: 'rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(12px)',
+            color: '#fff',
+            padding: '16px 36px',
+            borderRadius: 999,
+            fontWeight: 700,
+            fontSize: 15,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            border: '1px solid rgba(255,255,255,0.15)',
+            transition: 'background 0.2s ease, border-color 0.2s ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
+          >
+            <MapIcon size={18} /> Explore the map
           </Link>
         </div>
 
@@ -136,7 +167,7 @@ const Hero = () => (
         <div style={{
           position: 'absolute', top: 20, left: 20, background: '#fff',
           borderRadius: 16, padding: '12px 16px', display: 'flex', alignItems: 'center',
-          gap: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          gap: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 1000,
         }}>
           <div style={{ width: 44, height: 44, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <AlertTriangle size={22} color="#ef4444" />
@@ -151,7 +182,7 @@ const Hero = () => (
         <div style={{
           position: 'absolute', bottom: 20, right: 20, background: '#22c55e',
           borderRadius: 12, padding: '8px 14px', display: 'flex', alignItems: 'center',
-          gap: 8, boxShadow: '0 4px 16px rgba(34,197,94,0.4)',
+          gap: 8, boxShadow: '0 4px 16px rgba(34,197,94,0.4)', zIndex: 1000,
         }}>
           <CheckCircle2 size={15} color="#fff" />
           <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Live Updates</span>
