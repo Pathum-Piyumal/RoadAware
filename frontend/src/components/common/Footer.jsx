@@ -27,7 +27,7 @@ const Footer = () => (
             ] },
             { heading: 'Support',  links: [
                 { label: 'Help Center', path: '/help-center' }, 
-                { label: 'Safety Tips', path: '#' }, 
+                { label: 'Safety Tips', path: '/safety-tips' }, 
                 { label: 'Contact', path: '#' }
             ] },
             { heading: 'Connect',  links: [] },
