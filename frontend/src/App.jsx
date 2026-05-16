@@ -28,6 +28,7 @@ import HazardDetails from './pages/public/HazardDetails';
 import HazardMap from './pages/public/HazardMap';
 import AboutUs from './pages/public/AboutUs';
 import Features from './pages/public/Features';
+import Careers from './pages/public/Careers';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -67,6 +68,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/features" element={<Features />} />
+          <Route path="/careers" element={<Careers />} />
           <Route path="/hazard/:id" element={<HazardDetails />} />
           <Route path="/map" element={<ProtectedRoute><HazardMap /></ProtectedRoute>} />
 

@@ -23,7 +23,7 @@ const Footer = () => (
             { heading: 'Company', links: [
                 { label: 'About Us', path: '/about' }, 
                 { label: 'Features', path: '/features' }, 
-                { label: 'Careers', path: '#' }
+                { label: 'Careers', path: '/careers' }
             ] },
             { heading: 'Support',  links: [
                 { label: 'Help Center', path: '#' }, 
