@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Download, Search, Eye, Lightbulb, AlertTriangle, Construction, Droplets, AlertCircle, X } from 'lucide-react';
+import { Download, Search, Eye, Lightbulb, AlertTriangle, Construction, Droplets, AlertCircle, X, Heart } from 'lucide-react';
 import { recentActivity } from '../../utils/dummyData';
 
 const Reports = () => {
@@ -189,7 +189,7 @@ const Reports = () => {
                     <option value="REJECTED">Rejected</option>
                   </select>
                 </td>
-                <td className="p-4 text-sm text-admin-text font-semibold">▲ {report.upvotes}</td>
+                <td className="p-4 text-sm text-admin-text font-semibold flex items-center gap-1.5"><Heart size={14} className="text-red-500 fill-red-500" /> {report.upvotes}</td>
                 <td className="p-4 text-sm text-admin-text">
                   <p className="font-medium text-admin-text m-0">{report.time}</p>
                   <p className="text-xs text-admin-text-muted m-0 mt-0.5">by {report.reporter}</p>
@@ -275,7 +275,7 @@ const Reports = () => {
               <div className="pt-4 border-t border-admin-border">
                 <h3 className="text-sm font-semibold text-admin-text-muted uppercase tracking-wider mb-2">Engagement</h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-admin-text">▲ {selectedReport.upvotes} Upvotes</span>
+                  <span className="text-sm font-medium text-admin-text flex items-center gap-1.5"><Heart size={14} className="text-red-500 fill-red-500" /> {selectedReport.upvotes}</span>
                 </div>
               </div>
             </div>

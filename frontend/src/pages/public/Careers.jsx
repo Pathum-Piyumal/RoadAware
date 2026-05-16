@@ -149,9 +149,12 @@ export default function Careers() {
                   <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400" /> {job.salary}</div>
                 </div>
               </div>
-              <button className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap">
+              <a 
+                href={`mailto:careers@roadaware.com?subject=Application for ${job.title}`}
+                className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap"
+              >
                 Apply Now <ArrowRight size={18} />
-              </button>
+              </a>
             </div>
           ))}
         </div>

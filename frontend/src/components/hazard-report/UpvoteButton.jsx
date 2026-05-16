@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowBigUp } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
   const [upvotes, setUpvotes] = useState(initialUpvotes || 0);
@@ -21,18 +21,17 @@ const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
   return (
     <button
       onClick={handleUpvote}
-      className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all duration-300 border ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all duration-300 border cursor-pointer ${
         hasUpvoted 
-          ? 'bg-orange-50 text-orange-600 border-orange-200 shadow-sm' 
+          ? 'bg-red-50 text-red-600 border-red-200 shadow-sm' 
           : 'bg-white text-slate-500 border-gray-200 hover:bg-gray-50 hover:text-slate-900 shadow-sm'
       }`}
     >
-      <ArrowBigUp 
-        size={24} 
-        className={`transition-transform duration-300 ${isAnimating ? '-translate-y-1 scale-110' : ''} ${hasUpvoted ? 'fill-orange-500' : 'fill-transparent'}`} 
+      <Heart 
+        size={18} 
+        className={`transition-transform duration-300 ${isAnimating ? 'scale-125' : ''} ${hasUpvoted ? 'fill-red-500 text-red-500' : 'fill-transparent text-slate-500'}`} 
       />
-      <span className="text-lg">{upvotes}</span>
-      <span className="hidden sm:inline-block ml-1">{hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
+      <span className="text-sm font-medium">{upvotes}</span>
     </button>
   );
 };
