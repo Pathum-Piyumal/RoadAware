@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { FaFacebook, FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 
 const Footer = () => (
@@ -28,7 +29,7 @@ const Footer = () => (
             { heading: 'Support',  links: [
                 { label: 'Help Center', path: '/help-center' }, 
                 { label: 'Safety Tips', path: '/safety-tips' }, 
-                { label: 'Contact', path: '#' }
+                { label: 'Contact', path: '/contact' }
             ] },
             { heading: 'Connect',  links: [] },
           ].map((col, i) => (
@@ -43,9 +44,43 @@ const Footer = () => (
                   ))}
                 </ul>
               ) : (
-                <div style={{ display: 'flex', gap: 10 }}>
-                  {[1,2,3].map(n => (
-                    <div key={n} style={{ width: 38, height: 38, borderRadius: 10, background: '#111', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }} />
+                <div style={{ display: 'flex', gap: 12 }}>
+                  {[
+                    { Icon: FaFacebook, href: 'https://facebook.com' },
+                    { Icon: FaLinkedin, href: 'https://linkedin.com' },
+                    { Icon: FaTwitter, href: 'https://twitter.com' },
+                    { Icon: FaGithub, href: 'https://github.com' }
+                  ].map((social, idx) => (
+                    <a 
+                      key={idx} 
+                      href={social.href} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        width: 40, 
+                        height: 40, 
+                        borderRadius: 12, 
+                        background: '#111', 
+                        border: '1px solid rgba(255,255,255,0.07)', 
+                        color: '#9ca3af',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = '#1f2937';
+                        e.currentTarget.style.color = '#fff';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = '#111';
+                        e.currentTarget.style.color = '#9ca3af';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+                      }}
+                    >
+                      <social.Icon size={18} />
+                    </a>
                   ))}
                 </div>
               )}
