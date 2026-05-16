@@ -20,8 +20,16 @@ const Footer = () => (
         {/* Links */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }}>
           {[
-            { heading: 'Company', links: ['About Us', 'Features', 'Careers'] },
-            { heading: 'Support',  links: ['Help Center', 'Safety Tips', 'Contact'] },
+            { heading: 'Company', links: [
+                { label: 'About Us', path: '/about' }, 
+                { label: 'Features', path: '#' }, 
+                { label: 'Careers', path: '#' }
+            ] },
+            { heading: 'Support',  links: [
+                { label: 'Help Center', path: '#' }, 
+                { label: 'Safety Tips', path: '#' }, 
+                { label: 'Contact', path: '#' }
+            ] },
             { heading: 'Connect',  links: [] },
           ].map((col, i) => (
             <div key={i}>
@@ -30,7 +38,7 @@ const Footer = () => (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {col.links.map((l, j) => (
                     <li key={j} style={{ marginBottom: 12 }}>
-                      <a href="#" style={{ fontSize: 13, color: '#6b7280', textDecoration: 'none', fontWeight: 500 }}>{l}</a>
+                      <Link to={l.path} style={{ fontSize: 13, color: '#6b7280', textDecoration: 'none', fontWeight: 500 }}>{l.label}</Link>
                     </li>
                   ))}
                 </ul>
