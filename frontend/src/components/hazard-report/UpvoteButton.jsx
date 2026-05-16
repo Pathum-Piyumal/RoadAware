@@ -1,49 +1,38 @@
 import React, { useState } from 'react';
-import { ThumbsUp } from 'lucide-react';
-import HazardService from '../../services/hazard.service';
-import toast from 'react-hot-toast';
+import { ArrowBigUp } from 'lucide-react';
 
 const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
   const [upvotes, setUpvotes] = useState(initialUpvotes || 0);
   const [hasUpvoted, setHasUpvoted] = useState(initialHasUpvoted || false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const handleUpvote = async () => {
-    setHasUpvoted(!hasUpvoted);
-    setUpvotes(prev => hasUpvoted ? prev - 1 : prev + 1);
-    
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-    } catch (error) {
-      setHasUpvoted(hasUpvoted);
-      setUpvotes(initialUpvotes);
-      toast.error('Failed to register upvote. Please try again.');
-    } finally {
-      setIsLoading(false);
+  const handleUpvote = () => {
+    if (hasUpvoted) {
+      setUpvotes(prev => prev - 1);
+      setHasUpvoted(false);
+    } else {
+      setUpvotes(prev => prev + 1);
+      setHasUpvoted(true);
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 300);
     }
   };
 
   return (
     <button
       onClick={handleUpvote}
-      disabled={isLoading}
-      className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm border
-        ${hasUpvoted 
-          ? 'bg-blue-600 text-white border-blue-500 shadow-blue-500/20 hover:bg-blue-700' 
-          : 'bg-[#1a1a1a] text-gray-300 border-white/10 hover:border-blue-500/50 hover:bg-[#222]'}
-      `}
+      className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all duration-300 border ${
+        hasUpvoted 
+          ? 'bg-orange-500/20 text-orange-500 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]' 
+          : 'bg-[#1a1a1a] text-gray-400 border-white/10 hover:bg-[#222] hover:text-white'
+      }`}
     >
-      <div className={`p-1.5 rounded-full ${hasUpvoted ? 'bg-blue-500' : 'bg-[#0a0a0a]'}`}>
-        <ThumbsUp 
-          size={20} 
-          className={hasUpvoted ? 'fill-white text-white' : 'text-gray-400'} 
-        />
-      </div>
-      <div className="flex flex-col items-start leading-tight">
-        <span className="text-sm opacity-80">{hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
-        <span className="text-lg">{upvotes}</span>
-      </div>
+      <ArrowBigUp 
+        size={24} 
+        className={`transition-transform duration-300 ${isAnimating ? '-translate-y-1 scale-110' : ''} ${hasUpvoted ? 'fill-orange-500' : 'fill-transparent'}`} 
+      />
+      <span className="text-lg">{upvotes}</span>
+      <span className="hidden sm:inline-block ml-1">{hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
     </button>
   );
 };

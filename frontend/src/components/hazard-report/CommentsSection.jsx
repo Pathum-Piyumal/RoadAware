@@ -1,137 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import { Send, UserCircle2, Loader2 } from 'lucide-react';
-import HazardService from '../../services/hazard.service';
-import AuthService from '../../services/auth.service';
-import toast from 'react-hot-toast';
+import React, { useState } from 'react';
+import { Send, UserCircle2 } from 'lucide-react';
 
 const CommentsSection = ({ hazardId }) => {
-  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const currentUser = AuthService.getCurrentUser();
-
-  // Dummy Comments for initial load
-  const DUMMY_COMMENTS = [
+  // Dummy comments data
+  const [comments, setComments] = useState([
     {
-      id: 'c1',
+      id: 1,
       user: { name: 'Sarah Jenkins', avatar: 'https://i.pravatar.cc/150?u=sarah' },
-      content: 'I almost damaged my car here yesterday! Thanks for reporting.',
-      createdAt: '2026-05-13T10:20:00Z'
+      text: 'Just drove past this 10 mins ago. It is really dangerous, especially at night because the street light nearby is also broken.',
+      timestamp: '2 hours ago'
     },
     {
-      id: 'c2',
-      user: { name: 'Michael Chen', avatar: 'https://i.pravatar.cc/150?u=mike' },
-      content: 'The authorities need to fix this ASAP. It is on a main route.',
-      createdAt: '2026-05-13T14:45:00Z'
+      id: 2,
+      user: { name: 'Mike T.', avatar: 'https://i.pravatar.cc/150?u=mike' },
+      text: 'Thanks for reporting! I almost hit it yesterday.',
+      timestamp: '5 hours ago'
     }
-  ];
+  ]);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setComments(DUMMY_COMMENTS);
-      } catch (error) {
-        console.warn('API unavailable, loading dummy comments.');
-        setComments(DUMMY_COMMENTS);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchComments();
-  }, [hazardId]);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
-
-    if (!currentUser) {
-      toast.error('You must be logged in to comment.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const createdComment = {
-        id: Date.now().toString(),
-        user: { name: currentUser.name, avatar: currentUser.avatar },
-        content: newComment,
-        createdAt: new Date().toISOString()
-      };
-      
-      setComments([createdComment, ...comments]);
-      setNewComment('');
-      toast.success('Comment added!');
-    } catch (error) {
-      toast.error('Failed to add comment.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    const newCommentObj = {
+      id: Date.now(),
+      user: { name: 'You', avatar: 'https://i.pravatar.cc/150?u=you' },
+      text: newComment,
+      timestamp: 'Just now'
+    };
+    
+    setComments([newCommentObj, ...comments]);
+    setNewComment('');
   };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-  };
-
-  if (isLoading) {
-    return <div className="py-8 flex justify-center"><Loader2 className="animate-spin text-orange-500" /></div>;
-  }
 
   return (
-    <div className="bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-black/50 border border-white/10 mt-8">
-      <h3 className="text-xl font-bold text-white mb-6">Community Discussion ({comments.length})</h3>
-
-      {/* Add Comment Form */}
-      <div className="mb-8 flex gap-4">
-        {currentUser?.avatar ? (
-          <img src={currentUser.avatar} alt="You" className="w-10 h-10 rounded-full object-cover shadow-sm border border-white/10" />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center border border-white/10">
-            <UserCircle2 className="text-gray-500" size={24} />
+    <div className="bg-[#111] rounded-3xl p-6 md:p-8 shadow-xl shadow-black/50 border border-white/10">
+      <h3 className="text-xl font-bold text-white mb-6">Community Updates ({comments.length})</h3>
+      
+      {/* Add Comment Input */}
+      <form onSubmit={handleSubmit} className="mb-8 flex gap-3">
+        <div className="flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden border border-white/10">
+            <UserCircle2 size={24} className="text-gray-400" />
           </div>
-        )}
-        <form onSubmit={handleSubmit} className="flex-1 relative">
-          <textarea
+        </div>
+        <div className="flex-grow relative">
+          <input
+            type="text"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder={currentUser ? "Add a comment..." : "Sign in to comment..."}
-            disabled={!currentUser || isSubmitting}
-            className="w-full bg-[#0a0a0a] border border-white/10 text-white rounded-2xl py-3 px-4 pr-12 text-sm focus:ring-orange-500 focus:border-orange-500 transition-colors min-h-[80px] resize-y disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2"
+            placeholder="Add an update or comment..."
+            className="w-full bg-[#1a1a1a] text-white rounded-xl px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-orange-500/50 border border-white/5 transition-all"
           />
-          <button
+          <button 
             type="submit"
-            disabled={!newComment.trim() || isSubmitting || !currentUser}
-            className="absolute bottom-3 right-3 p-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            disabled={!newComment.trim()}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:hover:bg-orange-500 transition-colors"
           >
-            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            <Send size={16} />
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
 
       {/* Comments List */}
       <div className="space-y-6">
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-4 group">
-            {comment.user.avatar ? (
-              <img src={comment.user.avatar} alt={comment.user.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center border border-white/10">
-                <UserCircle2 className="text-gray-500" size={24} />
+            <img 
+              src={comment.user.avatar} 
+              alt={comment.user.name} 
+              className="w-10 h-10 rounded-full object-cover shadow-sm border border-white/10 flex-shrink-0" 
+            />
+            <div className="flex-grow">
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="font-bold text-white/90">{comment.user.name}</span>
+                <span className="text-xs text-gray-500 font-medium">{comment.timestamp}</span>
               </div>
-            )}
-            <div className="flex-1 bg-[#1a1a1a] rounded-2xl p-4 border border-white/5 group-hover:border-white/10 transition-colors">
-              <div className="flex justify-between items-center mb-1">
-                <span className="font-bold text-white text-sm">{comment.user.name}</span>
-                <span className="text-xs text-gray-500 font-medium">{formatDate(comment.createdAt)}</span>
-              </div>
-              <p className="text-sm text-gray-400 leading-relaxed">{comment.content}</p>
+              <p className="text-gray-400 text-sm leading-relaxed bg-[#1a1a1a] p-3 rounded-2xl rounded-tl-none border border-white/5">
+                {comment.text}
+              </p>
             </div>
           </div>
         ))}
