@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, AlertTriangle, MessageCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import styles from './HazardMap.module.css';
+import UpvoteButton from '../../components/hazard-report/UpvoteButton';
+import CommentsSection from '../../components/hazard-report/CommentsSection';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -22,23 +24,32 @@ const hazards = [
 ];
 
 const gridHazards = [
-  { id: 1, type: "Pothole", severity: "Low", title: "Widespread Pothole Area", location: "102 Main Road, Colombo", time: "15 days ago by User A", upvotes: 28 },
-  { id: 2, type: "Flooding", severity: "High", title: "Central station fully submerged", location: "15 Station Rd, Kandy", time: "2 days ago by User B", upvotes: 112 },
-  { id: 3, type: "Pothole", severity: "High", title: "Massive Pothole...", location: "28 Galle Road, Bentota", time: "18 days ago by User C", upvotes: 14 },
-  { id: 4, type: "Debris", severity: "Critical", title: "Hazardous debris on road", location: "44 Temple St, Anuradhapura", time: "12 days ago by User D", upvotes: 82 },
-  { id: 5, type: "Pothole", severity: "Low", title: "Minor potholes near bridge", location: "Bridge Ave, Galle", time: "20 days ago by User E", upvotes: 34 },
-  { id: 6, type: "Construction", severity: "Medium", title: "Unmarked construction zone", location: "40 Kandy Road, Kurunegala", time: "25 days ago by User F", upvotes: 71 },
-  { id: 7, type: "Flooding", severity: "High", title: "Multiple flooding points in center", location: "Center St, Jaffna", time: "22 days ago by User G", upvotes: 18 },
-  { id: 8, type: "Debris", severity: "Critical", title: "Boulder blocking mountain road", location: "Mountain Pass, Nuwara Eliya", time: "15 days ago by User H", upvotes: 140 },
-  { id: 9, type: "Streetlight", severity: "Low", title: "Broken streetlight series", location: "Park Lane, Negombo", time: "5 days ago by User I", upvotes: 42 },
-  { id: 10, type: "Animal", severity: "Medium", title: "Stray dog pack on highway", location: "Highway A1 exit, Kelaniya", time: "1 day ago by User J", upvotes: 56 },
-  { id: 11, type: "Construction", severity: "High", title: "Open manhole left unattended", location: "700 South St, Matara", time: "6 days ago by User K", upvotes: 97 },
-  { id: 12, type: "Pothole", severity: "Critical", title: "Deep pothole near junction", location: "88 Junction, Badulla", time: "10 days ago by User L", upvotes: 130 },
+  { id: 1, type: "Pothole", severity: "Low", title: "Widespread Pothole Area", location: "102 Main Road, Colombo", time: "15 days ago by User A", upvotes: 28, description: "Multiple potholes spanning a 200m stretch. Very dangerous for motorcycles and smaller vehicles, especially during rain." },
+  { id: 2, type: "Flooding", severity: "High", title: "Central station fully submerged", location: "15 Station Rd, Kandy", time: "2 days ago by User B", upvotes: 112, description: "The central station underpass is completely flooded after yesterday's heavy rainfall. Water level is at knee height." },
+  { id: 3, type: "Pothole", severity: "High", title: "Massive Pothole near junction", location: "28 Galle Road, Bentota", time: "18 days ago by User C", upvotes: 14, description: "A deep pothole has formed near the main junction. It's almost invisible at night and has caused several flat tires." },
+  { id: 4, type: "Debris", severity: "Critical", title: "Hazardous debris on road", location: "44 Temple St, Anuradhapura", time: "12 days ago by User D", upvotes: 82, description: "Construction debris has been left on the road after building work. Includes nails, broken concrete, and metal rods." },
+  { id: 5, type: "Pothole", severity: "Low", title: "Minor potholes near bridge", location: "Bridge Ave, Galle", time: "20 days ago by User E", upvotes: 34, description: "Several small potholes have appeared near the old bridge. Not dangerous yet but getting worse after each rain." },
+  { id: 6, type: "Construction", severity: "Medium", title: "Unmarked construction zone", location: "40 Kandy Road, Kurunegala", time: "25 days ago by User F", upvotes: 71, description: "A construction zone on the main road has no proper signage or barriers. Especially dangerous at night." },
+  { id: 7, type: "Flooding", severity: "High", title: "Multiple flooding points in center", location: "Center St, Jaffna", time: "22 days ago by User G", upvotes: 18, description: "Three separate flooding points have appeared in the town center after the drainage system failed." },
+  { id: 8, type: "Debris", severity: "Critical", title: "Boulder blocking mountain road", location: "Mountain Pass, Nuwara Eliya", time: "15 days ago by User H", upvotes: 140, description: "A large boulder has rolled onto the mountain road after a landslide. Only one lane is passable." },
+  { id: 9, type: "Streetlight", severity: "Low", title: "Broken streetlight series", location: "Park Lane, Negombo", time: "5 days ago by User I", upvotes: 42, description: "A series of 5 streetlights along Park Lane have all gone out, making the road very dark and unsafe at night." },
+  { id: 10, type: "Animal", severity: "Medium", title: "Stray dog pack on highway", location: "Highway A1 exit, Kelaniya", time: "1 day ago by User J", upvotes: 56, description: "A large pack of stray dogs is congregating near the highway exit ramp, posing a danger to motorcyclists." },
+  { id: 11, type: "Construction", severity: "High", title: "Open manhole left unattended", location: "700 South St, Matara", time: "6 days ago by User K", upvotes: 97, description: "An open manhole has been left without a cover or barriers after maintenance work. Extremely dangerous." },
+  { id: 12, type: "Pothole", severity: "Critical", title: "Deep pothole near junction", location: "88 Junction, Badulla", time: "10 days ago by User L", upvotes: 130, description: "A very deep pothole has formed at a busy junction. Several vehicles have been damaged. Urgent repair needed." },
 ];
 
 
 export default function HazardMap() {
-  const [viewMode, setViewMode] = useState('grid'); // Default to 'grid' to match design step 2
+  const [viewMode, setViewMode] = useState('grid');
+  const [selectedHazard, setSelectedHazard] = useState(null);
+
+  const handleOpenPanel = (hazard) => {
+    setSelectedHazard(hazard);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedHazard(null);
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -147,10 +158,13 @@ export default function HazardMap() {
                     <Clock size={12} /> {hazard.time}
                   </div>
                   <div className={styles.cardFooter}>
-                    <div className={styles.upvoteSection}>
-                      <ThumbsUp size={14} /> {hazard.upvotes}
-                    </div>
-                    <a href="#" className={styles.detailsLink}>Details &gt;</a>
+                    <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} />
+                    <button 
+                      onClick={() => handleOpenPanel(hazard)} 
+                      className={styles.detailsLink}
+                    >
+                      Details &gt;
+                    </button>
                   </div>
                 </div>
               ))}
@@ -159,6 +173,90 @@ export default function HazardMap() {
 
         </div>
       </main>
+
+      {/* ── Slide-Out Detail Panel ── */}
+      {selectedHazard && (
+        <>
+          {/* Backdrop overlay */}
+          <div 
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
+            onClick={handleClosePanel}
+          />
+
+          {/* Panel */}
+          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-50 overflow-y-auto animate-slide-in-right flex flex-col">
+            
+            {/* Panel Header */}
+            <div className="sticky top-0 bg-white z-10 px-8 pt-8 pb-4 border-b border-gray-100">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className={`${styles.badge} ${styles['badge' + selectedHazard.type]}`}>
+                      {selectedHazard.type}
+                    </span>
+                    <span className={`${styles.badge} ${styles['badge' + selectedHazard.severity]}`}>
+                      {selectedHazard.severity}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{selectedHazard.title}</h2>
+                </div>
+                <button 
+                  onClick={handleClosePanel}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={20} className="text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Panel Body */}
+            <div className="flex-1 px-8 py-6 space-y-6">
+              
+              {/* Image Placeholder */}
+              <div className="h-48 w-full bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
+                <span className="text-sm font-semibold">Attached Image (Placeholder)</span>
+              </div>
+
+              {/* Metadata */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Location</span>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                    <MapPin size={14} className="text-blue-500" />
+                    {selectedHazard.location}
+                  </div>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Reported</span>
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                    <Clock size={14} className="text-blue-500" />
+                    {selectedHazard.time}
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="text-base font-bold text-slate-900 mb-2">Description</h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  {selectedHazard.description}
+                </p>
+              </div>
+
+              {/* Upvote Section */}
+              <div className="flex items-center gap-4 py-4 border-y border-gray-100">
+                <UpvoteButton hazardId={selectedHazard.id} initialUpvotes={selectedHazard.upvotes} />
+                <span className="text-sm text-slate-500">
+                  Support this report to help prioritize it
+                </span>
+              </div>
+
+              {/* Comments Section */}
+              <CommentsSection hazardId={selectedHazard.id} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
