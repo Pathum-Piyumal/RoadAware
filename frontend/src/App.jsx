@@ -1,5 +1,14 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import AuthService from './services/auth.service';
+
+const ProtectedRoute = ({ children }) => {
+  const currentUser = AuthService.getCurrentUser();
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 // Admin Pages
 import AdminLayout from './layouts/AdminLayout';
@@ -55,7 +64,7 @@ function AppContent() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/hazard/:id" element={<HazardDetails />} />
-          <Route path="/map" element={<HazardMap />} />
+          <Route path="/map" element={<ProtectedRoute><HazardMap /></ProtectedRoute>} />
 
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
@@ -65,10 +74,10 @@ function AppContent() {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Citizen Routes */}
-          <Route path="/dashboard" element={<CitizenDashboard />} />
-          <Route path="/profile" element={<CitizenProfile />} />
-          <Route path="/report-hazard" element={<ReportHazard />} />
-          <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/dashboard" element={<ProtectedRoute><CitizenDashboard /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><CitizenProfile /></ProtectedRoute>} />
+          <Route path="/report-hazard" element={<ProtectedRoute><ReportHazard /></ProtectedRoute>} />
+          <Route path="/my-reports" element={<ProtectedRoute><MyReports /></ProtectedRoute>} />
 
           {/* Admin Login */}
           <Route path="/admin/login" element={<AdminLogin />} />
