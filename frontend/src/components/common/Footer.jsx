@@ -28,7 +28,7 @@ const Footer = () => (
             { heading: 'Support',  links: [
                 { label: 'Help Center', path: '/help-center' }, 
                 { label: 'Safety Tips', path: '/safety-tips' }, 
-                { label: 'Contact', path: '#' }
+                { label: 'Contact', path: '/contact' }
             ] },
             { heading: 'Connect',  links: [] },
           ].map((col, i) => (

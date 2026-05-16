@@ -31,6 +31,7 @@ import Features from './pages/public/Features';
 import Careers from './pages/public/Careers';
 import HelpCenter from './pages/public/HelpCenter';
 import SafetyTips from './pages/public/SafetyTips';
+import Contact from './pages/public/Contact';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -73,6 +74,7 @@ function AppContent() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/safety-tips" element={<SafetyTips />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/hazard/:id" element={<HazardDetails />} />
           <Route path="/map" element={<ProtectedRoute><HazardMap /></ProtectedRoute>} />
 
