@@ -16,6 +16,7 @@ import AdminLogin from './pages/auth/AdminLogin';
 // Public Pages
 import Home from './pages/public/Home';
 import HazardDetails from './pages/public/HazardDetails';
+import HazardMap from './pages/public/HazardMap';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -28,6 +29,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 import ReportHazard from './pages/citizen/ReportHazard';
 import CitizenDashboard from './pages/citizen/Dashboard';
 import CitizenProfile from './pages/citizen/Profile';
+import MyReports from './pages/citizen/MyReports';
 
 // Common Components
 import Navbar from './components/common/Navbar';
@@ -53,6 +55,7 @@ function AppContent() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/hazard/:id" element={<HazardDetails />} />
+          <Route path="/map" element={<HazardMap />} />
 
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
@@ -65,6 +68,7 @@ function AppContent() {
           <Route path="/dashboard" element={<CitizenDashboard />} />
           <Route path="/profile" element={<CitizenProfile />} />
           <Route path="/report-hazard" element={<ReportHazard />} />
+          <Route path="/my-reports" element={<MyReports />} />
 
           {/* Admin Login */}
           <Route path="/admin/login" element={<AdminLogin />} />
