@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -33,19 +33,63 @@ const getBadgeStyles = (key) => {
   return `px-2 py-1 rounded text-[9px] font-extrabold uppercase tracking-wider ${mapping[key] || "bg-gray-100 text-gray-600"}`;
 };
 
+// Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
+const ScrollReveal = ({ children, delay = 0, className = "" }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.02 });
+    
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+    
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, [delay]);
+
+  return (
+    <div
+      ref={domRef}
+      className={className}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'opacity, transform'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const initialHazards = [
-  { id: 1, lat: 6.9271, lng: 79.8612, type: "Pothole", severity: "Critical", status: "Reported", title: "Massive Pothole on Galle Road", location: "102 Galle Road, Colombo", time: "2 hours ago by User A", upvotes: 130 },
-  { id: 2, lat: 6.9340, lng: 79.8500, type: "Flooding", severity: "High", status: "In Progress", title: "Central station fully submerged", location: "Town Hall, Colombo", time: "5 hours ago by User B", upvotes: 98 },
-  { id: 3, lat: 6.9157, lng: 79.8636, type: "Streetlight", severity: "Medium", status: "Reported", title: "Broken Streetlight Series", location: "Marine Drive, Colombo", time: "1 day ago by User C", upvotes: 45 },
-  { id: 4, lat: 6.9390, lng: 79.8700, type: "Debris", severity: "High", status: "Reported", title: "Construction Debris on Road", location: "Bauddhaloka Mawatha, Colombo", time: "12 hours ago by User D", upvotes: 82 },
-  { id: 5, lat: 6.9200, lng: 79.8750, type: "Construction", severity: "Critical", status: "In Progress", title: "Open Manhole Cover", location: "Duplication Road, Colombo", time: "3 hours ago by User E", upvotes: 140 },
-  { id: 6, lat: 6.9450, lng: 79.8580, type: "Pothole", severity: "Low", status: "Reported", title: "Minor Road Cracks", location: "Independence Avenue, Colombo", time: "3 days ago by User F", upvotes: 22 },
-  { id: 7, lat: 6.9100, lng: 79.8520, type: "Flooding", severity: "High", status: "Reported", title: "Waterlogged Junction", location: "Bambalapitiya Junction, Colombo", time: "8 hours ago by User G", upvotes: 67 },
-  { id: 8, lat: 6.9500, lng: 79.8650, type: "Debris", severity: "Medium", status: "Resolved", title: "Fallen Tree Branch", location: "Horton Place, Colombo", time: "2 days ago by User H", upvotes: 34 },
-  { id: 9, lat: 6.9050, lng: 79.8700, type: "Animal", severity: "Low", status: "Reported", title: "Stray Animal Warning", location: "Wellawatte, Colombo", time: "1 day ago by User I", upvotes: 18 },
-  { id: 10, lat: 6.9320, lng: 79.8400, type: "Construction", severity: "High", status: "In Progress", title: "Unmarked Road Work Zone", location: "Baseline Road, Colombo", time: "6 hours ago by User J", upvotes: 71 },
-  { id: 11, lat: 6.9550, lng: 79.8550, type: "Pothole", severity: "Critical", status: "Reported", title: "Deep Pothole near Bridge", location: "Orugodawatte, Colombo", time: "4 hours ago by User K", upvotes: 112 },
-  { id: 12, lat: 6.9230, lng: 79.8450, type: "Construction", severity: "Medium", status: "Reported", title: "Damaged Road Barrier", location: "Havelock Road, Colombo", time: "1 day ago by User L", upvotes: 56, description: "A very deep pothole has formed at a busy junction. Several vehicles have been damaged. Urgent repair needed." },
+  { id: 1, lat: 6.9271, lng: 79.8612, type: "Pothole", severity: "Critical", status: "Reported", title: "Massive Pothole on Galle Road", location: "102 Galle Road, Colombo", time: "2 hours ago by User A", upvotes: 130, description: "A very deep, dangerous pothole measuring roughly 2 feet wide right in the middle of the active lane." },
+  { id: 2, lat: 6.9340, lng: 79.8500, type: "Flooding", severity: "High", status: "In Progress", title: "Central station fully submerged", location: "Town Hall, Colombo", time: "5 hours ago by User B", upvotes: 98, description: "Main terminal access street is completely flooded due to heavy downpours and blocked drains." },
+  { id: 3, lat: 6.9157, lng: 79.8636, type: "Streetlight", severity: "Medium", status: "Reported", title: "Broken Streetlight Series", location: "Marine Drive, Colombo", time: "1 day ago by User C", upvotes: 45, description: "At least four streetlights in a row are completely offline, leaving a dark blindspot on the bypass." },
+  { id: 4, lat: 6.9390, lng: 79.8700, type: "Debris", severity: "High", status: "Reported", title: "Construction Debris on Road", location: "Bauddhaloka Mawatha, Colombo", time: "12 hours ago by User D", upvotes: 82, description: "Sands, bricks, and concrete waste scattered along the primary travel path." },
+  { id: 5, lat: 6.9200, lng: 79.8750, type: "Construction", severity: "Critical", status: "In Progress", title: "Open Manhole Cover", location: "Duplication Road, Colombo", time: "3 hours ago by User E", upvotes: 140, description: "A hazardous open sewer hole without proper barricades or safety cones." },
+  { id: 6, lat: 6.9450, lng: 79.8580, type: "Pothole", severity: "Low", status: "Reported", title: "Minor Road Cracks", location: "Independence Avenue, Colombo", time: "3 days ago by User F", upvotes: 22, description: "Asphalt is beginning to degrade. Best to fix early before it deepens." },
+  { id: 7, lat: 6.9100, lng: 79.8520, type: "Flooding", severity: "High", status: "Reported", title: "Waterlogged Junction", location: "Bambalapitiya Junction, Colombo", time: "8 hours ago by User G", upvotes: 67, description: "Heavy surface water runoff is creating hydroplane risks." },
+  { id: 8, lat: 6.9500, lng: 79.8650, type: "Debris", severity: "Medium", status: "Resolved", title: "Fallen Tree Branch", location: "Horton Place, Colombo", time: "2 days ago by User H", upvotes: 34, description: "A large bough broke during high winds and blocked a portion of the lane." },
+  { id: 9, lat: 6.9050, lng: 79.8700, type: "Animal", severity: "Low", status: "Reported", title: "Stray Animal Warning", location: "Wellawatte, Colombo", time: "1 day ago by User I", upvotes: 18, description: "A pack of stray dogs frequently nesting near the sharp turn." },
+  { id: 10, lat: 6.9320, lng: 79.8400, type: "Construction", severity: "High", status: "In Progress", title: "Unmarked Road Work Zone", location: "Baseline Road, Colombo", time: "6 hours ago by User J", upvotes: 71, description: "Active pipe repairs without clear advanced warning signage." },
+  { id: 11, lat: 6.9550, lng: 79.8550, type: "Pothole", severity: "Critical", status: "Reported", title: "Deep Pothole near Bridge", location: "Orugodawatte, Colombo", time: "4 hours ago by User K", upvotes: 112, description: "Deep suspension-damaging road hole right near the bridge expansion seam." },
+  { id: 12, lat: 6.9230, lng: 79.8450, type: "Construction", severity: "Medium", status: "Reported", title: "Damaged Road Barrier", location: "Havelock Road, Colombo", time: "1 day ago by User L", upvotes: 56, description: "A metal crash cushion is severely crumpled and protruding slightly into traffic." },
 ];
 
 export default function HazardMap() {
@@ -85,7 +129,7 @@ export default function HazardMap() {
           <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </div>
         {isOpen && (
-          <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[100] max-h-[240px] overflow-y-auto p-1.5">
+          <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[100] max-h-[240px] overflow-y-auto p-1.5 animate-fade-in-up">
             {options.map(opt => (
               <div 
                 key={opt}
@@ -126,134 +170,153 @@ export default function HazardMap() {
   const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
 
   return (
-    <div className="font-sans bg-white min-h-screen flex flex-col">
+    <div className="font-sans bg-white min-h-screen flex flex-col selection:bg-orange-100 selection:text-orange-950">
       {/* Header Section */}
-      <header className="bg-[#f4f6f9] pt-12 pb-16 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-8 w-full">
+      <header className="bg-[#f4f6f9] pt-16 pb-20 border-b border-gray-200 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] -mr-48 -mt-48" />
+        <div className="max-w-7xl mx-auto px-8 w-full relative z-10 animate-fade-in-up">
           <span className="inline-block text-[11px] font-extrabold text-blue-600 tracking-widest uppercase mb-4">LIVE MAP</span>
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Hazards in your area</h1>
-          <p className="text-[15px] text-gray-500 max-w-[600px]">
-            Browse every reported hazard. Filter by type, status, or severity. Click any pin for details.
+          <h1 className="text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Hazards in your area.</h1>
+          <p className="text-[16px] text-gray-500 max-w-[620px] leading-relaxed">
+            Browse every active and reported hazard. Filter by category, action status, or threat level. Click any pin for detailed logs.
           </p>
         </div>
       </header>
 
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pb-24">
         <div className="max-w-7xl mx-auto px-8 w-full">
 
           {/* Filters Bar */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-md -mt-8 relative z-10">
-            <div className="flex-1 flex items-center gap-3 py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <Search size={18} className="text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search address, area, or ID..."
-                className="border-none bg-transparent w-full text-sm text-gray-900 outline-none placeholder-gray-400"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+          <ScrollReveal delay={100} className="relative z-30">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xl shadow-slate-200/50 -mt-10 relative z-30 transition-shadow hover:shadow-2xl">
+              <div className="flex-1 flex items-center gap-3 py-3 px-4 bg-gray-50 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-600/10 focus-within:border-blue-600 transition-all">
+                <Search size={18} className="text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search address, area, or ID..."
+                  className="border-none bg-transparent w-full text-sm text-gray-900 outline-none placeholder-gray-400"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
 
-            <div className="flex flex-wrap gap-3">
-              <CustomDropdown options={types} value={typeFilter} onChange={setTypeFilter} />
-              <CustomDropdown options={statuses} value={statusFilter} onChange={setStatusFilter} />
-              <CustomDropdown options={severities} value={severityFilter} onChange={setSeverityFilter} />
-            </div>
+              <div className="flex flex-wrap gap-3">
+                <CustomDropdown options={types} value={typeFilter} onChange={setTypeFilter} />
+                <CustomDropdown options={statuses} value={statusFilter} onChange={setStatusFilter} />
+                <CustomDropdown options={severities} value={severityFilter} onChange={setSeverityFilter} />
+              </div>
 
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
-              <button
-                className={`flex items-center justify-center py-2 px-3 rounded-md cursor-pointer transition-all duration-200 ${
-                  viewMode === 'map' ? 'bg-blue-900 text-white shadow-sm' : 'bg-transparent text-gray-500 hover:text-gray-700'
-                }`}
-                onClick={() => setViewMode('map')}
-              >
-                <Map size={16} />
-              </button>
-              <button
-                className={`flex items-center justify-center py-2 px-3 rounded-md cursor-pointer transition-all duration-200 ${
-                  viewMode === 'grid' ? 'bg-blue-900 text-white shadow-sm' : 'bg-transparent text-gray-500 hover:text-gray-700'
-                }`}
-                onClick={() => setViewMode('grid')}
-              >
-                <Grid size={16} />
-              </button>
+              <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
+                <button
+                  className={`flex items-center justify-center py-2.5 px-4 rounded-lg cursor-pointer transition-all duration-300 ${
+                    viewMode === 'map' ? 'bg-slate-900 text-white shadow-md' : 'bg-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                  onClick={() => setViewMode('map')}
+                >
+                  <Map size={16} className="mr-2" /> Map
+                </button>
+                <button
+                  className={`flex items-center justify-center py-2.5 px-4 rounded-lg cursor-pointer transition-all duration-300 ${
+                    viewMode === 'grid' ? 'bg-slate-900 text-white shadow-md' : 'bg-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid size={16} className="mr-2" /> Grid
+                </button>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Map Info Bar */}
-          <div className="flex justify-between items-center mt-6 mb-4 px-2">
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Filter size={14} />
-              <span><strong>{filteredHazards.length}</strong> of {initialHazards.length} hazards</span>
+          <ScrollReveal delay={150}>
+            <div className="flex justify-between items-center mt-8 mb-6 px-2">
+              <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                <Filter size={15} />
+                <span>Showing <strong>{filteredHazards.length}</strong> of {initialHazards.length} hazards</span>
+              </div>
+              <button
+                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                  isHeatmap ? 'bg-red-50 text-red-500 border border-red-100' : 'text-gray-500 hover:bg-gray-100'
+                }`}
+                onClick={() => setIsHeatmap(!isHeatmap)}
+              >
+                <Flame size={14} className={isHeatmap ? 'text-red-500 animate-pulse' : 'text-gray-500'} />
+                <span>Heatmap {isHeatmap ? 'ON' : 'OFF'}</span>
+              </button>
             </div>
-            <button
-              className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-md cursor-pointer transition-colors ${
-                isHeatmap ? 'bg-red-100 text-red-500' : 'text-gray-500 hover:bg-gray-50'
-              }`}
-              onClick={() => setIsHeatmap(!isHeatmap)}
-            >
-              <Flame size={14} className={isHeatmap ? 'text-red-500' : 'text-gray-500'} />
-              <span>Heatmap {isHeatmap ? 'ON' : 'OFF'}</span>
-            </button>
-          </div>
+          </ScrollReveal>
 
           {/* Content Area (Map or Grid) */}
           {viewMode === 'map' ? (
-            <div className="h-[600px] rounded-2xl overflow-hidden border border-gray-200 shadow-lg">
-              <MapContainer 
-                center={[6.9271, 79.8612]} 
-                zoom={13} 
-                className="w-full h-full"
-                zoomControl={false}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                {filteredHazards.map(hazard => (
-                  isHeatmap ? (
-                    <CircleMarker
-                      key={hazard.id}
-                      center={[hazard.lat, hazard.lng]}
-                      pathOptions={{ color: 'transparent', fillColor: '#ef4444', fillOpacity: 0.6 }}
-                      radius={35}
-                    >
-                      <Popup>{hazard.title} (Heat Zone)</Popup>
-                    </CircleMarker>
-                  ) : (
-                    <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
-                      <Popup>{hazard.title}</Popup>
-                    </Marker>
-                  )
-                ))}
-              </MapContainer>
-            </div>
+            <ScrollReveal>
+              <div className="h-[600px] rounded-3xl overflow-hidden border border-gray-200 shadow-2xl transition-all duration-500">
+                <MapContainer 
+                  center={[6.9271, 79.8612]} 
+                  zoom={13} 
+                  className="w-full h-full"
+                  zoomControl={false}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {filteredHazards.map(hazard => (
+                    isHeatmap ? (
+                      <CircleMarker
+                        key={hazard.id}
+                        center={[hazard.lat, hazard.lng]}
+                        pathOptions={{ color: 'transparent', fillColor: '#ef4444', fillOpacity: 0.6 }}
+                        radius={35}
+                      >
+                        <Popup>{hazard.title} (Heat Zone)</Popup>
+                      </CircleMarker>
+                    ) : (
+                      <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
+                        <Popup>{hazard.title}</Popup>
+                      </Marker>
+                    )
+                  ))}
+                </MapContainer>
+              </div>
+            </ScrollReveal>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {filteredHazards.map(hazard => (
-                <div key={hazard.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col hover:shadow-md transition-all">
-                  <div className="flex gap-2 mb-3">
-                    <span className={getBadgeStyles(hazard.type)}>{hazard.type}</span>
-                    <span className={getBadgeStyles(hazard.severity)}>{hazard.severity}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredHazards.map((hazard, idx) => (
+                <ScrollReveal key={hazard.id} delay={idx * 60}>
+                  <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-lg shadow-slate-100/50 flex flex-col hover:shadow-2xl hover:border-slate-200 hover:-translate-y-1.5 transition-all duration-300 h-full group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-full opacity-60 pointer-events-none" />
+                    <div className="flex gap-2 mb-4 relative z-10">
+                      <span className={getBadgeStyles(hazard.type)}>{hazard.type}</span>
+                      <span className={getBadgeStyles(hazard.severity)}>{hazard.severity}</span>
+                    </div>
+                    
+                    {/* Atmospheric background graphic */}
+                    <div className="h-28 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100/80 mb-5 border border-slate-100 flex items-center justify-center">
+                      <MapPin size={24} className="text-slate-400/80 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500" />
+                    </div>
+
+                    <h3 className="text-base font-bold text-gray-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">{hazard.title}</h3>
+                    
+                    <div className="space-y-2 mt-auto">
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <MapPin size={13} className="text-blue-500 flex-shrink-0" /> <span className="truncate">{hazard.location}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                        <Clock size={13} className="text-blue-500 flex-shrink-0" /> {hazard.time}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 pt-4 border-t border-slate-50 flex justify-between items-center relative z-10">
+                      <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} />
+                      <button
+                        onClick={() => handleOpenPanel(hazard)}
+                        className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-0.5 cursor-pointer bg-transparent border-none"
+                      >
+                        Details &gt;
+                      </button>
+                    </div>
                   </div>
-                  <div className="h-[120px] rounded-lg bg-slate-50 mb-4" />
-                  <h3 className="text-sm font-bold text-gray-900 mb-2 leading-snug">{hazard.title}</h3>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mb-1.5">
-                    <MapPin size={12} /> {hazard.location}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mb-1.5">
-                    <Clock size={12} /> {hazard.time}
-                  </div>
-                  <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center">
-                    <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} />
-                    <button
-                      onClick={() => handleOpenPanel(hazard)}
-                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-0.5 cursor-pointer bg-transparent border-none"
-                    >
-                      Details &gt;
-                    </button>
-                  </div>
-                </div>
+                </ScrollReveal>
               ))}
             </div>
           )}
@@ -266,18 +329,18 @@ export default function HazardMap() {
         <>
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 animate-fade-in"
             onClick={handleClosePanel}
           />
 
           {/* Panel */}
-          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-50 overflow-y-auto animate-slide-in-right flex flex-col">
+          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-50 overflow-y-auto animate-slide-in-right flex flex-col border-l border-slate-100">
 
             {/* Panel Header */}
-            <div className="sticky top-0 bg-white z-10 px-8 pt-8 pb-4 border-b border-gray-100">
+            <div className="sticky top-0 bg-white z-10 px-8 pt-8 pb-5 border-b border-slate-100">
               <div className="flex justify-between items-start">
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-3">
                     <span className={getBadgeStyles(selectedHazard.type)}>
                       {selectedHazard.type}
                     </span>
@@ -285,11 +348,11 @@ export default function HazardMap() {
                       {selectedHazard.severity}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{selectedHazard.title}</h2>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">{selectedHazard.title}</h2>
                 </div>
                 <button
                   onClick={handleClosePanel}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2.5 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <X size={20} className="text-gray-500" />
                 </button>
@@ -297,44 +360,45 @@ export default function HazardMap() {
             </div>
 
             {/* Panel Body */}
-            <div className="flex-1 px-8 py-6 space-y-6">
+            <div className="flex-grow px-8 py-8 space-y-8">
 
-              {/* Image Placeholder */}
-              <div className="h-48 w-full bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
-                <span className="text-sm font-semibold">Attached Image (Placeholder)</span>
+              {/* Cover Photo */}
+              <div className="h-56 w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-100">
+                <MapPin size={36} className="text-slate-300 mb-2" />
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Coordinate View</span>
               </div>
 
               {/* Metadata */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Location</span>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                    <MapPin size={14} className="text-blue-500" />
-                    {selectedHazard.location}
+                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Location</span>
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                    <MapPin size={14} className="text-blue-500 shrink-0" />
+                    <span className="truncate">{selectedHazard.location}</span>
                   </div>
                 </div>
-                <div className="bg-slate-50 rounded-xl p-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Reported</span>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                    <Clock size={14} className="text-blue-500" />
+                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Reported</span>
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                    <Clock size={14} className="text-blue-500 shrink-0" />
                     {selectedHazard.time}
                   </div>
                 </div>
               </div>
 
               {/* Description */}
-              <div>
-                <h3 className="text-base font-bold text-slate-900 mb-2">Description</h3>
+              <div className="space-y-2">
+                <h3 className="text-base font-black text-slate-900 uppercase tracking-wide">Description</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  {selectedHazard.description}
+                  {selectedHazard.description || "No detailed description was provided by the reporter. Please exercise extreme caution when approaching this zone."}
                 </p>
               </div>
 
               {/* Upvote Section */}
-              <div className="flex items-center gap-4 py-4 border-y border-gray-100">
+              <div className="flex items-center gap-4 py-6 border-y border-gray-100">
                 <UpvoteButton hazardId={selectedHazard.id} initialUpvotes={selectedHazard.upvotes} />
-                <span className="text-sm text-slate-500">
-                  Support this report to help prioritize it
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Support this report to help prioritize repairs
                 </span>
               </div>
 
@@ -347,4 +411,3 @@ export default function HazardMap() {
     </div>
   );
 }
-
