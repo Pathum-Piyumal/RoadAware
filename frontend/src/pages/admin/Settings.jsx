@@ -1,8 +1,51 @@
 import React, { useState } from 'react';
-import { User, Bell, Shield, Save } from 'lucide-react';
+import { User, Bell, Shield, Save, X, Smartphone, KeyRound } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('general');
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [is2FAModalOpen, setIs2FAModalOpen] = useState(false);
+  const [twoFAStep, setTwoFAStep] = useState(1);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+
+  const handleToggle2FA = () => {
+    if (is2FAEnabled) {
+      setIs2FAEnabled(false);
+      toast.success('2FA disabled successfully.');
+    } else {
+      setTwoFAStep(1);
+      setPhoneNumber('');
+      setOtpCode('');
+      setIs2FAModalOpen(true);
+    }
+  };
+
+  const handleNext2FA = (e) => {
+    e.preventDefault();
+    if (phoneNumber.length < 10) {
+      toast.error('Please enter a valid phone number.');
+      return;
+    }
+    setTwoFAStep(2);
+    toast.success('OTP sent to your phone.');
+  };
+
+  const handleVerify2FA = (e) => {
+    e.preventDefault();
+    if (otpCode.length < 6) {
+      toast.error('Please enter a valid 6-digit OTP.');
+      return;
+    }
+    setIs2FAEnabled(true);
+    setIs2FAModalOpen(false);
+    toast.success('2FA enabled successfully!');
+  };
+
+  const handleCloseModal = () => {
+    setIs2FAModalOpen(false);
+  };
 
   return (
     <div className="flex flex-col gap-6 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
@@ -73,7 +116,12 @@ const Settings = () => {
                   <p className="text-xs text-admin-text-muted mt-1.5">Require administrators to use 2FA when logging in.</p>
                 </div>
                 <label className="relative inline-block w-12 h-6 shrink-0 cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" />
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={is2FAEnabled}
+                    onChange={handleToggle2FA}
+                  />
                   <div className="absolute inset-0 bg-admin-border rounded-full transition-colors duration-300 peer-checked:bg-blue-500"></div>
                   <div className="absolute left-1 bottom-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-6"></div>
                 </label>
@@ -87,6 +135,91 @@ const Settings = () => {
           )}
         </div>
       </div>
+
+      {/* 2FA Modal */}
+      {is2FAModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-[fadeIn_0.2s_ease-in-out]">
+          <div className="bg-admin-card border border-admin-border rounded-xl shadow-xl w-full max-w-md animate-[slideUp_0.3s_ease-out]">
+            <div className="flex items-center justify-between p-6 border-b border-admin-border">
+              <h2 className="text-xl font-bold text-admin-text m-0">Setup Two-Factor Authentication</h2>
+              <button 
+                onClick={handleCloseModal}
+                className="p-2 hover:bg-admin-bg rounded-lg text-admin-text-muted hover:text-admin-text transition-colors cursor-pointer border-none bg-transparent"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {twoFAStep === 1 ? (
+                <form onSubmit={handleNext2FA} className="space-y-4">
+                  <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 mb-4">
+                      <Smartphone size={24} />
+                    </div>
+                    <p className="text-sm text-admin-text-muted m-0">Enter your phone number to receive a verification code. This will be used to secure your admin account.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-admin-text mb-1">Phone Number</label>
+                    <input 
+                      type="tel" 
+                      placeholder="+1 (555) 000-0000"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="w-full bg-admin-input-bg border border-admin-border rounded-lg px-4 py-2 text-sm text-admin-text transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div className="pt-4 mt-6">
+                    <button 
+                      type="submit"
+                      className="w-full py-2.5 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer border-none"
+                    >
+                      Send Code
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleVerify2FA} className="space-y-4">
+                  <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/10 text-blue-500 mb-4">
+                      <KeyRound size={24} />
+                    </div>
+                    <p className="text-sm text-admin-text-muted m-0">Enter the 6-digit verification code sent to <strong>{phoneNumber}</strong>.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-admin-text mb-1">Verification Code</label>
+                    <input 
+                      type="text" 
+                      placeholder="000000"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value)}
+                      className="w-full bg-admin-input-bg border border-admin-border rounded-lg px-4 py-2 text-center tracking-[0.5em] font-mono text-lg text-admin-text transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div className="pt-4 mt-6 flex gap-3">
+                    <button 
+                      type="button"
+                      onClick={() => setTwoFAStep(1)}
+                      className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-admin-border text-admin-text hover:bg-admin-bg transition-colors cursor-pointer bg-transparent"
+                    >
+                      Back
+                    </button>
+                    <button 
+                      type="submit"
+                      className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors cursor-pointer border-none"
+                    >
+                      Verify & Enable
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

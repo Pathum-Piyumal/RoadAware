@@ -13,7 +13,7 @@ import {
   Lightbulb,
   Snowflake,
   PawPrint,
-  ThumbsUp,
+  Heart,
   Star,
   ArrowRight,
   Map as MapIcon,
@@ -283,11 +283,11 @@ const HazardCard = ({ title, location, status, upvotes }) => (
     </p>
 
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: '1px solid #f9fafb' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 38, height: 38, background: '#f9fafb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <ThumbsUp size={16} color="#111" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 32, height: 32, background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Heart size={14} color="#ef4444" fill="#ef4444" />
         </div>
-        <span style={{ fontSize: 20, fontWeight: 900, color: '#111' }}>{upvotes}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>{upvotes}</span>
       </div>
       <button style={{ fontSize: 13, fontWeight: 700, color: '#111', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
         Details <ChevronRight size={15} />
