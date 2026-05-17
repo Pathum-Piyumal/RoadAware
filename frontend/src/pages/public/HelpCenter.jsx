@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Shield, User, MessageCircle, ChevronDown, 
   ArrowRight, ArrowLeft, LifeBuoy, Zap, FileText, X, CheckCircle2, Sparkles, Mail, Tag, FileCheck
@@ -63,6 +63,49 @@ const KNOWLEDGE_BASE = {
       content: "Managing a hazard report workflow is simple: 1. Click any ticket in the admin console. 2. Assign repair crews to the location. 3. Update the ticket status to 'In Progress' to automatically notify the citizen. 4. Mark as 'Resolved' once repaired, updating the live map pin instantly to green."
     }
   ]
+};
+
+// Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
+const ScrollReveal = ({ children, delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+    
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, [delay]);
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'opacity, transform'
+      }}
+    >
+      {children}
+    </div>
+  );
 };
 
 export default function HelpCenter() {
@@ -131,7 +174,7 @@ export default function HelpCenter() {
           <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-orange-600/5 rounded-full blur-[100px]" />
         </div>
         
-        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
+        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center animate-fade-in-up">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8">
             <LifeBuoy size={14} /> Knowledge Base
           </span>
@@ -156,82 +199,89 @@ export default function HelpCenter() {
       <section className="max-w-7xl mx-auto px-6 -mt-16 relative z-20">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((cat, i) => (
-            <div 
-              key={i} 
-              onClick={() => handleCategoryClick(cat)}
-              className="group bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl hover:border-blue-200/50 transition-all duration-500 cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className={`w-14 h-14 rounded-2xl ${cat.bg} ${cat.text} ${cat.border} border flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                  <cat.icon size={28} />
+            <ScrollReveal key={i} delay={i * 100}>
+              <div 
+                onClick={() => handleCategoryClick(cat)}
+                className="group bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl hover:border-blue-200/50 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full"
+              >
+                <div>
+                  <div className={`w-14 h-14 rounded-2xl ${cat.bg} ${cat.text} ${cat.border} border flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                    <cat.icon size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{cat.title}</h3>
+                  <p className="text-sm text-gray-500 font-medium mb-8">{cat.count} Articles</p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{cat.title}</h3>
-                <p className="text-sm text-gray-500 font-medium mb-8">{cat.count} Articles</p>
+                <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">
+                  <span>Explore</span> <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">
-                <span>Explore</span> <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* FAQs */}
       <section className="max-w-3xl mx-auto px-6 py-32">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
-          <p className="text-gray-500">Everything you need to know about the RoadAware platform.</p>
-        </div>
+        <ScrollReveal>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
+            <p className="text-gray-500">Everything you need to know about the RoadAware platform.</p>
+          </div>
+        </ScrollReveal>
 
         <div className="space-y-4">
           {faqs.map((faq, i) => (
-            <div key={i} className="bg-white rounded-[24px] border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <button 
-                onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                className="w-full px-8 py-6 flex items-center justify-between text-left group"
-              >
-                <span className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{faq.q}</span>
-                <ChevronDown 
-                  size={20} 
-                  className={`text-gray-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180 text-blue-500' : ''}`} 
-                />
-              </button>
-              <div className={`transition-all duration-300 ease-in-out ${activeFaq === i ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="px-8 pb-8 text-gray-500 leading-relaxed">
-                  {faq.a}
+            <ScrollReveal key={i} delay={i * 80}>
+              <div className="bg-white rounded-[24px] border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <button 
+                  onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                  className="w-full px-8 py-6 flex items-center justify-between text-left group"
+                >
+                  <span className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{faq.q}</span>
+                  <ChevronDown 
+                    size={20} 
+                    className={`text-gray-400 transition-transform duration-300 ${activeFaq === i ? 'rotate-180 text-blue-500' : ''}`} 
+                  />
+                </button>
+                <div className={`transition-all duration-300 ease-in-out ${activeFaq === i ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <div className="px-8 pb-8 text-gray-500 leading-relaxed">
+                    {faq.a}
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* Support CTA */}
       <section className="max-w-5xl mx-auto px-6">
-        <div className="bg-[#050505] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[80px] -mr-16 -mt-16" />
-          <h2 className="text-4xl font-black mb-6">Still need help?</h2>
-          <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
-            Our support desk is active to assist you with any questions or technical 
-            difficulties you might encounter.
-          </p>
-          <div className="flex flex-wrap justify-center gap-6">
-            <button 
-              onClick={handleOpenSupport}
-              className="px-10 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all flex items-center gap-2 shadow-xl shadow-blue-900/20"
-            >
-              <MessageCircle size={20} /> Open Support Desk
-            </button>
-            <a href="/contact" className="px-10 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2">
-              Send an Email <ArrowRight size={20} />
-            </a>
+        <ScrollReveal>
+          <div className="bg-[#050505] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[80px] -mr-16 -mt-16" />
+            <h2 className="text-4xl font-black mb-6">Still need help?</h2>
+            <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
+              Our support desk is active to assist you with any questions or technical 
+              difficulties you might encounter.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6">
+              <button 
+                onClick={handleOpenSupport}
+                className="px-10 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all flex items-center gap-2 shadow-xl shadow-blue-900/20"
+              >
+                <MessageCircle size={20} /> Open Support Desk
+              </button>
+              <a href="/contact" className="px-10 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2">
+                Send an Email <ArrowRight size={20} />
+              </a>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Category Explorer Drawer Modal */}
       {selectedCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-fade-in">
           <div className="bg-white rounded-[32px] p-8 md:p-10 border border-gray-100 shadow-2xl max-w-2xl w-full relative max-h-[85vh] overflow-y-auto transform scale-100 transition-transform duration-300">
             {/* Close Button */}
             <button 
@@ -305,7 +355,7 @@ export default function HelpCenter() {
 
       {/* Dynamic Support Desk Ticket Modal Drawer */}
       {isSupportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-fade-in">
           <div className="bg-white rounded-[32px] p-8 md:p-10 border border-gray-100 shadow-2xl max-w-lg w-full relative max-h-[90vh] overflow-y-auto transform scale-100 transition-all duration-300">
             {/* Close Button */}
             <button 

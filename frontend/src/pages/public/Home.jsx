@@ -635,9 +635,27 @@ const CommunityLeaderboard = () => {
 /* ─── SAFETY INSIGHTS (New Resources Grid Section) ───────── */
 const SafetyInsights = () => {
   const articles = [
-    { title: 'Navigating severe monsoon flooding safely', category: 'Driving Tips', date: 'May 16, 2026', image: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=400&auto=format&fit=crop' },
-    { title: 'How to claim insurance for pothole damage', category: 'Citizen Guide', date: 'May 12, 2026', image: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=400&auto=format&fit=crop' },
-    { title: 'Identifying road hazards in nighttime conditions', category: 'Night Safety', date: 'May 08, 2026', image: 'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=400&auto=format&fit=crop' }
+    { 
+      title: 'Navigating severe monsoon flooding safely', 
+      category: 'Driving Tips', 
+      date: 'May 16, 2026', 
+      image: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?q=80&w=600&auto=format&fit=crop',
+      doc: 'Rain & Flooding'
+    },
+    { 
+      title: 'How to claim insurance for pothole damage', 
+      category: 'Citizen Guide', 
+      date: 'May 12, 2026', 
+      image: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?q=80&w=600&auto=format&fit=crop',
+      doc: 'Pothole Awareness'
+    },
+    { 
+      title: 'Identifying road hazards in nighttime conditions', 
+      category: 'Night Safety', 
+      date: 'May 08, 2026', 
+      image: 'https://images.unsplash.com/photo-1509316975850-ff9c5edd0cd9?q=80&w=600&auto=format&fit=crop',
+      doc: 'Nighttime Driving'
+    }
   ];
 
   return (
@@ -692,6 +710,7 @@ const SafetyInsights = () => {
 
                   <Link 
                     to="/safety-tips"
+                    state={{ activeCategory: art.doc }}
                     style={{ fontSize: 13, fontWeight: 800, color: '#111', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
                     className="group-hover:text-orange-500 transition-colors"
                   >

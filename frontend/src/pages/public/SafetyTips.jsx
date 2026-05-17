@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   AlertTriangle, CloudRain, Moon, Hammer, ShieldCheck, Heart, Info, 
   ArrowRight, CheckCircle2, PhoneCall, AlertCircle, ShieldAlert, Bike, X, HelpCircle, ArrowDown 
@@ -37,8 +38,52 @@ const DETAILED_GUIDES = {
   ]
 };
 
+// Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
+const ScrollReveal = ({ children, delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+    
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, [delay]);
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'opacity, transform'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 export default function SafetyTips() {
   const [selectedTip, setSelectedTip] = useState(null);
+  const location = useLocation();
 
   const safetyTips = [
     {
@@ -48,7 +93,8 @@ export default function SafetyTips() {
       color: "text-blue-500",
       bg: "bg-blue-50",
       border: "border-blue-100",
-      severity: "High Alert"
+      severity: "High Alert",
+      image: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Nighttime Driving",
@@ -57,7 +103,8 @@ export default function SafetyTips() {
       color: "text-indigo-500",
       bg: "bg-indigo-50",
       border: "border-indigo-100",
-      severity: "Vigilance"
+      severity: "Vigilance",
+      image: "https://images.unsplash.com/photo-1494783367193-149034c05e8f?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Construction Zones",
@@ -66,7 +113,8 @@ export default function SafetyTips() {
       color: "text-orange-500",
       bg: "bg-orange-50",
       border: "border-orange-100",
-      severity: "Caution"
+      severity: "Caution",
+      image: "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Sharing the Road",
@@ -75,7 +123,8 @@ export default function SafetyTips() {
       color: "text-green-500",
       bg: "bg-green-50",
       border: "border-green-100",
-      severity: "Community"
+      severity: "Community",
+      image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Pothole Awareness",
@@ -84,9 +133,19 @@ export default function SafetyTips() {
       color: "text-red-500",
       bg: "bg-red-50",
       border: "border-red-100",
-      severity: "Risk"
+      severity: "Risk",
+      image: "https://images.unsplash.com/photo-1615840287214-7fe58a8b668f?q=80&w=600&auto=format&fit=crop"
     }
   ];
+
+  useEffect(() => {
+    if (location.state && location.state.activeCategory) {
+      const matched = safetyTips.find(tip => tip.title === location.state.activeCategory);
+      if (matched) {
+        setSelectedTip(matched);
+      }
+    }
+  }, [location.state]);
 
   const handleClose = () => {
     setSelectedTip(null);
@@ -118,91 +177,96 @@ export default function SafetyTips() {
       <section className="max-w-7xl mx-auto px-6 -mt-20 relative z-20">
         <div className="grid lg:grid-cols-3 gap-8">
           {safetyTips.map((tip, i) => (
-            <div 
-              key={i} 
-              onClick={() => setSelectedTip(tip)}
-              className="group bg-white rounded-[32px] p-10 border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:border-orange-100 transition-all duration-500 cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-center mb-8">
-                  <div className={`w-16 h-16 rounded-2xl ${tip.bg} ${tip.color} ${tip.border} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                    <tip.icon size={32} />
+            <ScrollReveal key={i} delay={i * 120}>
+              <div 
+                onClick={() => setSelectedTip(tip)}
+                className="group bg-white rounded-[32px] p-10 border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:border-orange-100 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full"
+              >
+                <div>
+                  <div className="flex justify-between items-center mb-8">
+                    <div className={`w-16 h-16 rounded-2xl ${tip.bg} ${tip.color} ${tip.border} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                      <tip.icon size={32} />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-3 py-1 rounded-full">
+                      {tip.severity}
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-3 py-1 rounded-full">
-                    {tip.severity}
-                  </span>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-orange-600 transition-colors">{tip.title}</h3>
+                  <p className="text-gray-500 leading-relaxed mb-8 text-sm">{tip.desc}</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-orange-600 transition-colors">{tip.title}</h3>
-                <p className="text-gray-500 leading-relaxed mb-8 text-sm">{tip.desc}</p>
+                <div className="pt-6 border-t border-gray-50 flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-orange-600 transition-colors">
+                  <span>Read Detailed Guide</span> <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
-              <div className="pt-6 border-t border-gray-50 flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-orange-600 transition-colors">
-                <span>Read Detailed Guide</span> <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* Checklist Section */}
       <section className="py-32 max-w-7xl mx-auto px-6">
-        <div className="bg-gray-50 rounded-[48px] p-12 md:p-20 grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <h2 className="text-4xl font-black text-gray-900 mb-8 leading-tight">
-              The RoadAware <br />
-              <span className="text-orange-600">Pre-Drive Checklist.</span>
-            </h2>
-            <div className="space-y-6">
-              {[
-                "Check tire pressure and tread depth.",
-                "Verify all lights and signals are working.",
-                "Ensure your windshield is clean and clear.",
-                "Check fuel or battery levels before long trips.",
-                "Open the RoadAware map to check your route."
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                  <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
-                  <span className="text-gray-700 font-semibold">{item}</span>
-                </div>
-              ))}
+        <ScrollReveal>
+          <div className="bg-gray-50 rounded-[48px] p-12 md:p-20 grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-black text-gray-900 mb-8 leading-tight">
+                The RoadAware <br />
+                <span className="text-orange-600">Pre-Drive Checklist.</span>
+              </h2>
+              <div className="space-y-6">
+                {[
+                  "Check tire pressure and tread depth.",
+                  "Verify all lights and signals are working.",
+                  "Ensure your windshield is clean and clear.",
+                  "Check fuel or battery levels before long trips.",
+                  "Open the RoadAware map to check your route."
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                    <CheckCircle2 className="text-green-500 mt-1 flex-shrink-0" size={20} />
+                    <span className="text-gray-700 font-semibold">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-orange-600/20 blur-[100px] -z-10 group-hover:bg-orange-600/30 transition-all" />
+              <div className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl">
+                <AlertCircle className="text-orange-500 mb-6" size={48} />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">See a Hazard?</h3>
+                <p className="text-gray-500 mb-8 leading-relaxed text-sm">
+                  If you encounter a road hazard, safely pull over and report it using the 
+                  RoadAware app. Your report could prevent the next accident.
+                </p>
+                <a href="/report-hazard" className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all shadow-xl shadow-orange-900/20 text-center">
+                  Report a Hazard
+                </a>
+              </div>
             </div>
           </div>
-          <div className="relative group">
-            <div className="absolute inset-0 bg-orange-600/20 blur-[100px] -z-10 group-hover:bg-orange-600/30 transition-all" />
-            <div className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl">
-              <AlertCircle className="text-orange-500 mb-6" size={48} />
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">See a Hazard?</h3>
-              <p className="text-gray-500 mb-8 leading-relaxed text-sm">
-                If you encounter a road hazard, safely pull over and report it using the 
-                RoadAware app. Your report could prevent the next accident.
-              </p>
-              <a href="/report-hazard" className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all shadow-xl shadow-orange-900/20 text-center">
-                Report a Hazard
-              </a>
-            </div>
-          </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Emergency Section */}
       <section className="max-w-7xl mx-auto px-6">
-        <div className="bg-red-600 rounded-[48px] p-12 md:p-20 text-white relative overflow-hidden text-center">
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
-          <h2 className="text-4xl font-black mb-8">In Case of Emergency</h2>
-          <p className="text-red-100 max-w-2xl mx-auto mb-12 text-lg leading-relaxed">
-            If you've been involved in an accident or witness a life-threatening situation, 
-            contact emergency services immediately. Do not use this app for emergencies.
-          </p>
-          <div className="flex flex-wrap justify-center gap-6">
-            <a href="tel:119" className="px-10 py-5 bg-white text-red-600 font-black rounded-2xl hover:bg-red-50 transition-all flex items-center gap-3 shadow-2xl shadow-black/20">
-              <PhoneCall size={24} /> Call Emergency (119)
-            </a>
+        <ScrollReveal>
+          <div className="bg-red-600 rounded-[48px] p-12 md:p-20 text-white relative overflow-hidden text-center">
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 rounded-full blur-[80px] -mr-32 -mt-32" />
+            <h2 className="text-4xl font-black mb-8">In Case of Emergency</h2>
+            <p className="text-red-100 max-w-2xl mx-auto mb-12 text-lg leading-relaxed">
+              If you've been involved in an accident or witness a life-threatening situation, 
+              contact emergency services immediately. Do not use this app for emergencies.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6">
+              <a href="tel:119" className="px-10 py-5 bg-white text-red-600 font-black rounded-2xl hover:bg-red-50 transition-all flex items-center gap-3 shadow-2xl shadow-black/20">
+                <PhoneCall size={24} /> Call Emergency (119)
+              </a>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Detailed Guide Drawer Modal */}
       {selectedTip && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-fade-in">
           <div className="bg-white rounded-[32px] p-8 md:p-10 border border-gray-100 shadow-2xl max-w-2xl w-full relative max-h-[85vh] overflow-y-auto transform scale-100 transition-all duration-300">
             {/* Close Button */}
             <button 
@@ -213,6 +277,15 @@ export default function SafetyTips() {
             </button>
 
             <div>
+              {/* Cover Image */}
+              <div className="overflow-hidden rounded-2xl mb-6 border border-slate-100/60 h-48 md:h-56">
+                <img 
+                  src={selectedTip.image} 
+                  alt={selectedTip.title} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
               {/* Header */}
               <div className="flex items-center gap-4 mb-6">
                 <div className={`w-14 h-14 rounded-2xl ${selectedTip.bg} ${selectedTip.color} ${selectedTip.border} border flex items-center justify-center`}>
