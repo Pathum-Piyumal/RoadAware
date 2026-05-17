@@ -10,7 +10,8 @@ export default function Features() {
       color: "text-blue-500",
       bg: "bg-blue-50",
       border: "border-blue-100",
-      tag: "Real-time"
+      tag: "Real-time",
+      path: "/map"
     },
     {
       title: "Precision Reporting",
@@ -19,7 +20,8 @@ export default function Features() {
       color: "text-orange-500",
       bg: "bg-orange-50",
       border: "border-orange-100",
-      tag: "Mobile Ready"
+      tag: "Mobile Ready",
+      path: "/report-hazard"
     },
     {
       title: "Community Consensus",
@@ -28,7 +30,8 @@ export default function Features() {
       color: "text-green-500",
       bg: "bg-green-50",
       border: "border-green-100",
-      tag: "Verified"
+      tag: "Verified",
+      path: "/my-reports"
     },
     {
       title: "Authorities Dashboard",
@@ -37,7 +40,8 @@ export default function Features() {
       color: "text-purple-500",
       bg: "bg-purple-50",
       border: "border-purple-100",
-      tag: "Enterprise"
+      tag: "Enterprise",
+      path: "/admin/login"
     },
     {
       title: "Smart Notifications",
@@ -46,16 +50,8 @@ export default function Features() {
       color: "text-amber-500",
       bg: "bg-amber-50",
       border: "border-amber-100",
-      tag: "Automated"
-    },
-    {
-      title: "Data Integrity",
-      description: "Our AI-powered system flags duplicates and cross-references data to ensure that authorities receive the most accurate infrastructure insights.",
-      icon: ShieldCheck,
-      color: "text-cyan-500",
-      bg: "bg-cyan-50",
-      border: "border-cyan-100",
-      tag: "AI Enhanced"
+      tag: "Automated",
+      path: "/status"
     }
   ];
 
@@ -109,9 +105,13 @@ export default function Features() {
                 <p className="text-gray-500 leading-relaxed mb-8 flex-grow">
                   {feature.description}
                 </p>
-                <div className="w-full pt-6 border-t border-gray-50 flex items-center justify-between text-sm font-bold text-gray-400 group-hover:text-blue-500 transition-colors">
-                  Learn more <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </div>
+                <Link 
+                  to={feature.path}
+                  className="w-full pt-6 border-t border-gray-50 flex items-center justify-between text-sm font-bold text-gray-400 group-hover:text-blue-500 transition-colors cursor-pointer text-left"
+                >
+                  <span>Learn more</span>
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
               </div>
             );
           })}

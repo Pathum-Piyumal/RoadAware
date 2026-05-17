@@ -23,7 +23,7 @@ export default function AboutUs() {
               infrastructure intelligence platform, powered by the people who use it every day.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link to="/report-hazard" className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-orange-900/20 flex items-center gap-2 group">
+              <Link to="/register" className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-orange-950/20 flex items-center gap-2 group">
                 Join the Mission <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
