@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -17,6 +18,7 @@ import {
   Star,
   ArrowRight,
   Map as MapIcon,
+  X,
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -192,6 +194,8 @@ const Hero = () => (
   </section>
 );
 
+
+
 /* ─── HOW IT WORKS ────────────────────────────────────────── */
 const HowItWorks = () => (
   <section style={{ padding: '96px 32px', background: '#fff' }}>
@@ -220,6 +224,8 @@ const HowItWorks = () => (
     </div>
   </section>
 );
+
+
 
 /* ─── WHAT YOU CAN REPORT ─────────────────────────────────── */
 const WhatYouCanReport = () => {
@@ -261,26 +267,32 @@ const WhatYouCanReport = () => {
   );
 };
 
+
+
 /* ─── HAZARD CARD ─────────────────────────────────────────── */
-const HazardCard = ({ title, location, status, upvotes }) => (
-  <div style={{ background: '#fff', borderRadius: 28, padding: '28px 28px 24px', border: '1px solid #f3f4f6', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-    {/* Badges */}
-    <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-      <span style={{
-        padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
-        background: status === 'Verified' ? '#dcfce7' : '#fff7ed',
-        color:      status === 'Verified' ? '#16a34a'  : '#ea580c',
-      }}>{status}</span>
-      <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#fee2e2', color: '#dc2626' }}>Pothole</span>
+const HazardCard = ({ title, location, status, upvotes, category, image, onDetailsClick }) => (
+  <div style={{ background: '#fff', borderRadius: 28, padding: '28px 28px 24px', border: '1px solid #f3f4f6', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+    <div>
+      {/* Badges */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <span style={{
+          padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
+          background: status === 'Verified' ? '#dcfce7' : '#fff7ed',
+          color:      status === 'Verified' ? '#16a34a'  : '#ea580c',
+        }}>{status}</span>
+        <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#fee2e2', color: '#dc2626' }}>{category}</span>
+      </div>
+
+      {/* Real Image instead of Placeholder */}
+      <div style={{ height: 152, borderRadius: 16, overflow: 'hidden', marginBottom: 20 }}>
+        <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+
+      <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111', marginBottom: 6 }}>{title}</h3>
+      <p style={{ fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
+        <MapPin size={14} /> {location}
+      </p>
     </div>
-
-    {/* Image placeholder */}
-    <div style={{ height: 152, borderRadius: 16, background: 'linear-gradient(135deg,#e5e7eb,#d1d5db)', marginBottom: 20 }} />
-
-    <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111', marginBottom: 6 }}>{title}</h3>
-    <p style={{ fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
-      <MapPin size={14} /> {location}
-    </p>
 
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: '1px solid #f9fafb' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -289,15 +301,20 @@ const HazardCard = ({ title, location, status, upvotes }) => (
         </div>
         <span style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>{upvotes}</span>
       </div>
-      <button style={{ fontSize: 13, fontWeight: 700, color: '#111', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+      <button 
+        onClick={onDetailsClick}
+        style={{ fontSize: 13, fontWeight: 700, color: '#111', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+      >
         Details <ChevronRight size={15} />
       </button>
     </div>
   </div>
 );
 
+
+
 /* ─── FEATURED HAZARDS ────────────────────────────────────── */
-const FeaturedHazards = () => (
+const FeaturedHazards = ({ hazards, onDetailsClick }) => (
   <section style={{ padding: '96px 32px', background: '#fff' }}>
     <div style={{ maxWidth: 1280, margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 52 }}>
@@ -305,19 +322,30 @@ const FeaturedHazards = () => (
           <p style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 8 }}>Live feed</p>
           <h2 style={{ fontSize: 36, fontWeight: 900, color: '#111', letterSpacing: '-1px', margin: 0 }}>Most-upvoted hazards near you</h2>
         </div>
-        <button style={{ fontSize: 14, fontWeight: 700, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+        <Link to="/map" style={{ fontSize: 14, fontWeight: 700, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}>
           View all <ChevronRight size={18} />
-        </button>
+        </Link>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 28 }}>
-        <HazardCard title="Pothole: Main Street"      location="102 Main Road, Colombo"        status="Pending"  upvotes={122} />
-        <HazardCard title="Flooding: A1 Highway"      location="A1 Highway km 45, Kandy"       status="Pending"  upvotes={150} />
-        <HazardCard title="Hazardous Debris"          location="88 Galle Road, Bentota"         status="Verified" upvotes={98}  />
+        {hazards.map((hazard) => (
+          <HazardCard 
+            key={hazard.id}
+            title={hazard.title}
+            location={hazard.location}
+            status={hazard.status}
+            upvotes={hazard.upvotes}
+            category={hazard.category}
+            image={hazard.image}
+            onDetailsClick={() => onDetailsClick(hazard)}
+          />
+        ))}
       </div>
     </div>
   </section>
 );
+
+
 
 /* ─── CTA SECTION ─────────────────────────────────────────── */
 const CTASection = () => (
@@ -356,16 +384,146 @@ const CTASection = () => (
 
 
 /* ─── PAGE ────────────────────────────────────────────────── */
-const Home = () => (
-  <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: '#fff' }}>
-    <main>
-      <Hero />
-      <HowItWorks />
-      <WhatYouCanReport />
-      <FeaturedHazards />
-      <CTASection />
-    </main>
-  </div>
-);
+export default function Home() {
+  const [selectedHazard, setSelectedHazard] = useState(null);
+  const [hazards, setHazards] = useState([
+    {
+      id: 1,
+      title: "Pothole: Main Street",
+      category: "Pothole",
+      location: "102 Main Road, Colombo",
+      description: "A deep, dangerous pothole measuring roughly 2 feet wide right in the middle of the active lane. Vehicles are swerving into oncoming traffic to avoid it, creating extreme collision risks.",
+      status: "Pending",
+      upvotes: 122,
+      date: "Reported 2 hours ago",
+      image: "https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop"
+    },
+    {
+      id: 2,
+      title: "Flooding: A1 Highway",
+      category: "Flooding",
+      location: "A1 Highway km 45, Kandy",
+      description: "Severe heavy drainage blockage causing water pooling across two lanes of the highway. Reduced speed limits are active, but hydroplaning hazards remain extremely high.",
+      status: "Pending",
+      upvotes: 150,
+      date: "Reported 5 hours ago",
+      image: "https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=600&auto=format&fit=crop"
+    },
+    {
+      id: 3,
+      title: "Hazardous Debris",
+      category: "Debris",
+      location: "88 Galle Road, Bentota",
+      description: "Large container cargo fragments and wood debris blocking the shoulder and left lane. Needs immediate street sweeper crew dispatch.",
+      status: "Verified",
+      upvotes: 98,
+      date: "Reported 1 day ago",
+      image: "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=600&auto=format&fit=crop"
+    }
+  ]);
 
-export default Home;
+  const handleUpvote = (id) => {
+    setHazards(prev => prev.map(h => h.id === id ? { ...h, upvotes: h.upvotes + 1 } : h));
+    setSelectedHazard(prev => prev && prev.id === id ? { ...prev, upvotes: prev.upvotes + 1 } : prev);
+  };
+
+  return (
+    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: '#fff' }}>
+      <main>
+        <Hero />
+        <HowItWorks />
+        <WhatYouCanReport />
+        <FeaturedHazards hazards={hazards} onDetailsClick={setSelectedHazard} />
+        <CTASection />
+      </main>
+
+      {/* Hazard Details Modal Overlay */}
+      {selectedHazard && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 32, padding: 32, maxWidth: 540, w: '100%', width: '100%',
+            position: 'relative', border: '1px solid #f3f4f6', boxShadow: '0 32px 80px rgba(0,0,0,0.3)',
+            maxHeight: '90vh', overflowY: 'auto'
+          }}>
+            {/* Close button */}
+            <button 
+              onClick={() => setSelectedHazard(null)}
+              style={{
+                position: 'absolute', top: 24, right: 24, background: '#f3f4f6', border: 'none',
+                borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', cursor: 'pointer', color: '#6b7280', transition: 'background 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
+              onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
+            >
+              <X size={18} />
+            </button>
+
+            <div>
+              {/* Image */}
+              <div style={{ height: 220, borderRadius: 20, overflow: 'hidden', marginBottom: 24 }}>
+                <img src={selectedHazard.image} alt={selectedHazard.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+
+              {/* Status and Category */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                <span style={{
+                  padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
+                  background: selectedHazard.status === 'Verified' ? '#dcfce7' : '#fff7ed',
+                  color:      selectedHazard.status === 'Verified' ? '#16a34a'  : '#ea580c',
+                }}>{selectedHazard.status}</span>
+                <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#fee2e2', color: '#dc2626' }}>{selectedHazard.category}</span>
+              </div>
+
+              {/* Title & Metadata */}
+              <h3 style={{ fontSize: 24, fontWeight: 900, color: '#111', marginBottom: 8, letterSpacing: '-0.5px' }}>{selectedHazard.title}</h3>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 13, color: '#6b7280', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f3f4f6' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <MapPin size={14} /> {selectedHazard.location}
+                </span>
+                <span>•</span>
+                <span>{selectedHazard.date}</span>
+              </div>
+
+              {/* Description */}
+              <div style={{ marginBottom: 28 }}>
+                <h4 style={{ fontSize: 12, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Incident Description</h4>
+                <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6, margin: 0 }}>{selectedHazard.description}</p>
+              </div>
+
+              {/* Action and upvotes */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, borderTop: '1px solid #f3f4f6' }}>
+                <button 
+                  onClick={() => handleUpvote(selectedHazard.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fee2e2',
+                    borderRadius: 16, padding: '12px 24px', cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#ffe4e4'; e.currentTarget.style.borderColor = '#fecaca'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.borderColor = '#fee2e2'; }}
+                >
+                  <Heart size={16} color="#ef4444" fill="#ef4444" />
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#dc2626' }}>Upvote ({selectedHazard.upvotes})</span>
+                </button>
+
+                <Link 
+                  to="/map"
+                  onClick={() => setSelectedHazard(null)}
+                  style={{
+                    fontSize: 13, fontWeight: 800, color: '#3b82f6', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4
+                  }}
+                >
+                  View on Live Map <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
