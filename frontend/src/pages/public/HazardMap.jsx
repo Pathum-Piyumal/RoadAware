@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, ThumbsUp, X, AlertTriangle, MessageCircle } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import styles from './HazardMap.module.css';
 import UpvoteButton from '../../components/hazard-report/UpvoteButton';
 import CommentsSection from '../../components/hazard-report/CommentsSection';
 
@@ -16,6 +15,23 @@ let DefaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
+
+// Helper to resolve badge styles based on type or severity using Tailwind
+const getBadgeStyles = (key) => {
+  const mapping = {
+    Pothole: "bg-sky-100 text-sky-700",
+    Low: "bg-slate-100 text-slate-500",
+    Flooding: "bg-blue-100 text-blue-800",
+    High: "bg-yellow-100 text-yellow-700",
+    Debris: "bg-green-100 text-green-700",
+    Critical: "bg-red-100 text-red-600",
+    Medium: "bg-orange-100 text-orange-600",
+    Streetlight: "bg-purple-100 text-purple-700",
+    Construction: "bg-orange-50 text-orange-700",
+    Animal: "bg-pink-100 text-pink-700",
+  };
+  return `px-2 py-1 rounded text-[9px] font-extrabold uppercase tracking-wider ${mapping[key] || "bg-gray-100 text-gray-600"}`;
+};
 
 const initialHazards = [
   { id: 1, lat: 6.9271, lng: 79.8612, type: "Pothole", severity: "Critical", status: "Reported", title: "Massive Pothole on Galle Road", location: "102 Galle Road, Colombo", time: "2 hours ago by User A", upvotes: 130 },
@@ -31,7 +47,6 @@ const initialHazards = [
   { id: 11, lat: 6.9550, lng: 79.8550, type: "Pothole", severity: "Critical", status: "Reported", title: "Deep Pothole near Bridge", location: "Orugodawatte, Colombo", time: "4 hours ago by User K", upvotes: 112 },
   { id: 12, lat: 6.9230, lng: 79.8450, type: "Construction", severity: "Medium", status: "Reported", title: "Damaged Road Barrier", location: "Havelock Road, Colombo", time: "1 day ago by User L", upvotes: 56, description: "A very deep pothole has formed at a busy junction. Several vehicles have been damaged. Urgent repair needed." },
 ];
-
 
 export default function HazardMap() {
   const [viewMode, setViewMode] = useState('grid');
@@ -52,7 +67,7 @@ export default function HazardMap() {
     
     return (
       <div 
-        style={{ position: 'relative', outline: 'none' }} 
+        className="relative outline-none"
         tabIndex={0}
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) {
@@ -61,32 +76,23 @@ export default function HazardMap() {
         }}
       >
         <div 
-          className={styles.dropdown} 
+          className={`flex items-center gap-2 py-2.5 px-4 bg-gray-50 border rounded-lg text-sm font-medium text-gray-700 cursor-pointer min-w-[140px] justify-between hover:bg-gray-100 transition-all ${
+            isOpen ? 'border-blue-600 ring-4 ring-blue-600/10' : 'border-gray-200'
+          }`}
           onClick={() => setIsOpen(!isOpen)}
-          style={{ borderColor: isOpen ? '#2563eb' : '#e5e7eb', boxShadow: isOpen ? '0 0 0 3px rgba(37,99,235,0.1)' : 'none' }}
         >
           <span>{value}</span>
-          <ChevronDown size={16} style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </div>
         {isOpen && (
-          <div style={{
-            position: 'absolute', top: 'calc(100% + 6px)', left: 0, width: '100%', minWidth: 160, background: '#fff',
-            border: '1px solid #e5e7eb', borderRadius: 12, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-            zIndex: 100, maxHeight: 240, overflowY: 'auto', padding: '6px'
-          }}>
+          <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[100] max-h-[240px] overflow-y-auto p-1.5">
             {options.map(opt => (
               <div 
                 key={opt}
-                style={{
-                  padding: '10px 14px', fontSize: 13, fontWeight: value === opt ? 600 : 500, cursor: 'pointer',
-                  background: value === opt ? '#f0f9ff' : 'transparent',
-                  color: value === opt ? '#0369a1' : '#4b5563',
-                  borderRadius: 8, transition: 'background 0.15s, color 0.15s',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between'
-                }}
+                className={`px-3.5 py-2 text-xs font-semibold cursor-pointer rounded-lg transition-colors flex items-center justify-between ${
+                  value === opt ? 'bg-sky-50 text-sky-700' : 'text-gray-600 hover:bg-gray-50'
+                }`}
                 onClick={() => { onChange(opt); setIsOpen(false); }}
-                onMouseEnter={(e) => { if (value !== opt) e.currentTarget.style.background = '#f9fafb'; }}
-                onMouseLeave={(e) => { if (value !== opt) e.currentTarget.style.background = 'transparent'; }}
               >
                 {opt}
               </div>
@@ -120,49 +126,53 @@ export default function HazardMap() {
   const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
 
   return (
-    <div className={styles.pageContainer}>
+    <div className="font-sans bg-white min-h-screen flex flex-col">
       {/* Header Section */}
-      <header className={styles.headerSection}>
-        <div className={styles.container}>
-          <span className={styles.liveBadge}>LIVE MAP</span>
-          <h1 className={styles.title}>Hazards in your area</h1>
-          <p className={styles.subtitle}>
+      <header className="bg-[#f4f6f9] pt-12 pb-16 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-8 w-full">
+          <span className="inline-block text-[11px] font-extrabold text-blue-600 tracking-widest uppercase mb-4">LIVE MAP</span>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Hazards in your area</h1>
+          <p className="text-[15px] text-gray-500 max-w-[600px]">
             Browse every reported hazard. Filter by type, status, or severity. Click any pin for details.
           </p>
         </div>
       </header>
 
-      <main className={styles.mainContent}>
-        <div className={styles.container}>
+      <main className="flex-1 pb-16">
+        <div className="max-w-7xl mx-auto px-8 w-full">
 
           {/* Filters Bar */}
-          <div className={styles.filterBar}>
-            <div className={styles.searchContainer}>
-              <Search size={18} className={styles.searchIcon} />
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-md -mt-8 relative z-10">
+            <div className="flex-1 flex items-center gap-3 py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <Search size={18} className="text-gray-400" />
               <input
                 type="text"
                 placeholder="Search address, area, or ID..."
-                className={styles.searchInput}
+                className="border-none bg-transparent w-full text-sm text-gray-900 outline-none placeholder-gray-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            <div className={styles.dropdownsContainer}>
+            <div className="flex flex-wrap gap-3">
               <CustomDropdown options={types} value={typeFilter} onChange={setTypeFilter} />
               <CustomDropdown options={statuses} value={statusFilter} onChange={setStatusFilter} />
               <CustomDropdown options={severities} value={severityFilter} onChange={setSeverityFilter} />
             </div>
 
-            <div className={styles.viewToggle}>
+            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
               <button
-                className={`${styles.toggleBtn} ${viewMode === 'map' ? styles.activeToggle : ''}`}
+                className={`flex items-center justify-center py-2 px-3 rounded-md cursor-pointer transition-all duration-200 ${
+                  viewMode === 'map' ? 'bg-blue-900 text-white shadow-sm' : 'bg-transparent text-gray-500 hover:text-gray-700'
+                }`}
                 onClick={() => setViewMode('map')}
               >
                 <Map size={16} />
               </button>
               <button
-                className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.activeToggle : ''}`}
+                className={`flex items-center justify-center py-2 px-3 rounded-md cursor-pointer transition-all duration-200 ${
+                  viewMode === 'grid' ? 'bg-blue-900 text-white shadow-sm' : 'bg-transparent text-gray-500 hover:text-gray-700'
+                }`}
                 onClick={() => setViewMode('grid')}
               >
                 <Grid size={16} />
@@ -171,28 +181,29 @@ export default function HazardMap() {
           </div>
 
           {/* Map Info Bar */}
-          <div className={styles.mapInfoBar}>
-            <div className={styles.hazardCount}>
+          <div className="flex justify-between items-center mt-6 mb-4 px-2">
+            <div className="flex items-center gap-2 text-xs text-gray-500">
               <Filter size={14} />
-              <strong>{filteredHazards.length}</strong> of {initialHazards.length} hazards
+              <span><strong>{filteredHazards.length}</strong> of {initialHazards.length} hazards</span>
             </div>
             <button
-              className={styles.heatmapToggle}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-md cursor-pointer transition-colors ${
+                isHeatmap ? 'bg-red-100 text-red-500' : 'text-gray-500 hover:bg-gray-50'
+              }`}
               onClick={() => setIsHeatmap(!isHeatmap)}
-              style={{ background: isHeatmap ? '#fee2e2' : 'transparent', color: isHeatmap ? '#ef4444' : 'inherit' }}
             >
-              <Flame size={14} color={isHeatmap ? '#ef4444' : 'currentColor'} />
-              Heatmap {isHeatmap ? 'ON' : 'OFF'}
+              <Flame size={14} className={isHeatmap ? 'text-red-500' : 'text-gray-500'} />
+              <span>Heatmap {isHeatmap ? 'ON' : 'OFF'}</span>
             </button>
           </div>
 
           {/* Content Area (Map or Grid) */}
           {viewMode === 'map' ? (
-            <div className={styles.mapWrapper}>
+            <div className="h-[600px] rounded-2xl overflow-hidden border border-gray-200 shadow-lg">
               <MapContainer 
                 center={[6.9271, 79.8612]} 
                 zoom={13} 
-                className={styles.map}
+                className="w-full h-full"
                 zoomControl={false}
               >
                 <TileLayer
@@ -218,26 +229,26 @@ export default function HazardMap() {
               </MapContainer>
             </div>
           ) : (
-            <div className={styles.gridWrapper}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {filteredHazards.map(hazard => (
-                <div key={hazard.id} className={styles.hazardCard}>
-                  <div className={styles.cardBadges}>
-                    <span className={`${styles.badge} ${styles['badge' + hazard.type]}`}>{hazard.type}</span>
-                    <span className={`${styles.badge} ${styles['badge' + hazard.severity]}`}>{hazard.severity}</span>
+                <div key={hazard.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col hover:shadow-md transition-all">
+                  <div className="flex gap-2 mb-3">
+                    <span className={getBadgeStyles(hazard.type)}>{hazard.type}</span>
+                    <span className={getBadgeStyles(hazard.severity)}>{hazard.severity}</span>
                   </div>
-                  <div className={styles.cardImagePlaceholder} />
-                  <h3 className={styles.cardTitle}>{hazard.title}</h3>
-                  <div className={styles.cardMeta}>
+                  <div className="h-[120px] rounded-lg bg-slate-50 mb-4" />
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 leading-snug">{hazard.title}</h3>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mb-1.5">
                     <MapPin size={12} /> {hazard.location}
                   </div>
-                  <div className={styles.cardMeta}>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mb-1.5">
                     <Clock size={12} /> {hazard.time}
                   </div>
-                  <div className={styles.cardFooter}>
+                  <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center">
                     <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} />
                     <button
                       onClick={() => handleOpenPanel(hazard)}
-                      className={styles.detailsLink}
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-0.5 cursor-pointer bg-transparent border-none"
                     >
                       Details &gt;
                     </button>
@@ -267,10 +278,10 @@ export default function HazardMap() {
               <div className="flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className={`${styles.badge} ${styles['badge' + selectedHazard.type]}`}>
+                    <span className={getBadgeStyles(selectedHazard.type)}>
                       {selectedHazard.type}
                     </span>
-                    <span className={`${styles.badge} ${styles['badge' + selectedHazard.severity]}`}>
+                    <span className={getBadgeStyles(selectedHazard.severity)}>
                       {selectedHazard.severity}
                     </span>
                   </div>
@@ -336,3 +347,4 @@ export default function HazardMap() {
     </div>
   );
 }
+
