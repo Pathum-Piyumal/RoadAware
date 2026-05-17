@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   AlertTriangle, CloudRain, Moon, Hammer, ShieldCheck, Heart, Info, 
   ArrowRight, CheckCircle2, PhoneCall, AlertCircle, ShieldAlert, Bike, X, HelpCircle, ArrowDown 
@@ -82,6 +83,7 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 
 export default function SafetyTips() {
   const [selectedTip, setSelectedTip] = useState(null);
+  const location = useLocation();
 
   const safetyTips = [
     {
@@ -91,7 +93,8 @@ export default function SafetyTips() {
       color: "text-blue-500",
       bg: "bg-blue-50",
       border: "border-blue-100",
-      severity: "High Alert"
+      severity: "High Alert",
+      image: "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Nighttime Driving",
@@ -100,7 +103,8 @@ export default function SafetyTips() {
       color: "text-indigo-500",
       bg: "bg-indigo-50",
       border: "border-indigo-100",
-      severity: "Vigilance"
+      severity: "Vigilance",
+      image: "https://images.unsplash.com/photo-1494783367193-149034c05e8f?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Construction Zones",
@@ -109,7 +113,8 @@ export default function SafetyTips() {
       color: "text-orange-500",
       bg: "bg-orange-50",
       border: "border-orange-100",
-      severity: "Caution"
+      severity: "Caution",
+      image: "https://images.unsplash.com/photo-1584467541268-b040f83be3fd?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Sharing the Road",
@@ -118,7 +123,8 @@ export default function SafetyTips() {
       color: "text-green-500",
       bg: "bg-green-50",
       border: "border-green-100",
-      severity: "Community"
+      severity: "Community",
+      image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=600&auto=format&fit=crop"
     },
     {
       title: "Pothole Awareness",
@@ -127,9 +133,19 @@ export default function SafetyTips() {
       color: "text-red-500",
       bg: "bg-red-50",
       border: "border-red-100",
-      severity: "Risk"
+      severity: "Risk",
+      image: "https://images.unsplash.com/photo-1615840287214-7fe58a8b668f?q=80&w=600&auto=format&fit=crop"
     }
   ];
+
+  useEffect(() => {
+    if (location.state && location.state.activeCategory) {
+      const matched = safetyTips.find(tip => tip.title === location.state.activeCategory);
+      if (matched) {
+        setSelectedTip(matched);
+      }
+    }
+  }, [location.state]);
 
   const handleClose = () => {
     setSelectedTip(null);
@@ -261,6 +277,15 @@ export default function SafetyTips() {
             </button>
 
             <div>
+              {/* Cover Image */}
+              <div className="overflow-hidden rounded-2xl mb-6 border border-slate-100/60 h-48 md:h-56">
+                <img 
+                  src={selectedTip.image} 
+                  alt={selectedTip.title} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
               {/* Header */}
               <div className="flex items-center gap-4 mb-6">
                 <div className={`w-14 h-14 rounded-2xl ${selectedTip.bg} ${selectedTip.color} ${selectedTip.border} border flex items-center justify-center`}>
