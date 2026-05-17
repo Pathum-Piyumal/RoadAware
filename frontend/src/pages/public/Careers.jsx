@@ -174,7 +174,7 @@ export default function Careers() {
                 className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap"
               >
                 Apply Now <ArrowRight size={18} />
-              </a>
+              </button>
             </div>
           ))}
         </div>
