@@ -1,6 +1,11 @@
-import { Briefcase, MapPin, Clock, ArrowRight, Star, Heart, Coffee, Globe, Rocket, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Briefcase, MapPin, Clock, ArrowRight, Star, Heart, Coffee, Globe, Rocket, Users, X, CheckCircle2 } from 'lucide-react';
 
 export default function Careers() {
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', portfolio: '', coverLetter: '' });
+  const [submitted, setSubmitted] = useState(false);
+
   const jobs = [
     {
       title: "Senior Full Stack Engineer",
@@ -42,6 +47,21 @@ export default function Careers() {
     { icon: Coffee, title: "Work-Life Balance", desc: "Unlimited PTO and flexible working hours." },
     { icon: Star, title: "Growth Budget", desc: "$2,000 annual budget for courses and books." }
   ];
+
+  const handleApplyClick = (job) => {
+    setSelectedJob(job);
+    setSubmitted(false);
+    setFormData({ name: '', email: '', portfolio: '', coverLetter: '' });
+  };
+
+  const handleClose = () => {
+    setSelectedJob(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 pb-24 selection:bg-orange-100 selection:text-orange-900">
@@ -149,8 +169,8 @@ export default function Careers() {
                   <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400" /> {job.salary}</div>
                 </div>
               </div>
-              <a 
-                href={`mailto:careers@roadaware.com?subject=Application for ${job.title}`}
+              <button 
+                onClick={() => handleApplyClick(job)}
                 className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap"
               >
                 Apply Now <ArrowRight size={18} />
@@ -174,6 +194,108 @@ export default function Careers() {
           </a>
         </div>
       </section>
+
+      {/* Dynamic Application Modal */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+          <div className="bg-white rounded-[32px] p-8 md:p-10 border border-gray-100 shadow-2xl max-w-lg w-full relative max-h-[90vh] overflow-y-auto transform scale-100 transition-transform duration-300">
+            {/* Close Button */}
+            <button 
+              onClick={handleClose}
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-900 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {!submitted ? (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                    {selectedJob.department}
+                  </span>
+                  <h3 className="text-2xl font-black text-gray-900 mt-3">Apply for {selectedJob.title}</h3>
+                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                    <MapPin size={12} /> {selectedJob.location} • {selectedJob.type}
+                  </p>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-gray-100">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Full Name</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-3 px-4 text-sm text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Email Address</label>
+                    <input 
+                      type="email" 
+                      required
+                      placeholder="john@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-3 px-4 text-sm text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Resume / Portfolio Link</label>
+                    <input 
+                      type="url" 
+                      required
+                      placeholder="https://github.com/johndoe"
+                      value={formData.portfolio}
+                      onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-3 px-4 text-sm text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Why do you want to join RoadAware?</label>
+                    <textarea 
+                      rows="3"
+                      required
+                      placeholder="Tell us about your passion for safety and building infrastructure..."
+                      value={formData.coverLetter}
+                      onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-3 px-4 text-sm text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all resize-none"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl shadow-lg shadow-orange-950/20 transition-all flex items-center justify-center gap-2"
+                >
+                  Submit Application <ArrowRight size={18} />
+                </button>
+              </form>
+            ) : (
+              <div className="py-8 text-center flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 mb-6">
+                  <CheckCircle2 size={36} />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Application Received!</h3>
+                <p className="text-sm text-gray-500 leading-relaxed max-w-sm mb-8">
+                  Thank you for applying to be our next <strong className="text-gray-900">{selectedJob.title}</strong>. Our recruiting team will review your application and contact you soon!
+                </p>
+                <button 
+                  onClick={handleClose}
+                  className="px-8 py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl transition-colors"
+                >
+                  Close Window
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
