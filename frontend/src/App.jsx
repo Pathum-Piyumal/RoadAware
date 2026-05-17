@@ -40,6 +40,7 @@ import HazardDetails from './pages/public/HazardDetails';
 import HazardMap from './pages/public/HazardMap';
 import AboutUs from './pages/public/AboutUs';
 import Features from './pages/public/Features';
+import FeatureDetail from './pages/public/FeatureDetail';
 import Careers from './pages/public/Careers';
 import HelpCenter from './pages/public/HelpCenter';
 import SafetyTips from './pages/public/SafetyTips';
@@ -86,6 +87,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/features" element={<Features />} />
+          <Route path="/features/:featureKey" element={<FeatureDetail />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/safety-tips" element={<SafetyTips />} />

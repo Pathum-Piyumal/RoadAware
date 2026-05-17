@@ -11,7 +11,7 @@ export default function Features() {
       bg: "bg-blue-50",
       border: "border-blue-100",
       tag: "Real-time Map",
-      path: "/map"
+      path: "/features/map"
     },
     {
       title: "Precision Reporting",
@@ -21,7 +21,7 @@ export default function Features() {
       bg: "bg-orange-50",
       border: "border-orange-100",
       tag: "GPS Pinpoint",
-      path: "/report-hazard"
+      path: "/features/reporting"
     },
     {
       title: "Community Consensus",
@@ -31,7 +31,7 @@ export default function Features() {
       bg: "bg-emerald-50",
       border: "border-emerald-100",
       tag: "Consensus",
-      path: "/my-reports"
+      path: "/features/consensus"
     },
     {
       title: "Authorities Dashboard",
@@ -41,7 +41,7 @@ export default function Features() {
       bg: "bg-purple-50",
       border: "border-purple-100",
       tag: "Enterprise Portal",
-      path: "/admin/login"
+      path: "/features/dashboard"
     }
   ];
 
