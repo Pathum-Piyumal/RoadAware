@@ -1,5 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Briefcase, MapPin, Clock, ArrowRight, Star, Heart, Coffee, Globe, Rocket, Users, X, CheckCircle2 } from 'lucide-react';
+
+// Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
+const ScrollReveal = ({ children, delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+    
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, [delay]);
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'opacity, transform'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default function Careers() {
   const [selectedJob, setSelectedJob] = useState(null);
@@ -70,7 +113,7 @@ export default function Careers() {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-[120px] -mr-32 -mt-32" />
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl animate-fade-in-up">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold tracking-widest uppercase mb-8">
               <Rocket size={14} className="fill-current" /> Join the Revolution
             </span>
@@ -90,13 +133,15 @@ export default function Careers() {
       <section className="py-24 max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {perks.map((perk, i) => (
-            <div key={i} className="p-8 rounded-[32px] bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                <perk.icon className="text-orange-500" size={24} />
+            <ScrollReveal key={i} delay={i * 100}>
+              <div className="p-8 rounded-[32px] bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-xl transition-all duration-300 h-full">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                  <perk.icon className="text-orange-500" size={24} />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">{perk.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{perk.desc}</p>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">{perk.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{perk.desc}</p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
@@ -105,99 +150,110 @@ export default function Careers() {
       <section className="py-24 bg-gray-50 border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <div className="space-y-8">
-              <h2 className="text-4xl font-black text-gray-900 tracking-tight">
-                Our culture is defined by <br />
-                <span className="text-orange-600">Impact & Transparency.</span>
-              </h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                At RoadAware, we don't just write code. We solve real-world problems 
-                that affect millions of people every day. We value ownership, 
-                radical candor, and the relentless pursuit of excellence.
-              </p>
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <div className="text-3xl font-black text-gray-900 mb-1">100%</div>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Distributed Team</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-black text-gray-900 mb-1">4.9/5</div>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Glassdoor Rating</div>
-                </div>
-              </div>
-            </div>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-orange-600/20 blur-[80px] -z-10 group-hover:bg-orange-600/30 transition-all" />
-              <div className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl relative overflow-hidden">
-                <Users className="text-orange-500/10 absolute -right-8 -bottom-8 w-64 h-64" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">"I joined RoadAware to build things that actually matter. The mission is what gets me up every morning."</h3>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full" />
+            <ScrollReveal>
+              <div className="space-y-8">
+                <h2 className="text-4xl font-black text-gray-900 tracking-tight">
+                  Our culture is defined by <br />
+                  <span className="text-orange-600">Impact & Transparency.</span>
+                </h2>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  At RoadAware, we don't just write code. We solve real-world problems 
+                  that affect millions of people every day. We value ownership, 
+                  radical candor, and the relentless pursuit of excellence.
+                </p>
+                <div className="grid grid-cols-2 gap-8">
                   <div>
-                    <div className="font-bold text-gray-900">Sarah Jenkins</div>
-                    <div className="text-sm text-gray-500">Lead Product Designer</div>
+                    <div className="text-3xl font-black text-gray-900 mb-1">100%</div>
+                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Distributed Team</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-black text-gray-900 mb-1">4.9/5</div>
+                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Glassdoor Rating</div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
+            
+            <ScrollReveal delay={150}>
+              <div className="relative group">
+                <div className="absolute inset-0 bg-orange-600/20 blur-[80px] -z-10 group-hover:bg-orange-600/30 transition-all" />
+                <div className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl relative overflow-hidden">
+                  <Users className="text-orange-500/10 absolute -right-8 -bottom-8 w-64 h-64 pointer-events-none" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">"I joined RoadAware to build things that actually matter. The mission is what gets me up every morning."</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-full" />
+                    <div>
+                      <div className="font-bold text-gray-900">Sarah Jenkins</div>
+                      <div className="text-sm text-gray-500">Lead Product Designer</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
       {/* Job List */}
       <section className="py-32 max-w-5xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-black text-gray-900 mb-4">Current Openings</h2>
-          <p className="text-gray-500">Find your place in our growing team.</p>
-        </div>
+        <ScrollReveal>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-gray-900 mb-4">Current Openings</h2>
+            <p className="text-gray-500">Find your place in our growing team.</p>
+          </div>
+        </ScrollReveal>
 
         <div className="space-y-6">
           {jobs.map((job, idx) => (
-            <div key={idx} className="group bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div className="space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
-                    {job.department}
-                  </span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                    {job.type}
-                  </span>
+            <ScrollReveal key={idx} delay={idx * 80}>
+              <div className="group bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8 h-full">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                      {job.department}
+                    </span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                      {job.type}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{job.title}</h3>
+                  <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
+                    <div className="flex items-center gap-2"><MapPin size={16} className="text-gray-400" /> {job.location}</div>
+                    <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400" /> {job.salary}</div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">{job.title}</h3>
-                <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
-                  <div className="flex items-center gap-2"><MapPin size={16} className="text-gray-400" /> {job.location}</div>
-                  <div className="flex items-center gap-2"><Clock size={16} className="text-gray-400" /> {job.salary}</div>
-                </div>
+                <button 
+                  onClick={() => handleApplyClick(job)}
+                  className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap"
+                >
+                  Apply Now <ArrowRight size={18} />
+                </button>
               </div>
-              <button 
-                onClick={() => handleApplyClick(job)}
-                className="px-8 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-2 whitespace-nowrap"
-              >
-                Apply Now <ArrowRight size={18} />
-              </button>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* Spontaneous Application */}
       <section className="max-w-7xl mx-auto px-6 mt-12">
-        <div className="bg-[#050505] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-orange-600/10 rounded-full blur-[80px] -ml-16 -mt-16" />
-          <h2 className="text-4xl font-black mb-6">Don't see a fit?</h2>
-          <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
-            We're always looking for talented individuals to join our journey. 
-            Send your resume to our talent team and we'll be in touch.
-          </p>
-          <a href="mailto:careers@roadaware.com" className="inline-flex items-center gap-2 px-10 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all shadow-xl shadow-orange-900/20">
-            Email Resume <ArrowRight size={18} />
-          </a>
-        </div>
+        <ScrollReveal>
+          <div className="bg-[#050505] rounded-[48px] p-12 md:p-20 text-center text-white relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-orange-600/10 rounded-full blur-[80px] -ml-16 -mt-16" />
+            <h2 className="text-4xl font-black mb-6">Don't see a fit?</h2>
+            <p className="text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
+              We're always looking for talented individuals to join our journey. 
+              Send your resume to our talent team and we'll be in touch.
+            </p>
+            <a href="mailto:careers@roadaware.com" className="inline-flex items-center gap-2 px-10 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all shadow-xl shadow-orange-900/20">
+              Email Resume <ArrowRight size={18} />
+            </a>
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* Dynamic Application Modal */}
       {selectedJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-fade-in">
           <div className="bg-white rounded-[32px] p-8 md:p-10 border border-gray-100 shadow-2xl max-w-lg w-full relative max-h-[90vh] overflow-y-auto transform scale-100 transition-transform duration-300">
             {/* Close Button */}
             <button 

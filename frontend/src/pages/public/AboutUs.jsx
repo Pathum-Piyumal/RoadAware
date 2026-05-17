@@ -1,5 +1,102 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { Shield, Target, Users, Eye, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+// Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
+const ScrollReveal = ({ children, delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            setIsVisible(true);
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+    
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, [delay]);
+
+  return (
+    <div
+      ref={domRef}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'opacity, transform'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Viewport Sensor Count-Up Component for Slick Numerical Animations
+const CountUp = ({ to, suffix = "", duration = 1200 }) => {
+  const [count, setCount] = useState(0);
+  const domRef = useRef();
+
+  useEffect(() => {
+    let startTime = null;
+    const numericTarget = parseFloat(to);
+    
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const progressPercent = Math.min(progress / duration, 1);
+      
+      // Easing curve (easeOutQuad)
+      const easedProgress = progressPercent * (2 - progressPercent);
+      const currentVal = easedProgress * numericTarget;
+      
+      setCount(currentVal);
+      
+      if (progress < duration) {
+        requestAnimationFrame(animate);
+      } else {
+        setCount(numericTarget);
+      }
+    };
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          requestAnimationFrame(animate);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, [to, duration]);
+
+  const isFloat = !Number.isInteger(parseFloat(to));
+  const formattedCount = isFloat ? count.toFixed(1) : Math.floor(count).toString();
+
+  return <span ref={domRef}>{formattedCount}{suffix}</span>;
+};
 
 export default function AboutUs() {
   return (
@@ -15,7 +112,7 @@ export default function AboutUs() {
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold tracking-widest uppercase mb-8">
               <Shield size={14} /> Our Story
             </span>
-            <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-[1.1] mb-8">
+            <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-[1.1] mb-8 animate-fade-in-up">
               Pioneering <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500">Road Safety</span> for everyone.
             </h1>
             <p className="text-xl text-gray-400 leading-relaxed mb-10 max-w-2xl">
@@ -33,85 +130,102 @@ export default function AboutUs() {
 
       {/* Stats Section - Overlapping */}
       <section className="max-w-7xl mx-auto px-6 -mt-16 relative z-20">
-        <div className="bg-white rounded-[40px] shadow-2xl shadow-gray-200/50 border border-gray-100 p-10 md:p-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-            {[
-              { label: 'Reports Made', value: '12k+', color: 'text-orange-600' },
-              { label: 'Hazards Fixed', value: '8.5k', color: 'text-blue-600' },
-              { label: 'Avg Response', value: '24h', color: 'text-green-600' },
-              { label: 'Active Users', value: '50k', color: 'text-purple-600' }
-            ].map((stat, i) => (
-              <div key={i} className="space-y-2">
-                <div className={`text-4xl md:text-5xl font-black ${stat.color} tracking-tighter`}>{stat.value}</div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.label}</div>
-              </div>
-            ))}
+        <ScrollReveal>
+          <div className="bg-white rounded-[40px] shadow-2xl shadow-gray-200/50 border border-gray-100 p-10 md:p-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+              {[
+                { label: 'Reports Made', value: '12', suffix: 'k+', color: 'text-orange-600' },
+                { label: 'Hazards Fixed', value: '8.5', suffix: 'k', color: 'text-blue-600' },
+                { label: 'Avg Response', value: '24', suffix: 'h', color: 'text-green-600' },
+                { label: 'Active Users', value: '50', suffix: 'k', color: 'text-purple-600' }
+              ].map((stat, i) => (
+                <div key={i} className="space-y-2">
+                  <div className={`text-4xl md:text-5xl font-black ${stat.color} tracking-tighter`}>
+                    <CountUp to={stat.value} suffix={stat.suffix} />
+                  </div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Mission Section */}
       <section className="py-32 max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-24 items-center">
-          <div className="space-y-8">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">
-              A mission to make every journey <span className="text-orange-600">secure.</span>
-            </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              We believe that infrastructure maintenance shouldn't be a black box. By connecting 
-              citizens directly with the authorities, we create a closed-loop system of 
-              accountability and rapid response.
-            </p>
-            <div className="space-y-4">
-              {[
-                'Real-time verification of road conditions',
-                'Transparent progress tracking for repairs',
-                'Empowering local communities with data',
-                'Reducing accidents through proactive reporting'
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 text-gray-700 font-semibold">
-                  <CheckCircle2 size={20} className="text-orange-500" />
-                  {item}
-                </div>
-              ))}
+          <ScrollReveal>
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">
+                A mission to make every journey <span className="text-orange-600">secure.</span>
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                We believe that infrastructure maintenance shouldn't be a black box. By connecting 
+                citizens directly with the authorities, we create a closed-loop system of 
+                accountability and rapid response.
+              </p>
+              <div className="space-y-4">
+                {[
+                  'Real-time verification of road conditions',
+                  'Transparent progress tracking for repairs',
+                  'Empowering local communities with data',
+                  'Reducing accidents through proactive reporting'
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 text-gray-700 font-semibold">
+                    <CheckCircle2 size={20} className="text-orange-500" />
+                    {item}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-2 gap-6 relative">
             {/* Decorative element */}
             <div className="absolute inset-0 bg-orange-100/50 blur-[100px] -z-10 rounded-full" />
             
             <div className="space-y-6">
-              <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all">
-                <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Shield size={24} />
+              <ScrollReveal delay={100}>
+                <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all h-full">
+                  <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mb-6">
+                    <Shield size={24} />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">Safety First</h3>
+                  <p className="text-sm text-gray-500">Prioritizing the well-being of all road users.</p>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Safety First</h3>
-                <p className="text-sm text-gray-500">Prioritizing the well-being of all road users.</p>
-              </div>
-              <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all">
-                <div className="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Users size={24} />
+              </ScrollReveal>
+
+              <ScrollReveal delay={200}>
+                <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all h-full">
+                  <div className="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-6">
+                    <Users size={24} />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">Community</h3>
+                  <p className="text-sm text-gray-500">Built on the vigilance of active citizens.</p>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Community</h3>
-                <p className="text-sm text-gray-500">Built on the vigilance of active citizens.</p>
-              </div>
+              </ScrollReveal>
             </div>
+
             <div className="space-y-6 mt-12">
-              <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all">
-                <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Target size={24} />
+              <ScrollReveal delay={300}>
+                <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all h-full">
+                  <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6">
+                    <Target size={24} />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">Precision</h3>
+                  <p className="text-sm text-gray-500">Pinpoint accuracy for repair crews.</p>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Precision</h3>
-                <p className="text-sm text-gray-500">Pinpoint accuracy for repair crews.</p>
-              </div>
-              <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all">
-                <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Eye size={24} />
+              </ScrollReveal>
+
+              <ScrollReveal delay={400}>
+                <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-200/30 hover:shadow-2xl transition-all h-full">
+                  <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-6">
+                    <Eye size={24} />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">Transparency</h3>
+                  <p className="text-sm text-gray-500">Open tracking for every hazard reported.</p>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Transparency</h3>
-                <p className="text-sm text-gray-500">Open tracking for every hazard reported.</p>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </div>
@@ -119,4 +233,3 @@ export default function AboutUs() {
     </div>
   );
 }
-
