@@ -20,7 +20,7 @@ const AdminLayout = () => {
   }, [isDarkMode]);
 
   return (
-    <div className={`flex flex-col h-screen max-h-screen w-full flex-auto bg-admin-bg text-admin-text overflow-hidden ${isDarkMode ? 'dark' : ''}`}>
+    <div className={`flex flex-col h-screen max-h-screen w-full flex-auto bg-gradient-to-br from-admin-bg via-admin-bg to-blue-50/50 dark:to-blue-900/10 text-admin-text overflow-hidden transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
       {/* Navbar (Full Width) */}
       <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 

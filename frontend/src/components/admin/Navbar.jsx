@@ -13,7 +13,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
   };
 
   return (
-    <nav className="bg-admin-card border-b border-admin-border h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-10">
+    <nav className="glass-panel border-b-0 border-b border-admin-border h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-40">
       {/* Left side */}
       <div className="flex items-center flex-1">
         <button
@@ -38,7 +38,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
           </div>
           <input
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-admin-border rounded-full leading-5 bg-admin-input-bg text-admin-text text-sm box-border placeholder:text-admin-text-muted focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full pl-10 pr-3 py-2 border border-admin-border rounded-full leading-5 bg-admin-input-bg/50 backdrop-blur-sm text-admin-text text-sm box-border placeholder:text-admin-text-muted focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300"
             placeholder="Search reports, users..."
           />
         </div>
@@ -74,7 +74,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-admin-card border border-admin-border focus:outline-none">
+            <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-xl shadow-xl bg-admin-card/90 backdrop-blur-xl border border-admin-border focus:outline-none overflow-hidden">
               <div className="py-1">
                 <Menu.Item>
                   {({ active }) => (

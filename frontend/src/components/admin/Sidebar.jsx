@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, setSidebarOpen }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed top-16 bottom-0 left-0 z-30 w-64 bg-admin-sidebar transition-transform duration-300 ease-in-out border-r border-admin-border lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed top-16 bottom-0 left-0 z-30 w-64 glass-panel border-r-0 border-r border-admin-border transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         
         <div className="h-full flex flex-col">
           <ul className="flex-1 py-6 flex flex-col gap-2 overflow-y-auto m-0 p-0 list-none admin-scrollbar">
@@ -46,18 +46,28 @@ const Sidebar = ({ isOpen, setSidebarOpen }) => {
                   to={item.to}
                   end={item.exact}
                   className={({ isActive }) =>
-                    `flex items-center px-6 py-3.5 no-underline transition-all duration-200 text-base group hover:bg-admin-sidebar-active ${
+                    `flex items-center px-6 py-3.5 no-underline transition-all duration-300 ease-out text-base group relative overflow-hidden ${
                       isActive 
-                        ? 'bg-admin-sidebar-active text-blue-500 border-r-[3px] border-blue-500 font-medium' 
-                        : 'text-admin-text-muted font-normal hover:text-admin-text border-r-[3px] border-transparent'
+                        ? 'text-blue-500 font-medium' 
+                        : 'text-admin-text-muted font-normal hover:text-admin-text'
                     }`
                   }
                   onClick={() => setSidebarOpen(false)} // close sidebar on mobile after click
                 >
                   {({ isActive }) => (
                     <>
-                      <span className={`mr-5 flex items-center transition-opacity duration-200 ${isActive ? 'opacity-100 text-blue-500' : 'opacity-80 group-hover:opacity-100 group-hover:text-admin-text'}`}>
-                        <item.icon size={20} />
+                      {/* Active state background with gradient and glass effect */}
+                      {isActive && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent border-l-[3px] border-blue-500 -z-10" />
+                      )}
+                      
+                      {/* Hover effect background */}
+                      {!isActive && (
+                        <div className="absolute inset-0 bg-admin-text/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+                      )}
+
+                      <span className={`mr-4 flex items-center transition-all duration-300 ${isActive ? 'opacity-100 text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'opacity-70 group-hover:opacity-100 group-hover:text-admin-text group-hover:scale-110'}`}>
+                        <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                       </span>
                       <span className="flex-1">{item.name}</span>
                     </>

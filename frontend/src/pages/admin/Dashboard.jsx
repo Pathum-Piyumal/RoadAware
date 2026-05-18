@@ -62,7 +62,9 @@ const Dashboard = () => {
 
       {/* Row 1: Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 relative hover-lift group overflow-hidden">
+          {/* Subtle gradient glow in the background of the card */}
+          <div className="absolute -inset-4 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="flex justify-between items-start mb-2">
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.1)' }}>
               <AlertTriangle size={20} />
@@ -75,7 +77,9 @@ const Dashboard = () => {
           <p className="text-sm text-admin-text-muted m-0">Total reports</p>
         </div>
 
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 relative hover-lift group overflow-hidden">
+          {/* Subtle gradient glow in the background of the card */}
+          <div className="absolute -inset-4 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="flex justify-between items-start mb-2">
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)' }}>
               <CheckCircle2 size={20} />
@@ -88,7 +92,9 @@ const Dashboard = () => {
           <p className="text-sm text-admin-text-muted m-0">Resolution rate</p>
         </div>
 
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 relative hover-lift group overflow-hidden">
+          {/* Subtle gradient glow in the background of the card */}
+          <div className="absolute -inset-4 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="flex justify-between items-start mb-2">
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.1)' }}>
               <Clock size={20} />
@@ -101,7 +107,9 @@ const Dashboard = () => {
           <p className="text-sm text-admin-text-muted m-0">In progress</p>
         </div>
 
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 relative shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 relative hover-lift group overflow-hidden">
+          {/* Subtle gradient glow in the background of the card */}
+          <div className="absolute -inset-4 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
           <div className="flex justify-between items-start mb-2">
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)' }}>
               <AlertOctagon size={20} />
@@ -118,7 +126,7 @@ const Dashboard = () => {
       {/* Row 2: Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
         {/* Area Chart */}
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col hover-glow transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-base font-semibold text-admin-text m-0">Reports vs resolutions</h2>
             <p className="text-xs text-admin-text-muted mt-1 mb-0">Last 14 days</p>
@@ -151,7 +159,7 @@ const Dashboard = () => {
         </div>
 
         {/* Donut Chart */}
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col hover-glow transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-base font-semibold text-admin-text m-0">Status breakdown</h2>
             <p className="text-xs text-admin-text-muted mt-1 mb-0">All reports</p>
@@ -194,7 +202,7 @@ const Dashboard = () => {
       {/* Row 3: Bar Chart & Hotspots */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Hazards by type */}
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col hover-glow transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-base font-semibold text-admin-text m-0">Hazards by type</h2>
             <p className="text-xs text-admin-text-muted mt-1 mb-0">All time</p>
@@ -220,7 +228,7 @@ const Dashboard = () => {
         </div>
 
         {/* Top Hotspots */}
-        <div className="bg-admin-card rounded-xl border border-admin-border p-6 flex flex-col shadow-sm">
+        <div className="glass-panel rounded-2xl p-6 flex flex-col hover-glow transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-base font-semibold text-admin-text m-0">Top hotspots</h2>
             <p className="text-xs text-admin-text-muted mt-1 mb-0">Areas with most reports</p>
@@ -258,8 +266,8 @@ const Dashboard = () => {
         </div>
 
         <div className="flex flex-col">
-          {recentActivity.map((activity) => (
-            <div key={activity.id} className="flex items-start justify-between py-4 border-b border-admin-border last:border-0 last:pb-0">
+          {recentActivity.map((activity, index) => (
+            <div key={activity.id} className={`flex items-start justify-between py-4 border-b border-admin-border/50 last:border-0 last:pb-0 animate-fade-in-up stagger-${(index % 5) + 1} hover:bg-admin-text/5 px-2 -mx-2 rounded-lg transition-colors`}>
               <div className="flex gap-4">
                 <div className="text-amber-500 mt-1">
                   {getIcon(activity.type)}
