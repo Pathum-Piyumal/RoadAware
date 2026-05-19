@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import AuthService from './services/auth.service';
+import { ThemeProvider } from './context/ThemeContext';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -75,7 +76,7 @@ function AppContent() {
   const hideNavAndFooter = isAdminPage || isAuthPage;
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-slate-100 font-sans flex flex-col transition-colors duration-300">
 
       {/* Show Navbar conditionally */}
       {!hideNavAndFooter && <Navbar />}
@@ -139,10 +140,12 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <AppContent />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <ScrollToTop />
+        <AppContent />
+      </Router>
+    </ThemeProvider>
   );
 }
 
