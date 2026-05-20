@@ -21,5 +21,6 @@
   "bugs": {
     "url": "https://github.com/Pathum-Piyumal/RoadAware/issues"
   },
-  "homepage": "https://github.com/Pathum-Piyumal/RoadAware#readme"
+  "homepage": "https://github.com/Pathum-Piyumal/RoadAware#readme",
+  "main": "index.js"
 }
