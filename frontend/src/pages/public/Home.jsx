@@ -152,7 +152,10 @@ const Hero = () => (
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(5,5,5,0.4) 0%, rgba(5,5,5,0.9) 70%, #050505 100%)' }} />
     </div>
 
-    <div style={{ maxWidth: 1280, width: '100%', margin: '0 auto', padding: '100px 32px', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="grid-cols-1 lg:grid-cols-2">
+    <div 
+      className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center px-6 md:px-8 py-16 lg:py-24"
+      style={{ maxWidth: 1280, width: '100%', margin: '0 auto', position: 'relative', zIndex: 1 }}
+    >
       {/* Left column */}
       <div className="space-y-8">
         {/* Live pulsing badge */}
@@ -171,9 +174,9 @@ const Hero = () => (
 
         {/* Headline */}
         <h1 
-          className="animate-fade-in-up"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-[950] tracking-tight leading-[1.02] text-white animate-fade-in-up"
           style={{ 
-            fontSize: 70, fontWeight: 950, color: '#fff', lineHeight: 1.02, letterSpacing: '-3px', margin: 0,
+            margin: 0,
             animationDelay: '150ms', animationFillMode: 'both'
           }}
         >
@@ -184,9 +187,9 @@ const Hero = () => (
 
         {/* Subtext */}
         <p 
-          className="animate-fade-in-up"
+          className="text-base sm:text-lg text-white/55 leading-relaxed max-w-lg animate-fade-in-up"
           style={{ 
-            fontSize: 17, color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, maxWidth: 480, margin: 0,
+            margin: 0,
             animationDelay: '300ms', animationFillMode: 'both'
           }}
         >
@@ -196,8 +199,8 @@ const Hero = () => (
 
         {/* CTAs */}
         <div 
-          className="animate-fade-in-up"
-          style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16, animationDelay: '450ms', animationFillMode: 'both' }}
+          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-fade-in-up"
+          style={{ animationDelay: '450ms', animationFillMode: 'both' }}
         >
           <Link to="/login" style={{
             background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
@@ -209,6 +212,7 @@ const Hero = () => (
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: 10,
             boxShadow: '0 12px 32px rgba(249,115,22,0.35)',
             transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease',
@@ -229,6 +233,7 @@ const Hero = () => (
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: 10,
             border: '1px solid rgba(255,255,255,0.12)',
             transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
@@ -242,8 +247,8 @@ const Hero = () => (
 
         {/* Ratings and Stats Combined Row */}
         <div 
-          className="animate-fade-in-up"
-          style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 32, pt: 16, animationDelay: '600ms', animationFillMode: 'both' }}
+          className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-6 sm:gap-8 pt-4 animate-fade-in-up"
+          style={{ animationDelay: '600ms', animationFillMode: 'both' }}
         >
           {/* Active members */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -297,7 +302,7 @@ const Hero = () => (
           animationDelay: '300ms'
         }}
       >
-        <div style={{ height: 480 }}>
+        <div className="h-[320px] sm:h-[400px] lg:h-[480px]">
           <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <Marker position={[51.556, -0.297]}>
@@ -307,11 +312,7 @@ const Hero = () => (
         </div>
 
         {/* Floating Top Indicator Badge */}
-        <div style={{
-          position: 'absolute', top: 24, left: 24, background: '#fff',
-          borderRadius: 20, padding: '14px 20px', display: 'flex', alignItems: 'center',
-          gap: 12, boxShadow: '0 12px 36px rgba(0,0,0,0.2)', zIndex: 1000,
-        }}>
+        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 shadow-lg z-[1000]">
           <div style={{ width: 40, height: 40, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <AlertTriangle size={20} color="#ef4444" />
           </div>
@@ -322,13 +323,9 @@ const Hero = () => (
         </div>
 
         {/* Floating Bottom Tracker Badge */}
-        <div style={{
-          position: 'absolute', bottom: 24, right: 24, background: '#10b981',
-          borderRadius: 16, padding: '10px 16px', display: 'flex', alignItems: 'center',
-          gap: 8, boxShadow: '0 8px 24px rgba(16,185,129,0.4)', zIndex: 1000,
-        }}>
+        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-emerald-500 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 shadow-emerald-500/40 shadow-lg z-[1000]">
           <CheckCircle2 size={16} color="#fff" />
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', uppercase: true, letterSpacing: '0.05em' }}>Verification Live</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verification Live</span>
         </div>
       </div>
     </div>
@@ -348,18 +345,24 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section style={{ padding: '120px 32px', background: 'var(--color-admin-card-solid)', position: 'relative', overflow: 'hidden' }}>
+    <section 
+      className="py-16 px-6 md:py-24 md:px-8"
+      style={{ background: 'var(--color-admin-card-solid)', position: 'relative', overflow: 'hidden' }}
+    >
       <div style={{ maxWidth: 1280, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         
         <ScrollReveal>
           <p style={{ fontSize: 11, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 12 }}>Workflow Engine</p>
-          <h2 style={{ fontSize: 42, fontWeight: 950, color: 'var(--color-admin-text)', letterSpacing: '-1.5px', marginBottom: 16 }}>Three steps to a safer street</h2>
-          <p style={{ fontSize: 16, color: 'var(--color-admin-text-muted)', marginBottom: 80, maxWidth: 540, margin: '0 auto 80px', lineHeight: 1.7 }}>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-[950] text-[var(--color-admin-text)] tracking-tight mb-4">Three steps to a safer street</h2>
+          <p style={{ fontSize: 16, color: 'var(--color-admin-text-muted)', maxWidth: 540, margin: '0 auto 80px', lineHeight: 1.7 }}>
             From initial citizen reporting to city works resolution, RoadAware bridges municipal gaps transparently.
           </p>
         </ScrollReveal>
 
-        <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }} className="grid-cols-1 md:grid-cols-3">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 relative"
+          style={{ position: 'relative' }}
+        >
           {/* Background Connective Glow Line */}
           <div 
             style={{
@@ -386,10 +389,10 @@ const HowItWorks = () => {
                 onMouseEnter={() => setHoveredStep(i)}
                 onMouseLeave={() => setHoveredStep(null)}
                 style={{ 
-                  padding: '48px 40px', borderRadius: 32, border: '1px solid var(--color-admin-border)', background: 'var(--color-admin-card-solid)', cursor: 'default',
+                  borderRadius: 32, border: '1px solid var(--color-admin-border)', background: 'var(--color-admin-card-solid)', cursor: 'default',
                   transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
-                className={`hover:scale-[1.05] hover:shadow-2xl hover:shadow-slate-200/80 group ${step.border} h-full`}
+                className={`p-8 sm:p-10 hover:scale-[1.05] hover:shadow-2xl hover:shadow-slate-200/80 group ${step.border} h-full`}
               >
                 <div 
                   className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} ${step.shadow} flex items-center justify-center mb-8 mx-auto md:mx-0 transition-transform duration-500 group-hover:scale-115 group-hover:rotate-6`}
@@ -424,14 +427,17 @@ const WhatYouCanReport = () => {
   ];
 
   return (
-    <section style={{ padding: '96px 32px', background: 'var(--color-admin-bg)' }}>
+    <section 
+      className="py-16 px-6 md:py-24 md:px-8"
+      style={{ background: 'var(--color-admin-bg)' }}
+    >
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <ScrollReveal>
           <h2 style={{ fontSize: 32, fontWeight: 900, color: 'var(--color-admin-text)', marginBottom: 8, letterSpacing: '-0.5px' }}>What you can report</h2>
           <p style={{ fontSize: 15, color: 'var(--color-admin-text-muted)', marginBottom: 48 }}>Every logged coordinates ticket contributes directly to local municipal safety.</p>
         </ScrollReveal>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8,1fr)', gap: 20 }} className="grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 md:gap-5">
           {categories.map((cat, i) => (
             <ScrollReveal key={i} delay={i * 80}>
               <div 
@@ -505,11 +511,16 @@ const HazardCard = ({ title, location, status, upvotes, category, image, onDetai
 
 /* ─── FEATURED HAZARDS ────────────────────────────────────── */
 const FeaturedHazards = ({ hazards, onDetailsClick }) => (
-  <section style={{ padding: '120px 32px', background: 'var(--color-admin-card-solid)' }}>
+  <section 
+    className="py-16 px-6 md:py-24 md:px-8"
+    style={{ background: 'var(--color-admin-card-solid)' }}
+  >
     <div style={{ maxWidth: 1280, margin: '0 auto' }}>
       
       <ScrollReveal>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56 }} className="flex-col md:flex-row gap-6 md:items-end">
+        <div 
+          className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-14"
+        >
           <div>
             <p style={{ fontSize: 11, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 8 }}>Live feed</p>
             <h2 style={{ fontSize: 40, fontWeight: 950, color: 'var(--color-admin-text)', letterSpacing: '-1.5px', margin: 0 }}>Most-upvoted hazards near you</h2>
@@ -520,7 +531,7 @@ const FeaturedHazards = ({ hazards, onDetailsClick }) => (
         </div>
       </ScrollReveal>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {hazards.map((hazard, i) => (
           <ScrollReveal key={hazard.id} delay={i * 150}>
             <HazardCard
@@ -542,9 +553,12 @@ const CommunityLeaderboard = () => {
   ];
 
   return (
-    <section style={{ padding: '120px 32px', background: 'var(--color-admin-bg)' }}>
+    <section 
+      className="py-16 px-6 md:py-24 md:px-8"
+      style={{ background: 'var(--color-admin-bg)' }}
+    >
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 64, alignItems: 'center' }} className="grid-cols-1 lg:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           <ScrollReveal>
             <div>
@@ -575,12 +589,11 @@ const CommunityLeaderboard = () => {
             {users.map((u, i) => (
               <ScrollReveal key={u.rank} delay={i * 150}>
                 <div 
+                  className="p-5 sm:p-6 md:p-8 flex items-center justify-between gap-4 hover:scale-[1.03] hover:shadow-xl hover:border-slate-200/60 group duration-300"
                   style={{
-                    background: 'var(--color-admin-card-solid)', padding: '24px 32px', borderRadius: 28,
-                    border: '1px solid var(--color-admin-border)', display: 'flex', alignItems: 'center',
-                    justifyContent: 'space-between', transition: 'all 0.4s'
+                    background: 'var(--color-admin-card-solid)', borderRadius: 28,
+                    border: '1px solid var(--color-admin-border)', transition: 'all 0.4s'
                   }}
-                  className="hover:scale-[1.03] hover:shadow-xl hover:border-slate-200/60 group"
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                     {/* Rank Indicator */}
@@ -651,11 +664,16 @@ const SafetyInsights = () => {
   ];
 
   return (
-    <section style={{ padding: '120px 32px', background: 'var(--color-admin-bg)' }}>
+    <section 
+      className="py-16 px-6 md:py-24 md:px-8"
+      style={{ background: 'var(--color-admin-bg)' }}
+    >
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         
         <ScrollReveal>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56 }} className="flex-col md:flex-row gap-6 md:items-end">
+          <div 
+            className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-14"
+          >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <div style={{ width: 44, height: 44, background: 'rgba(59, 130, 246, 0.1)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -671,7 +689,7 @@ const SafetyInsights = () => {
           </div>
         </ScrollReveal>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((art, i) => (
             <ScrollReveal key={i} delay={i * 150}>
               <div 
@@ -723,15 +741,16 @@ const SafetyInsights = () => {
 
 /* ─── CTA SECTION ─────────────────────────────────────────── */
 const CTASection = () => (
-  <section style={{ padding: '0 32px 96px' }}>
+  <section className="px-6 pb-16 md:px-8 md:pb-24">
     <ScrollReveal>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #1e40af 0%, #0f172a 100%)',
-          borderRadius: 48, padding: '96px 40px', textAlign: 'center',
-          position: 'relative', overflow: 'hidden',
-          boxShadow: '0 32px 80px rgba(30,64,175,0.3)',
-        }}>
+        <div 
+          className="py-16 px-6 sm:py-20 sm:px-10 md:py-24 md:px-16 text-center rounded-[32px] sm:rounded-[48px] relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #1e40af 0%, #0f172a 100%)',
+            boxShadow: '0 32px 80px rgba(30,64,175,0.3)',
+          }}
+        >
           {/* Subtle grid texture */}
           <div style={{ position: 'absolute', inset: 0, opacity: 0.05, backgroundImage: 'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 40px)' }} />
 
@@ -742,8 +761,8 @@ const CTASection = () => (
             <div style={{ width: 64, height: 64, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
               <CheckCircle2 size={30} color="#fff" />
             </div>
-            <h2 style={{ fontSize: 50, fontWeight: 950, color: '#fff', letterSpacing: '-1.5px', marginBottom: 16 }}>See something? Say something.</h2>
-            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', marginBottom: 40, maxWidth: 540, margin: '0 auto 40px', lineHeight: 1.7 }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-[950] tracking-tight mb-4 text-white">See something? Say something.</h2>
+            <p className="text-base sm:text-lg text-white/70 max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
               Your coordinates report could prevent the next accident. Help build safer roads and highly accountable civic infrastructure.
             </p>
             <Link to="/report-hazard" style={{
@@ -828,11 +847,12 @@ export default function Home() {
           position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)',
           backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
         }}>
-          <div style={{
-            background: 'var(--color-admin-card-solid)', borderRadius: 32, padding: 32, maxWidth: 540, w: '100%', width: '100%',
-            position: 'relative', border: '1px solid var(--color-admin-border)', boxShadow: '0 32px 80px rgba(0,0,0,0.3)',
-            maxHeight: '90vh', overflowY: 'auto'
-          }}>
+          <div 
+            className="p-6 sm:p-8 max-w-[540px] w-full max-h-[90vh] overflow-y-auto relative rounded-[32px] border border-[var(--color-admin-border)] shadow-2xl"
+            style={{
+              background: 'var(--color-admin-card-solid)'
+            }}
+          >
             {/* Close button */}
             <button 
               onClick={() => setSelectedHazard(null)}
