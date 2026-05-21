@@ -53,7 +53,7 @@ const ReportHazard = () => {
     <div className="min-h-[calc(100vh-64px)] bg-gray-50 flex flex-col w-full selection:bg-orange-100 selection:text-orange-950">
       {/* Full-width Colored Header */}
       {!isSuccess && (
-        <div className="bg-[#f0f4f8] w-full pt-16 pb-28 border-b border-gray-200 relative overflow-hidden">
+        <div className="bg-slate-50 w-full pt-16 pb-28 border-b border-gray-200 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] -mr-48 -mt-48 pointer-events-none" />
           <div className="max-w-3xl mx-auto px-4 relative z-10 animate-fade-in-up">
             <div className="mb-10 text-center md:text-left">

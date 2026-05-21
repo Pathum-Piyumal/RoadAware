@@ -172,7 +172,7 @@ export default function HazardMap() {
   return (
     <div className="font-sans bg-white min-h-screen flex flex-col selection:bg-orange-100 selection:text-orange-950">
       {/* Header Section */}
-      <header className="bg-[#f4f6f9] pt-16 pb-20 border-b border-gray-200 relative overflow-hidden">
+      <header className="bg-gray-50 pt-16 pb-20 border-b border-gray-200 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] -mr-48 -mt-48" />
         <div className="max-w-7xl mx-auto px-8 w-full relative z-10 animate-fade-in-up">
           <span className="inline-block text-[11px] font-extrabold text-blue-600 tracking-widest uppercase mb-4">LIVE MAP</span>

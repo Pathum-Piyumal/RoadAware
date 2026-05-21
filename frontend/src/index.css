@@ -46,7 +46,8 @@
   }
 
   .dark .bg-slate-50,
-  .dark .bg-slate-100 {
+  .dark .bg-slate-100,
+  .dark .bg-gray-100 {
     background-color: #121824 !important;
   }
 
@@ -55,6 +56,13 @@
   .dark .text-slate-800,
   .dark .text-gray-800 {
     color: #f8fafc !important;
+  }
+
+  .dark .text-slate-700,
+  .dark .text-gray-700,
+  .dark .text-slate-600,
+  .dark .text-gray-600 {
+    color: #cbd5e1 !important;
   }
 
   .dark .text-slate-500,
@@ -90,10 +98,15 @@
   .bg-gray-50\/50,
   .bg-slate-50,
   .bg-slate-100,
+  .bg-gray-100,
   .text-slate-900,
   .text-gray-900,
   .text-slate-800,
   .text-gray-800,
+  .text-slate-700,
+  .text-gray-700,
+  .text-slate-600,
+  .text-gray-600,
   .text-slate-500,
   .text-gray-500,
   .text-slate-400,
