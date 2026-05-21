@@ -348,13 +348,13 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section style={{ padding: '120px 32px', background: '#fff', position: 'relative', overflow: 'hidden' }}>
+    <section style={{ padding: '120px 32px', background: 'var(--color-admin-card-solid)', position: 'relative', overflow: 'hidden' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 10 }}>
         
         <ScrollReveal>
           <p style={{ fontSize: 11, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 12 }}>Workflow Engine</p>
-          <h2 style={{ fontSize: 42, fontWeight: 950, color: '#111', letterSpacing: '-1.5px', marginBottom: 16 }}>Three steps to a safer street</h2>
-          <p style={{ fontSize: 16, color: '#6b7280', marginBottom: 80, maxWidth: 540, margin: '0 auto 80px', lineHeight: 1.7 }}>
+          <h2 style={{ fontSize: 42, fontWeight: 950, color: 'var(--color-admin-text)', letterSpacing: '-1.5px', marginBottom: 16 }}>Three steps to a safer street</h2>
+          <p style={{ fontSize: 16, color: 'var(--color-admin-text-muted)', marginBottom: 80, maxWidth: 540, margin: '0 auto 80px', lineHeight: 1.7 }}>
             From initial citizen reporting to city works resolution, RoadAware bridges municipal gaps transparently.
           </p>
         </ScrollReveal>
@@ -364,7 +364,7 @@ const HowItWorks = () => {
           <div 
             style={{
               position: 'absolute', top: '78px', left: '15%', right: '15%', height: '4px',
-              background: '#f1f5f9', zIndex: -1, borderRadius: 2
+              background: 'var(--color-admin-border)', zIndex: -1, borderRadius: 2
             }}
             className="hidden lg:block"
           />
@@ -386,7 +386,7 @@ const HowItWorks = () => {
                 onMouseEnter={() => setHoveredStep(i)}
                 onMouseLeave={() => setHoveredStep(null)}
                 style={{ 
-                  padding: '48px 40px', borderRadius: 32, border: '1px solid #f1f5f9', background: '#fff', cursor: 'default',
+                  padding: '48px 40px', borderRadius: 32, border: '1px solid var(--color-admin-border)', background: 'var(--color-admin-card-solid)', cursor: 'default',
                   transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
                 className={`hover:scale-[1.05] hover:shadow-2xl hover:shadow-slate-200/80 group ${step.border} h-full`}
@@ -397,8 +397,8 @@ const HowItWorks = () => {
                 >
                   <step.icon size={26} color="#fff" className="group-hover:animate-pulse" />
                 </div>
-                <h3 style={{ fontSize: 21, fontWeight: 900, color: '#111', marginBottom: 12 }}>{step.title}</h3>
-                <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
+                <h3 style={{ fontSize: 21, fontWeight: 900, color: 'var(--color-admin-text)', marginBottom: 12 }}>{step.title}</h3>
+                <p style={{ fontSize: 14, color: 'var(--color-admin-text-muted)', lineHeight: 1.7, margin: 0 }}>{step.desc}</p>
               </div>
             </ScrollReveal>
           ))}
@@ -413,22 +413,22 @@ const HowItWorks = () => {
 /* ─── WHAT YOU CAN REPORT ─────────────────────────────────── */
 const WhatYouCanReport = () => {
   const categories = [
-    { name: 'Pothole',      icon: Car, color: 'hover:bg-red-50 hover:text-red-600 hover:border-red-200 hover:shadow-red-500/10' },
-    { name: 'Debris',       icon: Truck, color: 'hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 hover:shadow-amber-500/10' },
-    { name: 'Construction', icon: Construction, color: 'hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-orange-500/10' },
-    { name: 'Streetlight',  icon: Lightbulb, color: 'hover:bg-yellow-50 hover:text-yellow-600 hover:border-yellow-200 hover:shadow-yellow-500/10' },
-    { name: 'Flooding',     icon: Droplets, color: 'hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 hover:shadow-blue-500/10' },
-    { name: 'Ice / Snow',   icon: Snowflake, color: 'hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 hover:shadow-sky-500/10' },
-    { name: 'Animal',       icon: PawPrint, color: 'hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-emerald-500/10' },
-    { name: 'Other',        icon: AlertTriangle, color: 'hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 hover:shadow-slate-500/10' },
+    { name: 'Pothole',      icon: Car, color: 'hover:bg-red-50 hover:text-red-600 hover:border-red-200 hover:shadow-red-500/10 dark:hover:bg-red-950/20 dark:hover:text-red-400 dark:hover:border-red-900/50' },
+    { name: 'Debris',       icon: Truck, color: 'hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 hover:shadow-amber-500/10 dark:hover:bg-amber-950/20 dark:hover:text-amber-400 dark:hover:border-amber-900/50' },
+    { name: 'Construction', icon: Construction, color: 'hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-orange-500/10 dark:hover:bg-orange-950/20 dark:hover:text-orange-400 dark:hover:border-orange-900/50' },
+    { name: 'Streetlight',  icon: Lightbulb, color: 'hover:bg-yellow-50 hover:text-yellow-600 hover:border-yellow-200 hover:shadow-yellow-500/10 dark:hover:bg-yellow-950/20 dark:hover:text-yellow-400 dark:hover:border-yellow-900/50' },
+    { name: 'Flooding',     icon: Droplets, color: 'hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 hover:shadow-blue-500/10 dark:hover:bg-blue-950/20 dark:hover:text-blue-400 dark:hover:border-blue-900/50' },
+    { name: 'Ice / Snow',   icon: Snowflake, color: 'hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200 hover:shadow-sky-500/10 dark:hover:bg-sky-950/20 dark:hover:text-sky-400 dark:hover:border-sky-900/50' },
+    { name: 'Animal',       icon: PawPrint, color: 'hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-emerald-500/10 dark:hover:bg-emerald-950/20 dark:hover:text-emerald-400 dark:hover:border-emerald-900/50' },
+    { name: 'Other',        icon: AlertTriangle, color: 'hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 hover:shadow-slate-500/10 dark:hover:bg-slate-800/40 dark:hover:text-slate-200 dark:hover:border-slate-700/50' },
   ];
 
   return (
-    <section style={{ padding: '96px 32px', background: '#f8fafc' }}>
+    <section style={{ padding: '96px 32px', background: 'var(--color-admin-bg)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <ScrollReveal>
-          <h2 style={{ fontSize: 32, fontWeight: 900, color: '#111', marginBottom: 8, letterSpacing: '-0.5px' }}>What you can report</h2>
-          <p style={{ fontSize: 15, color: '#6b7280', marginBottom: 48 }}>Every logged coordinates ticket contributes directly to local municipal safety.</p>
+          <h2 style={{ fontSize: 32, fontWeight: 900, color: 'var(--color-admin-text)', marginBottom: 8, letterSpacing: '-0.5px' }}>What you can report</h2>
+          <p style={{ fontSize: 15, color: 'var(--color-admin-text-muted)', marginBottom: 48 }}>Every logged coordinates ticket contributes directly to local municipal safety.</p>
         </ScrollReveal>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8,1fr)', gap: 20 }} className="grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
@@ -453,7 +453,7 @@ const WhatYouCanReport = () => {
 /* ─── HAZARD CARD ─────────────────────────────────────────── */
 const HazardCard = ({ title, location, status, upvotes, category, image, onDetailsClick }) => (
   <div 
-    style={{ background: '#fff', borderRadius: 32, padding: 32, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', height: '100%' }}
+    style={{ background: 'var(--color-admin-card-solid)', borderRadius: 32, padding: 32, border: '1px solid var(--color-admin-border)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', height: '100%' }}
     className="group hover:shadow-2xl hover:shadow-slate-200/75 hover:border-orange-500/20 hover:-translate-y-1.5 animate-shimmer"
   >
     <div>
@@ -461,10 +461,10 @@ const HazardCard = ({ title, location, status, upvotes, category, image, onDetai
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
         <span style={{
           padding: '5px 14px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em',
-          background: status === 'Verified' ? '#dcfce7' : '#fff7ed',
-          color:      status === 'Verified' ? '#15803d'  : '#c2410c',
+          background: status === 'Verified' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(249, 115, 22, 0.15)',
+          color:      status === 'Verified' ? '#10b981'  : '#f97316',
         }}>{status}</span>
-        <span style={{ padding: '5px 14px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', background: '#fee2e2', color: '#b91c1c' }}>{category}</span>
+        <span style={{ padding: '5px 14px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>{category}</span>
       </div>
 
       {/* Real Zooming Image */}
@@ -477,22 +477,22 @@ const HazardCard = ({ title, location, status, upvotes, category, image, onDetai
         />
       </div>
 
-      <h3 style={{ fontSize: 20, fontWeight: 900, color: '#111', marginBottom: 8, transition: 'colors 0.3s' }} className="group-hover:text-orange-500">{title}</h3>
-      <p style={{ fontSize: 13, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 24 }}>
+      <h3 style={{ fontSize: 20, fontWeight: 900, color: 'var(--color-admin-text)', marginBottom: 8, transition: 'colors 0.3s' }} className="group-hover:text-orange-500">{title}</h3>
+      <p style={{ fontSize: 13, color: 'var(--color-admin-text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 24 }}>
         <MapPin size={14} className="text-slate-400" /> {location}
       </p>
     </div>
 
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTop: '1px solid #f8fafc' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTop: '1px solid var(--color-admin-border)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ width: 34, height: 34, background: '#fef2f2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifycontent: 'center', transition: 'transform 0.3s' }} className="flex items-center justify-center group-hover:scale-110">
+        <div style={{ width: 34, height: 34, background: 'rgba(239, 68, 68, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.3s' }} className="flex items-center justify-center group-hover:scale-110">
           <Heart size={14} color="#ef4444" fill="#ef4444" />
         </div>
-        <span style={{ fontSize: 15, fontWeight: 800, color: '#111' }}>{upvotes}</span>
+        <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-admin-text)' }}>{upvotes}</span>
       </div>
       <button 
         onClick={onDetailsClick}
-        style={{ fontSize: 13, fontWeight: 800, color: '#111', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+        style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-admin-text)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
         className="hover:text-orange-500 transition-colors"
       >
         Details <ChevronRight size={16} />
@@ -505,16 +505,16 @@ const HazardCard = ({ title, location, status, upvotes, category, image, onDetai
 
 /* ─── FEATURED HAZARDS ────────────────────────────────────── */
 const FeaturedHazards = ({ hazards, onDetailsClick }) => (
-  <section style={{ padding: '120px 32px', background: '#fff' }}>
+  <section style={{ padding: '120px 32px', background: 'var(--color-admin-card-solid)' }}>
     <div style={{ maxWidth: 1280, margin: '0 auto' }}>
       
       <ScrollReveal>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56 }} className="flex-col md:flex-row gap-6 md:items-end">
           <div>
             <p style={{ fontSize: 11, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.25em', marginBottom: 8 }}>Live feed</p>
-            <h2 style={{ fontSize: 40, fontWeight: 950, color: '#111', letterSpacing: '-1.5px', margin: 0 }}>Most-upvoted hazards near you</h2>
+            <h2 style={{ fontSize: 40, fontWeight: 950, color: 'var(--color-admin-text)', letterSpacing: '-1.5px', margin: 0 }}>Most-upvoted hazards near you</h2>
           </div>
-          <Link to="/map" style={{ fontSize: 14, fontWeight: 800, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }} className="hover:text-orange-500 transition-colors">
+          <Link to="/map" style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-admin-text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }} className="hover:text-orange-500 transition-colors">
             View all <ChevronRight size={18} />
           </Link>
         </div>
@@ -523,13 +523,8 @@ const FeaturedHazards = ({ hazards, onDetailsClick }) => (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32 }} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {hazards.map((hazard, i) => (
           <ScrollReveal key={hazard.id} delay={i * 150}>
-            <HazardCard 
-              title={hazard.title}
-              location={hazard.location}
-              status={hazard.status}
-              upvotes={hazard.upvotes}
-              category={hazard.category}
-              image={hazard.image}
+            <HazardCard
+              {...hazard}
               onDetailsClick={() => onDetailsClick(hazard)}
             />
           </ScrollReveal>
@@ -539,9 +534,6 @@ const FeaturedHazards = ({ hazards, onDetailsClick }) => (
   </section>
 );
 
-
-
-/* ─── COMMUNITY LEADERBOARD (New Premium Section) ────────── */
 const CommunityLeaderboard = () => {
   const users = [
     { rank: 1, name: 'Pathum Piyumal', score: '2,450', reports: 48, badge: 'Road Warden', color: 'from-amber-400 to-orange-500', text: 'text-amber-500' },
@@ -550,24 +542,24 @@ const CommunityLeaderboard = () => {
   ];
 
   return (
-    <section style={{ padding: '120px 32px', background: '#f8fafc' }}>
+    <section style={{ padding: '120px 32px', background: 'var(--color-admin-bg)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 64, alignItems: 'center' }} className="grid-cols-1 lg:grid-cols-2">
           
           <ScrollReveal>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                <div style={{ width: 44, height: 44, background: '#fef2f2', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 44, height: 44, background: 'rgba(239, 68, 68, 0.1)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Award size={22} className="text-red-500" />
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.25em' }}>Community Heroes</span>
               </div>
-              <h2 style={{ fontSize: 42, fontWeight: 950, color: '#111', letterSpacing: '-1.5px', marginBottom: 20 }}>Meet our top safety reporters</h2>
-              <p style={{ fontSize: 16, color: '#6b7280', lineHeight: 1.8, marginBottom: 36 }}>
+              <h2 style={{ fontSize: 42, fontWeight: 950, color: 'var(--color-admin-text)', letterSpacing: '-1.5px', marginBottom: 20 }}>Meet our top safety reporters</h2>
+              <p style={{ fontSize: 16, color: 'var(--color-admin-text-muted)', lineHeight: 1.8, marginBottom: 36 }}>
                 Road safety is a collaborative effort. Our gamified leaderboard celebrates active citizens who submit coordinates, upload photo evidence, and upvote hazards. 
               </p>
               <Link to="/register" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8, background: '#111', color: '#fff',
+                display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--color-admin-text)', color: 'var(--color-admin-card-solid)',
                 padding: '16px 36px', borderRadius: 16, fontWeight: 800, fontSize: 14, textDecoration: 'none',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.1)', transition: 'all 0.3s'
               }}
@@ -584,8 +576,8 @@ const CommunityLeaderboard = () => {
               <ScrollReveal key={u.rank} delay={i * 150}>
                 <div 
                   style={{
-                    background: '#fff', padding: '24px 32px', borderRadius: 28,
-                    border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center',
+                    background: 'var(--color-admin-card-solid)', padding: '24px 32px', borderRadius: 28,
+                    border: '1px solid var(--color-admin-border)', display: 'flex', alignItems: 'center',
                     justifyContent: 'space-between', transition: 'all 0.4s'
                   }}
                   className="hover:scale-[1.03] hover:shadow-xl hover:border-slate-200/60 group"
@@ -601,9 +593,9 @@ const CommunityLeaderboard = () => {
 
                     {/* Meta info */}
                     <div>
-                      <h4 style={{ fontSize: 17, fontWeight: 900, color: '#111', margin: '0 0 4px 0' }}>{u.name}</h4>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, color: '#6b7280' }}>
-                        <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 bg-slate-100 rounded-md font-extrabold`}>{u.badge}</span>
+                      <h4 style={{ fontSize: 17, fontWeight: 900, color: 'var(--color-admin-text)', margin: '0 0 4px 0' }}>{u.name}</h4>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, color: 'var(--color-admin-text-muted)' }}>
+                        <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md font-extrabold`}>{u.badge}</span>
                         <span>•</span>
                         <span>{u.reports} Reports</span>
                       </div>
@@ -612,8 +604,8 @@ const CommunityLeaderboard = () => {
 
                   {/* Reputation points */}
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: 18, fontWeight: 950, color: '#111', margin: 0 }}>{u.score}</p>
-                    <p style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Reputation Pts</p>
+                    <p style={{ fontSize: 18, fontWeight: 950, color: 'var(--color-admin-text)', margin: 0 }}>{u.score}</p>
+                    <p style={{ fontSize: 9, fontWeight: 800, color: 'var(--color-admin-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Reputation Pts</p>
                   </div>
                 </div>
               </ScrollReveal>
@@ -659,21 +651,21 @@ const SafetyInsights = () => {
   ];
 
   return (
-    <section style={{ padding: '120px 32px', background: '#f8fafc' }}>
+    <section style={{ padding: '120px 32px', background: 'var(--color-admin-bg)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         
         <ScrollReveal>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56 }} className="flex-col md:flex-row gap-6 md:items-end">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 44, height: 44, background: '#eff6ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 44, height: 44, background: 'rgba(59, 130, 246, 0.1)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <BookOpen size={22} className="text-blue-500" />
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.25em' }}>Safety Insights</span>
               </div>
-              <h2 style={{ fontSize: 40, fontWeight: 950, color: '#111', letterSpacing: '-1.5px', margin: 0 }}>Latest news & public bulletins</h2>
+              <h2 style={{ fontSize: 40, fontWeight: 950, color: 'var(--color-admin-text)', letterSpacing: '-1.5px', margin: 0 }}>Latest news & public bulletins</h2>
             </div>
-            <Link to="/safety-tips" style={{ fontSize: 14, fontWeight: 800, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }} className="hover:text-orange-500 transition-colors">
+            <Link to="/safety-tips" style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-admin-text-muted)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }} className="hover:text-orange-500 transition-colors">
               Read all bulletins <ChevronRight size={18} />
             </Link>
           </div>
@@ -683,7 +675,7 @@ const SafetyInsights = () => {
           {articles.map((art, i) => (
             <ScrollReveal key={i} delay={i * 150}>
               <div 
-                style={{ background: '#fff', borderRadius: 32, overflow: 'hidden', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', height: '100%', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
+                style={{ background: 'var(--color-admin-card-solid)', borderRadius: 32, overflow: 'hidden', border: '1px solid var(--color-admin-border)', display: 'flex', flexDirection: 'column', height: '100%', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
                 className="group hover:shadow-2xl hover:-translate-y-2 hover:border-slate-200"
               >
                 {/* Photo cover zoom */}
@@ -696,14 +688,14 @@ const SafetyInsights = () => {
                   />
                 </div>
 
-                <div style={{ padding: 32, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div style={{ padding: 32, flex: 1, display: 'flex', flexDirection: 'column', justifycontent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>
                       <span>{art.category}</span>
                       <span>•</span>
-                      <span style={{ color: '#9ca3af' }}>{art.date}</span>
+                      <span style={{ color: 'var(--color-admin-text-muted)' }}>{art.date}</span>
                     </div>
-                    <h3 style={{ fontSize: 18, fontWeight: 900, color: '#111', lineHeight: 1.4, margin: '0 0 24px 0', transition: 'colors 0.3s' }} className="group-hover:text-orange-500">
+                    <h3 style={{ fontSize: 18, fontWeight: 900, color: 'var(--color-admin-text)', lineHeight: 1.4, margin: '0 0 24px 0', transition: 'colors 0.3s' }} className="group-hover:text-orange-500">
                       {art.title}
                     </h3>
                   </div>
@@ -711,7 +703,7 @@ const SafetyInsights = () => {
                   <Link 
                     to="/safety-tips"
                     state={{ activeCategory: art.doc }}
-                    style={{ fontSize: 13, fontWeight: 800, color: '#111', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
+                    style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-admin-text)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
                     className="group-hover:text-orange-500 transition-colors"
                   >
                     Read Detailed Guide <ChevronRight size={15} />
@@ -819,7 +811,7 @@ export default function Home() {
   };
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: '#fff' }}>
+    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'var(--color-admin-bg)' }}>
       <main>
         <Hero />
         <HowItWorks />
@@ -837,20 +829,20 @@ export default function Home() {
           backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
         }}>
           <div style={{
-            background: '#fff', borderRadius: 32, padding: 32, maxWidth: 540, w: '100%', width: '100%',
-            position: 'relative', border: '1px solid #f3f4f6', boxShadow: '0 32px 80px rgba(0,0,0,0.3)',
+            background: 'var(--color-admin-card-solid)', borderRadius: 32, padding: 32, maxWidth: 540, w: '100%', width: '100%',
+            position: 'relative', border: '1px solid var(--color-admin-border)', boxShadow: '0 32px 80px rgba(0,0,0,0.3)',
             maxHeight: '90vh', overflowY: 'auto'
           }}>
             {/* Close button */}
             <button 
               onClick={() => setSelectedHazard(null)}
               style={{
-                position: 'absolute', top: 24, right: 24, background: '#f3f4f6', border: 'none',
+                position: 'absolute', top: 24, right: 24, background: 'var(--color-admin-input-bg)', border: 'none',
                 borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center',
-                justifyContent: 'center', cursor: 'pointer', color: '#6b7280', transition: 'background 0.2s'
+                justifyContent: 'center', cursor: 'pointer', color: 'var(--color-admin-text-muted)', transition: 'background 0.2s'
               }}
-              onMouseEnter={e => e.currentTarget.style.background = '#e5e7eb'}
-              onMouseLeave={e => e.currentTarget.style.background = '#f3f4f6'}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--color-admin-border)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--color-admin-input-bg)'}
             >
               <X size={18} />
             </button>
@@ -865,16 +857,16 @@ export default function Home() {
               <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                 <span style={{
                   padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
-                  background: selectedHazard.status === 'Verified' ? '#dcfce7' : '#fff7ed',
-                  color:      selectedHazard.status === 'Verified' ? '#16a34a'  : '#ea580c',
+                  background: selectedHazard.status === 'Verified' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(249, 115, 22, 0.15)',
+                  color:      selectedHazard.status === 'Verified' ? '#10b981'  : '#f97316',
                 }}>{selectedHazard.status}</span>
-                <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#fee2e2', color: '#dc2626' }}>{selectedHazard.category}</span>
+                <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>{selectedHazard.category}</span>
               </div>
 
               {/* Title & Metadata */}
-              <h3 style={{ fontSize: 24, fontWeight: 900, color: '#111', marginBottom: 8, letterSpacing: '-0.5px' }}>{selectedHazard.title}</h3>
+              <h3 style={{ fontSize: 24, fontWeight: 900, color: 'var(--color-admin-text)', marginBottom: 8, letterSpacing: '-0.5px' }}>{selectedHazard.title}</h3>
               
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 13, color: '#6b7280', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, fontSize: 13, color: 'var(--color-admin-text-muted)', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--color-admin-border)' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <MapPin size={14} /> {selectedHazard.location}
                 </span>
@@ -884,23 +876,23 @@ export default function Home() {
 
               {/* Description */}
               <div style={{ marginBottom: 28 }}>
-                <h4 style={{ fontSize: 12, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Incident Description</h4>
-                <p style={{ fontSize: 14, color: '#4b5563', lineHeight: 1.6, margin: 0 }}>{selectedHazard.description}</p>
+                <h4 style={{ fontSize: 12, fontWeight: 800, color: 'var(--color-admin-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Incident Description</h4>
+                <p style={{ fontSize: 14, color: 'var(--color-admin-text)', lineHeight: 1.6, margin: 0 }}>{selectedHazard.description}</p>
               </div>
 
               {/* Action and upvotes */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, borderTop: '1px solid #f3f4f6' }} className="flex items-center justify-between">
+              <div style={{ display: 'flex', alignItems: 'center', justifycontent: 'space-between', paddingTop: 20, borderTop: '1px solid var(--color-admin-border)' }} className="flex items-center justify-between">
                 <button 
                   onClick={() => handleUpvote(selectedHazard.id)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fee2e2',
+                    display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)',
                     borderRadius: 16, padding: '12px 24px', cursor: 'pointer', transition: 'all 0.2s'
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#ffe4e4'; e.currentTarget.style.borderColor = '#fecaca'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.borderColor = '#fee2e2'; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.25)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.15)'; }}
                 >
                   <Heart size={16} color="#ef4444" fill="#ef4444" />
-                  <span style={{ fontSize: 14, fontWeight: 800, color: '#dc2626' }}>Upvote ({selectedHazard.upvotes})</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#ef4444' }}>Upvote ({selectedHazard.upvotes})</span>
                 </button>
 
                 <Link 

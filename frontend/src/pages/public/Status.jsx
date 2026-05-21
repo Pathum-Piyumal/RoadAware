@@ -153,7 +153,7 @@ export default function Status() {
               technical team know immediately.
             </p>
             <div className="flex flex-wrap justify-center gap-6">
-              <a href="/contact" className="px-10 py-4 bg-white text-black font-bold rounded-2xl hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2">
+              <a href="/contact" className="px-10 py-4 bg-white text-black font-bold rounded-2xl hover:bg-gray-100 transition-all shadow-xl flex items-center gap-2" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
                 Report System Issue <AlertCircle size={20} />
               </a>
             </div>
