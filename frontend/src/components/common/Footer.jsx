@@ -8,10 +8,10 @@ const Footer = () => (
     <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '400px', background: 'rgba(249, 115, 22, 0.03)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
     
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 64, marginBottom: 80 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 mb-20">
         
         {/* Brand Section */}
-        <div style={{ gridColumn: 'span 2' }}>
+        <div className="col-span-1 sm:col-span-2">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
             <img src={logo} alt="RoadAware Logo" style={{ height: 32, width: 'auto' }} />
             <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em' }}>ROADAWARE</span>
