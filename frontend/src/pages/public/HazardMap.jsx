@@ -187,8 +187,8 @@ export default function HazardMap() {
         <div className="max-w-7xl mx-auto px-8 w-full">
 
           {/* Filters Bar */}
-          <ScrollReveal delay={100} className="relative z-30">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xl shadow-slate-200/50 -mt-10 relative z-30 transition-shadow hover:shadow-2xl">
+          <ScrollReveal delay={100} className="relative z-[1001]">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xl shadow-slate-200/50 -mt-10 relative z-[1001] transition-shadow hover:shadow-2xl">
               <div className="flex-1 flex items-center gap-3 py-3 px-4 bg-gray-50 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-blue-600/10 focus-within:border-blue-600 transition-all">
                 <Search size={18} className="text-gray-400" />
                 <input
@@ -329,12 +329,12 @@ export default function HazardMap() {
         <>
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 animate-fade-in"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] transition-opacity duration-300 animate-fade-in"
             onClick={handleClosePanel}
           />
 
           {/* Panel */}
-          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-50 overflow-y-auto animate-slide-in-right flex flex-col border-l border-slate-100">
+          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-white shadow-2xl z-[9999] overflow-y-auto animate-slide-in-right flex flex-col border-l border-slate-100">
 
             {/* Panel Header */}
             <div className="sticky top-0 bg-white z-10 px-8 pt-8 pb-5 border-b border-slate-100">
