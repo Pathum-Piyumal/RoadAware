@@ -1,38 +1,31 @@
-import express from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
+import app from './src/app.js';
+import { sequelize } from './models/index.js';
 import { connectDB } from './config/database.js';
+import { seedDatabase } from './seeders/db.seeder.js';
 
 dotenv.config();
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'success', message: 'RoadAware API is running' });
-});
-
-// Error handling
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal Server Error'
-  });
-});
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
+    // Authenticate database connection & create DB if missing
     await connectDB();
+
+    // Synchronize models (Creates tables if not exists)
+    await sequelize.sync();
+    console.log('✔ Database models synchronized.');
+
+    // Seed default admin user and base categories
+    await seedDatabase();
+
+    // Start server
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error('Failed to start the server:', error);
     process.exit(1);
   }
 };
