@@ -1,17 +1,28 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Lock, ArrowRight } from 'lucide-react';
+import AuthService from '../../services/auth.service';
+import toast from 'react-hot-toast';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // In a real app, perform authentication here
-    // If successful, redirect to admin dashboard
-    navigate('/admin');
+    setLoading(true);
+    try {
+      await AuthService.adminLogin(email, password);
+      toast.success('Access Granted! Welcome to the Admin Console.');
+      navigate('/admin');
+    } catch (error) {
+      const message = error.response?.data?.message || 'Access Denied. Invalid credentials.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,8 +69,8 @@ const AdminLogin = () => {
               />
             </div>
 
-            <button type="submit" className="flex items-center justify-center gap-3 w-full p-3.5 bg-blue-700 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-colors mt-2 hover:bg-blue-600">
-              Access Console <ArrowRight size={18} />
+            <button type="submit" disabled={loading} className="flex items-center justify-center gap-3 w-full p-3.5 bg-blue-700 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-colors mt-2 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? 'Authorizing...' : 'Access Console'} {!loading && <ArrowRight size={18} />}
             </button>
           </form>
         </div>
