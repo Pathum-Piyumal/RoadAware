@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
 
-const HazardCategory = sequelize.define('HazardCategory', {
+const Hotspot = sequelize.define('Hotspot', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -12,13 +12,17 @@ const HazardCategory = sequelize.define('HazardCategory', {
     allowNull: false,
     unique: true,
   },
-  color: {
-    type: DataTypes.STRING,
-    defaultValue: '#3B82F6',
+  count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  max: {
+    type: DataTypes.INTEGER,
+    defaultValue: 10,
   },
 }, {
-  tableName: 'categories',
+  tableName: 'hotspots',
   timestamps: true,
 });
 
-export default HazardCategory;
+export default Hotspot;
