@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { User, Bell, Shield, Save, X, Smartphone, KeyRound } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Shield, Save, X, Smartphone, KeyRound } from 'lucide-react';
+import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const Settings = () => {
@@ -9,6 +10,54 @@ const Settings = () => {
   const [twoFAStep, setTwoFAStep] = useState(1);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
+
+  // Settings values state
+  const [appName, setAppName] = useState('RoadAware');
+  const [supportEmail, setSupportEmail] = useState('support@roadaware.app');
+  const [timezone, setTimezone] = useState('UTC (Coordinated Universal Time)');
+  const [sessionTimeout, setSessionTimeout] = useState('60');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await api.get('/admin/settings');
+        if (response.data.success) {
+          const s = response.data.settings;
+          setAppName(s.appName || 'RoadAware');
+          setSupportEmail(s.supportEmail || 'support@roadaware.app');
+          setTimezone(s.timezone || 'UTC (Coordinated Universal Time)');
+          setSessionTimeout(s.sessionTimeout || '60');
+          setIs2FAEnabled(s.twoFactorAuth === 'true');
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+        toast.error('Failed to load configuration settings.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSaveSettings = async () => {
+    try {
+      const response = await api.put('/admin/settings', {
+        appName,
+        supportEmail,
+        timezone,
+        sessionTimeout,
+        twoFactorAuth: String(is2FAEnabled),
+      });
+
+      if (response.data.success) {
+        toast.success('System settings saved successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error('Failed to save settings.');
+    }
+  };
 
   const handleToggle2FA = () => {
     if (is2FAEnabled) {
@@ -47,6 +96,14 @@ const Settings = () => {
     setIs2FAModalOpen(false);
   };
 
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-10rem)] items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
       {/* Header */}
@@ -55,7 +112,10 @@ const Settings = () => {
           <h1 className="text-2xl font-bold text-admin-text tracking-tight m-0">Settings</h1>
           <p className="text-admin-text-muted text-sm mt-1 mb-0">Manage application preferences and system configurations.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-blue-500 text-white border-none hover:bg-blue-600">
+        <button 
+          onClick={handleSaveSettings}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer bg-blue-500 text-white border-none hover:bg-blue-600"
+        >
           <Save size={16} /> Save Changes
         </button>
       </div>
@@ -86,18 +146,32 @@ const Settings = () => {
               
               <div className="mb-6">
                 <label className="block text-sm font-medium text-admin-text mb-2">Application Name</label>
-                <input type="text" className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" defaultValue="RoadAware" />
+                <input 
+                  type="text" 
+                  className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                  value={appName} 
+                  onChange={(e) => setAppName(e.target.value)}
+                />
                 <p className="text-xs text-admin-text-muted mt-1.5">The name of the application displayed to users.</p>
               </div>
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-admin-text mb-2">Support Email</label>
-                <input type="email" className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" defaultValue="support@roadaware.app" />
+                <input 
+                  type="email" 
+                  className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                  value={supportEmail} 
+                  onChange={(e) => setSupportEmail(e.target.value)}
+                />
               </div>
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-admin-text mb-2">Timezone</label>
-                <select className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <select 
+                  className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                >
                   <option>UTC (Coordinated Universal Time)</option>
                   <option>EST (Eastern Standard Time)</option>
                   <option>PST (Pacific Standard Time)</option>
@@ -129,7 +203,12 @@ const Settings = () => {
 
               <div className="mb-6 mt-6">
                 <label className="block text-sm font-medium text-admin-text mb-2">Session Timeout (Minutes)</label>
-                <input type="number" className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" defaultValue="60" />
+                <input 
+                  type="number" 
+                  className="w-full max-w-2xl px-3.5 py-2.5 bg-admin-input-bg border border-admin-border rounded-lg text-admin-text text-sm transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                  value={sessionTimeout} 
+                  onChange={(e) => setSessionTimeout(e.target.value)}
+                />
               </div>
             </div>
           )}

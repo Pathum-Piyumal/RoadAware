@@ -23,6 +23,14 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const currentAdmin = AuthService.getCurrentAdmin();
+  if (!currentAdmin) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return children;
+};
+
 // Admin Pages
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -116,7 +124,7 @@ function AppContent() {
           <Route path="/admin/login" element={<AdminLogin />} />
 
           {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="profile" element={<AdminProfile />} />
             <Route path="reports" element={<Reports />} />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -10,11 +10,49 @@ import {
   Lightbulb, AlertCircle, Droplets, ArrowUpRight, ArrowDownRight,
   Construction
 } from 'lucide-react';
-import {
-  areaChartData, statusData, hazardTypeData, hotspotData, recentActivity
-} from '../../utils/dummyData';
+import api from '../../services/api';
 
 const Dashboard = () => {
+  const [stats, setStats] = useState({
+    totalReports: 0,
+    resolutionRate: 0,
+    inProgressReports: 0,
+    criticalOpen: 0
+  });
+  const [areaChartData, setAreaChartData] = useState([]);
+  const [statusData, setStatusData] = useState([]);
+  const [hazardTypeData, setHazardTypeData] = useState([]);
+  const [hotspotData, setHotspotData] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await api.get('/analytics/dashboard');
+        if (response.data.success) {
+          const s = response.data.stats;
+          setStats({
+            totalReports: s.totalReports,
+            resolutionRate: s.resolutionRate,
+            inProgressReports: s.inProgressReports,
+            criticalOpen: s.criticalOpen
+          });
+          setAreaChartData(s.areaChartData || []);
+          setStatusData(s.statusData || []);
+          setHazardTypeData(s.hazardTypeData || []);
+          setHotspotData(s.hotspotData || []);
+          setRecentActivity(s.recentActivity || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
   // Helpers
   const getIcon = (type) => {
     switch (type) {
@@ -45,6 +83,14 @@ const Dashboard = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-10rem)] items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
       <style>{`
@@ -69,11 +115,8 @@ const Dashboard = () => {
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.1)' }}>
               <AlertTriangle size={20} />
             </div>
-            <div className="text-xs font-semibold flex items-center gap-1 text-emerald-500">
-              <ArrowUpRight size={14} /> +12%
-            </div>
           </div>
-          <p className="text-3xl font-bold text-admin-text m-0 mb-1">32</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">{stats.totalReports}</p>
           <p className="text-sm text-admin-text-muted m-0">Total reports</p>
         </div>
 
@@ -84,11 +127,8 @@ const Dashboard = () => {
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)' }}>
               <CheckCircle2 size={20} />
             </div>
-            <div className="text-xs font-semibold flex items-center gap-1 text-emerald-500">
-              <ArrowUpRight size={14} /> +5%
-            </div>
           </div>
-          <p className="text-3xl font-bold text-admin-text m-0 mb-1">28%</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">{stats.resolutionRate}%</p>
           <p className="text-sm text-admin-text-muted m-0">Resolution rate</p>
         </div>
 
@@ -99,11 +139,8 @@ const Dashboard = () => {
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.1)' }}>
               <Clock size={20} />
             </div>
-            <div className="text-xs font-semibold flex items-center gap-1 text-red-500">
-              <ArrowDownRight size={14} /> -3%
-            </div>
           </div>
-          <p className="text-3xl font-bold text-admin-text m-0 mb-1">9</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">{stats.inProgressReports}</p>
           <p className="text-sm text-admin-text-muted m-0">In progress</p>
         </div>
 
@@ -114,11 +151,8 @@ const Dashboard = () => {
             <div className="bg-admin-bg rounded-lg p-2 inline-flex" style={{ color: '#EF4444', backgroundColor: 'rgba(239,68,68,0.1)' }}>
               <AlertOctagon size={20} />
             </div>
-            <div className="text-xs font-semibold flex items-center gap-1 text-red-500">
-              <ArrowUpRight size={14} /> +2
-            </div>
           </div>
-          <p className="text-3xl font-bold text-admin-text m-0 mb-1">5</p>
+          <p className="text-3xl font-bold text-admin-text m-0 mb-1">{stats.criticalOpen}</p>
           <p className="text-sm text-admin-text-muted m-0">Critical open</p>
         </div>
       </div>

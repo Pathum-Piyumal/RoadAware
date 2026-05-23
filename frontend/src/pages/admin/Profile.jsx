@@ -1,24 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { Camera } from 'lucide-react';
+import AuthService from '../../services/auth.service';
 
 const Profile = () => {
-  const [name, setName] = useState('Admin User');
-  const [email, setEmail] = useState('admin@roadaware.com');
-  const [profileImage, setProfileImage] = useState('https://ui-avatars.com/api/?name=Admin+User&background=3B82F6&color=fff&size=150');
+  const adminUser = AuthService.getCurrentAdmin() || {};
 
-  const handleImageUpload = (e) => {
+  const [name, setName] = useState(adminUser.name || 'Admin User');
+  const [email, setEmail] = useState(adminUser.email || 'admin@roadaware.com');
+  const [profileImage, setProfileImage] = useState(
+    adminUser.avatar || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(adminUser.name || 'Admin User')}&background=3B82F6&color=fff&size=150`
+  );
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
-      toast.success('Profile image updated successfully!');
+      const formData = new FormData();
+      formData.append('avatar', file);
+      try {
+        const response = await api.post('/auth/avatar', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (response.data.success) {
+          const newAvatar = response.data.avatarUrl;
+          setProfileImage(newAvatar);
+          // Update session storage
+          const updatedUser = { ...adminUser, avatar: newAvatar };
+          sessionStorage.setItem('adminUser', JSON.stringify(updatedUser));
+          toast.success('Profile image updated successfully!');
+          window.location.reload(); // reload to sync Navbar avatar instantly
+        }
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+        toast.error('Failed to upload avatar.');
+      }
     }
   };
 
-  const handleUpdateProfile = (e) => {
+  const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    toast.success('Profile updated successfully!');
+    try {
+      const response = await api.put('/auth/profile', { name, email });
+      if (response.data.success) {
+        // Update session storage
+        const updatedUser = { 
+          ...adminUser, 
+          name: response.data.user.name, 
+          email: response.data.user.email 
+        };
+        sessionStorage.setItem('adminUser', JSON.stringify(updatedUser));
+        toast.success('Profile updated successfully!');
+        window.location.reload(); // reload to sync Navbar profile details
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to update profile.';
+      toast.error(message);
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.put('/auth/change-password', {
+        currentPassword,
+        newPassword,
+      });
+      if (response.data.success) {
+        toast.success('Password updated successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to update password.';
+      toast.error(message);
+    }
   };
 
   return (
@@ -54,9 +116,9 @@ const Profile = () => {
           <div className="h-px bg-admin-border my-6 w-full"></div>
           
           <p className="text-admin-text-muted text-sm mt-1 text-left w-full leading-loose">
-            <strong className="text-admin-text">Joined:</strong> January 2026<br />
-            <strong className="text-admin-text">Status:</strong> Active<br />
-            <strong className="text-admin-text">Location:</strong> Headquarters
+            <strong className="text-admin-text">Role:</strong> {adminUser.role ? adminUser.role.toUpperCase() : 'ADMIN'}<br />
+            <strong className="text-admin-text">Status:</strong> {adminUser.status ? adminUser.status.toUpperCase() : 'ACTIVE'}<br />
+            <strong className="text-admin-text">Location:</strong> Colombo Headquarters
           </p>
         </div>
 
@@ -68,7 +130,7 @@ const Profile = () => {
               <input
                 id="fullName"
                 type="text"
-                className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-admin-sidebar-active disabled:text-admin-text-muted disabled:cursor-not-allowed"
+                className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -80,7 +142,7 @@ const Profile = () => {
               <input
                 id="email"
                 type="email"
-                className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-admin-sidebar-active disabled:text-admin-text-muted disabled:cursor-not-allowed"
+                className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -93,7 +155,7 @@ const Profile = () => {
                 id="role"
                 type="text"
                 className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-admin-sidebar-active disabled:text-admin-text-muted disabled:cursor-not-allowed"
-                value="System Administrator"
+                value={adminUser.role ? adminUser.role.toUpperCase() : 'ADMIN'}
                 disabled
               />
             </div>
@@ -106,14 +168,30 @@ const Profile = () => {
           <div className="h-px bg-admin-border my-6 w-full"></div>
           
           <h3 className="text-base font-semibold text-admin-text mb-4 mt-0">Password Settings</h3>
-          <form className="flex flex-col gap-5" onSubmit={(e) => { e.preventDefault(); toast.success('Password change requested!'); }}>
+          <form className="flex flex-col gap-5" onSubmit={handleUpdatePassword}>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-admin-text-muted" htmlFor="currentPassword">Current Password</label>
-              <input id="currentPassword" type="password" className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-admin-sidebar-active disabled:text-admin-text-muted disabled:cursor-not-allowed" placeholder="••••••••" required />
+              <input 
+                id="currentPassword" 
+                type="password" 
+                className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                placeholder="••••••••" 
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required 
+              />
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-admin-text-muted" htmlFor="newPassword">New Password</label>
-              <input id="newPassword" type="password" className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:bg-admin-sidebar-active disabled:text-admin-text-muted disabled:cursor-not-allowed" placeholder="••••••••" required />
+              <input 
+                id="newPassword" 
+                type="password" 
+                className="bg-admin-input-bg border border-admin-border rounded-lg px-3.5 py-2.5 text-admin-text text-sm w-full transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                placeholder="••••••••" 
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required 
+              />
             </div>
             <button type="submit" className="bg-admin-sidebar text-admin-text border border-admin-border rounded-lg px-6 py-3 text-sm font-semibold cursor-pointer hover:bg-admin-border transition-colors self-start mt-2">
               Update Password

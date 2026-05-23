@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Search, Eye, Lightbulb, AlertTriangle, Construction, Droplets, AlertCircle, X, Heart } from 'lucide-react';
-import { recentActivity } from '../../utils/dummyData';
+import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 const Reports = () => {
   const getIcon = (type) => {
-    switch(type) {
+    switch(type.toLowerCase()) {
       case 'light': return <Lightbulb size={18} />;
       case 'infrastructure': return <AlertTriangle size={18} />;
       case 'construction': return <Construction size={18} />;
@@ -16,16 +17,8 @@ const Reports = () => {
   const getStatusClass = (status) => status.toLowerCase().replace(' ', '-');
   const getSeverityClass = (severity) => severity.toLowerCase();
 
-  // Multiply data for realistic table
-  const initialReportsData = useMemo(() => {
-    return [...recentActivity, ...recentActivity, ...recentActivity].map((r, i) => ({
-      ...r,
-      id: `HZ-${1083 - i}`,
-      upvotes: Math.floor(Math.random() * 100) + 10,
-      reporter: ['Ethan L.', 'Sofia G.', 'Daniel R.', 'Priya S.', 'Marcus T.'][i % 5]
-    }));
-  }, []);
-
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('All types');
   const [statusFilter, setStatusFilter] = useState('All statuses');
@@ -33,53 +26,72 @@ const Reports = () => {
   const [sortOrder, setSortOrder] = useState('Newest first');
   const [selectedReport, setSelectedReport] = useState(null);
 
-  const filteredReports = useMemo(() => {
-    let result = initialReportsData.filter(report => {
-      const matchSearch = searchTerm === '' || 
-        report.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        report.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        report.location.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        report.reporter.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchType = typeFilter === 'All types' || report.type.toLowerCase() === typeFilter.toLowerCase();
-      // Status matching
-      const matchStatus = statusFilter === 'All statuses' || report.status.toLowerCase() === statusFilter.toLowerCase();
-      const matchSeverity = severityFilter === 'All severities' || report.severity.toLowerCase() === severityFilter.toLowerCase();
-
-      return matchSearch && matchType && matchStatus && matchSeverity;
-    });
-
-    result.sort((a, b) => {
-      if (sortOrder === 'Newest first') {
-        return b.id.localeCompare(a.id);
-      } else if (sortOrder === 'Oldest first') {
-        return a.id.localeCompare(b.id);
-      } else if (sortOrder === 'Most upvoted') {
-        return b.upvotes - a.upvotes;
+  const fetchReports = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/admin/reports', {
+        params: {
+          search: searchTerm,
+          type: typeFilter,
+          status: statusFilter,
+          severity: severityFilter,
+          sort: sortOrder,
+          limit: 100
+        }
+      });
+      if (response.data.success) {
+        setReports(response.data.reports);
       }
-      return 0;
-    });
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+      toast.error('Failed to load reports.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return result;
-  }, [initialReportsData, searchTerm, typeFilter, statusFilter, severityFilter, sortOrder]);
+  useEffect(() => {
+    fetchReports();
+  }, [searchTerm, typeFilter, statusFilter, severityFilter, sortOrder]);
 
-  const handleExportCSV = () => {
-    if (filteredReports.length === 0) return;
-    
-    const headers = ['ID', 'Title', 'Type', 'Location', 'Severity', 'Status', 'Upvotes', 'Reported At', 'Reporter'];
-    const csvContent = [
-      headers.join(','),
-      ...filteredReports.map(r => `"${r.id}","${r.title}","${r.type}","${r.location}","${r.severity}","${r.status}","${r.upvotes}","${r.time}","${r.reporter}"`)
-    ].join('\n');
+  const handleStatusChange = async (reportId, newStatus) => {
+    try {
+      const response = await api.put(`/admin/reports/${reportId}/status`, { status: newStatus });
+      if (response.data.success) {
+        toast.success(`Report status updated to ${newStatus}`);
+        fetchReports();
+      }
+    } catch (error) {
+      toast.error('Failed to update status.');
+      console.error(error);
+    }
+  };
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'reports_export.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExportCSV = async () => {
+    try {
+      const response = await api.get('/admin/reports/export', {
+        params: {
+          search: searchTerm,
+          type: typeFilter,
+          status: statusFilter,
+          severity: severityFilter
+        },
+        responseType: 'blob'
+      });
+      
+      const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'reports_export.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('CSV exported successfully!');
+    } catch (error) {
+      console.error('CSV Export failed:', error);
+      toast.error('Failed to export CSV.');
+    }
   };
 
   const selectClasses = "bg-admin-input-bg border border-admin-border rounded-lg py-2 pl-4 pr-8 text-sm text-admin-text cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:1rem] transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%236B7280%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')]";
@@ -139,7 +151,7 @@ const Reports = () => {
         </select>
       </div>
 
-      <p className="text-sm text-admin-text-muted m-0">Showing <strong className="text-admin-text">{filteredReports.length}</strong> of {initialReportsData.length} reports</p>
+      <p className="text-sm text-admin-text-muted m-0">Showing <strong className="text-admin-text">{reports.length}</strong> reports</p>
 
       {/* Table */}
       <div className="bg-admin-card rounded-xl border border-admin-border overflow-x-auto shadow-sm">
@@ -156,54 +168,69 @@ const Reports = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredReports.map((report) => (
-              <tr key={report.id} className="border-b border-admin-border last:border-0 hover:bg-admin-bg transition-colors">
-                <td className="p-4 text-sm text-admin-text">
-                  <div className="flex items-center gap-3">
-                    <div className="text-amber-500 shrink-0">
-                      {getIcon(report.type)}
-                    </div>
-                    <div>
-                      <p className="font-medium text-admin-text m-0">{report.title}</p>
-                      <p className="text-xs text-admin-text-muted m-0 mt-0.5">{report.id}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-sm text-admin-text">
-                  <p className="font-medium text-admin-text m-0">{report.location}</p>
-                  <p className="text-xs text-admin-text-muted m-0 mt-0.5">123 Example St.</p>
-                </td>
-                <td className="p-4 text-sm text-admin-text">
-                  <span className={`px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border border-current text-${getSeverityClass(report.severity) === 'critical' ? 'red' : getSeverityClass(report.severity) === 'high' ? 'amber' : getSeverityClass(report.severity) === 'medium' ? 'blue' : 'emerald'}-500 bg-${getSeverityClass(report.severity) === 'critical' ? 'red' : getSeverityClass(report.severity) === 'high' ? 'amber' : getSeverityClass(report.severity) === 'medium' ? 'blue' : 'emerald'}-500/10`}>
-                    {report.severity}
-                  </span>
-                </td>
-                <td className="p-4 text-sm text-admin-text">
-                  <select 
-                    className={`${selectClasses} !py-1 !pl-2 !pr-8 border-transparent bg-transparent hover:border-admin-border focus:border-blue-500 focus:bg-admin-input-bg`}
-                    defaultValue={report.status}
-                  >
-                    <option value="REPORTED">Reported</option>
-                    <option value="IN PROGRESS">In Progress</option>
-                    <option value="RESOLVED">Resolved</option>
-                    <option value="REJECTED">Rejected</option>
-                  </select>
-                </td>
-                <td className="p-4 text-sm text-admin-text font-semibold flex items-center gap-1.5"><Heart size={14} className="text-red-500 fill-red-500" /> {report.upvotes}</td>
-                <td className="p-4 text-sm text-admin-text">
-                  <p className="font-medium text-admin-text m-0">{report.time}</p>
-                  <p className="text-xs text-admin-text-muted m-0 mt-0.5">by {report.reporter}</p>
-                </td>
-                <td className="p-4 text-sm text-admin-text">
-                  <button 
-                    onClick={() => setSelectedReport(report)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors bg-transparent border border-admin-border text-admin-text hover:bg-admin-bg hover:text-blue-500 hover:border-blue-500"
-                  >
-                    <Eye size={14} /> View
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan="7" className="p-8 text-center text-admin-text-muted">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                 </td>
               </tr>
-            ))}
+            ) : reports.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="p-8 text-center text-admin-text-muted">
+                  No hazard reports found matching the criteria.
+                </td>
+              </tr>
+            ) : (
+              reports.map((report) => (
+                <tr key={report.id} className="border-b border-admin-border last:border-0 hover:bg-admin-bg transition-colors">
+                  <td className="p-4 text-sm text-admin-text">
+                    <div className="flex items-center gap-3">
+                      <div className="text-amber-500 shrink-0">
+                        {getIcon(report.type)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-admin-text m-0">{report.title}</p>
+                        <p className="text-xs text-admin-text-muted m-0 mt-0.5">{report.id}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <p className="font-medium text-admin-text m-0">{report.location}</p>
+                    <p className="text-xs text-admin-text-muted m-0 mt-0.5">Latitude: {report.latitude || 'N/A'}, Longitude: {report.longitude || 'N/A'}</p>
+                  </td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <span className={`px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border border-current text-${getSeverityClass(report.severity) === 'critical' ? 'red' : getSeverityClass(report.severity) === 'high' ? 'amber' : getSeverityClass(report.severity) === 'medium' ? 'blue' : 'emerald'}-500 bg-${getSeverityClass(report.severity) === 'critical' ? 'red' : getSeverityClass(report.severity) === 'high' ? 'amber' : getSeverityClass(report.severity) === 'medium' ? 'blue' : 'emerald'}-500/10`}>
+                      {report.severity}
+                    </span>
+                  </td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <select 
+                      className={`${selectClasses} !py-1 !pl-2 !pr-8 border-transparent bg-transparent hover:border-admin-border focus:border-blue-500 focus:bg-admin-input-bg`}
+                      value={report.status}
+                      onChange={(e) => handleStatusChange(report.id, e.target.value)}
+                    >
+                      <option value="REPORTED">Reported</option>
+                      <option value="IN PROGRESS">In Progress</option>
+                      <option value="RESOLVED">Resolved</option>
+                      <option value="REJECTED">Rejected</option>
+                    </select>
+                  </td>
+                  <td className="p-4 text-sm text-admin-text font-semibold flex items-center gap-1.5"><Heart size={14} className="text-red-500 fill-red-500" /> {report.upvotes}</td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <p className="font-medium text-admin-text m-0">{new Date(report.time).toLocaleDateString()}</p>
+                    <p className="text-xs text-admin-text-muted m-0 mt-0.5">by {report.reporter}</p>
+                  </td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <button 
+                      onClick={() => setSelectedReport(report)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors bg-transparent border border-admin-border text-admin-text hover:bg-admin-bg hover:text-blue-500 hover:border-blue-500"
+                    >
+                      <Eye size={14} /> View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

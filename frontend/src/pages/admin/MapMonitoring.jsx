@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { AlertTriangle, MapPin, Clock, ThumbsUp } from 'lucide-react';
+import api from '../../services/api';
 
 // Fix default marker icon for Leaflet + React
 let DefaultIcon = L.icon({
@@ -41,22 +42,6 @@ const severityIcons = {
   Low: createColorIcon('#10B981'),
 };
 
-// Hazard data with Sri Lanka locations
-const hazardData = [
-  { id: 1, lat: 6.9271, lng: 79.8612, title: "Massive Pothole on Galle Road", location: "102 Galle Road, Colombo 03", type: "Pothole", status: "Reported", severity: "Critical", upvotes: 130, time: "2 hours ago" },
-  { id: 2, lat: 6.9340, lng: 79.8500, title: "Street Flooding near Town Hall", location: "Town Hall, Colombo 07", type: "Flooding", status: "In Progress", severity: "High", upvotes: 98, time: "5 hours ago" },
-  { id: 3, lat: 6.9157, lng: 79.8636, title: "Broken Streetlight Series", location: "Marine Drive, Colombo 03", type: "Streetlight", status: "Reported", severity: "Medium", upvotes: 45, time: "1 day ago" },
-  { id: 4, lat: 6.9390, lng: 79.8700, title: "Construction Debris on Road", location: "Bauddhaloka Mawatha, Colombo 07", type: "Debris", status: "Reported", severity: "High", upvotes: 82, time: "12 hours ago" },
-  { id: 5, lat: 6.9200, lng: 79.8750, title: "Open Manhole Cover", location: "Duplication Road, Colombo 04", type: "Construction", status: "In Progress", severity: "Critical", upvotes: 140, time: "3 hours ago" },
-  { id: 6, lat: 6.9450, lng: 79.8580, title: "Minor Road Cracks", location: "Independence Avenue, Colombo 07", type: "Pothole", status: "Reported", severity: "Low", upvotes: 22, time: "3 days ago" },
-  { id: 7, lat: 6.9100, lng: 79.8520, title: "Waterlogged Junction", location: "Bambalapitiya Junction, Colombo 04", type: "Flooding", status: "Reported", severity: "High", upvotes: 67, time: "8 hours ago" },
-  { id: 8, lat: 6.9500, lng: 79.8650, title: "Fallen Tree Branch", location: "Horton Place, Colombo 07", type: "Debris", status: "Resolved", severity: "Medium", upvotes: 34, time: "2 days ago" },
-  { id: 9, lat: 6.9050, lng: 79.8700, title: "Stray Animal Warning", location: "Wellawatte, Colombo 06", type: "Animal", status: "Reported", severity: "Low", upvotes: 18, time: "1 day ago" },
-  { id: 10, lat: 6.9320, lng: 79.8400, title: "Unmarked Road Work Zone", location: "Baseline Road, Colombo 09", type: "Construction", status: "In Progress", severity: "High", upvotes: 71, time: "6 hours ago" },
-  { id: 11, lat: 6.9550, lng: 79.8550, title: "Deep Pothole near Bridge", location: "Orugodawatte, Colombo 10", type: "Pothole", status: "Reported", severity: "Critical", upvotes: 112, time: "4 hours ago" },
-  { id: 12, lat: 6.9230, lng: 79.8450, title: "Damaged Road Barrier", location: "Havelock Road, Colombo 05", type: "Construction", status: "Reported", severity: "Medium", upvotes: 56, time: "1 day ago" },
-];
-
 const severityColors = {
   Critical: { bg: 'rgba(239, 68, 68, 0.15)', text: '#EF4444', border: 'rgba(239, 68, 68, 0.3)' },
   High: { bg: 'rgba(245, 158, 11, 0.15)', text: '#F59E0B', border: 'rgba(245, 158, 11, 0.3)' },
@@ -71,26 +56,58 @@ const statusColors = {
 };
 
 const MapMonitoring = () => {
+  const [hazards, setHazards] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState('All types');
   const [statusFilter, setStatusFilter] = useState('All statuses');
   const [severityFilter, setSeverityFilter] = useState('All severities');
 
   const selectClasses = "bg-admin-input-bg border border-admin-border rounded-lg py-2 pl-4 pr-8 text-sm text-admin-text cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] bg-[length:1rem] transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%236B7280%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')]";
 
+  useEffect(() => {
+    const fetchMarkers = async () => {
+      try {
+        const response = await api.get('/reports/map');
+        if (response.data.success) {
+          setHazards(response.data.markers || []);
+        }
+      } catch (error) {
+        console.error('Failed to load map markers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMarkers();
+  }, []);
+
   // Filter hazards based on selected filters
   const filteredHazards = useMemo(() => {
-    return hazardData.filter(hazard => {
+    return hazards.filter(hazard => {
       const matchType = typeFilter === 'All types' || hazard.type === typeFilter;
       const matchStatus = statusFilter === 'All statuses' || hazard.status === statusFilter;
       const matchSeverity = severityFilter === 'All severities' || hazard.severity === severityFilter;
       return matchType && matchStatus && matchSeverity;
     });
-  }, [typeFilter, statusFilter, severityFilter]);
+  }, [hazards, typeFilter, statusFilter, severityFilter]);
 
-  // Get unique types from data
-  const types = ['All types', ...new Set(hazardData.map(h => h.type))];
-  const statuses = ['All statuses', ...new Set(hazardData.map(h => h.status))];
+  // Get unique types and statuses from dynamic data
+  const types = useMemo(() => {
+    return ['All types', ...new Set(hazards.map(h => h.type))];
+  }, [hazards]);
+
+  const statuses = useMemo(() => {
+    return ['All statuses', ...new Set(hazards.map(h => h.status))];
+  }, [hazards]);
+
   const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
+
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-10rem)] items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 h-full min-h-[calc(100vh-8rem)] animate-[fadeIn_0.5s_ease-in-out] p-4 lg:p-0 pb-8">
@@ -160,7 +177,7 @@ const MapMonitoring = () => {
       {/* Map Container */}
       <div className="flex-1 bg-admin-card border border-admin-border rounded-xl overflow-hidden shadow-sm relative" style={{ minHeight: '500px' }}>
         <MapContainer
-          center={[6.9271, 79.8612]}
+          center={[6.9271, 79.8612]} // Center at Sri Lanka / Colombo defaults
           zoom={13}
           style={{ height: '100%', width: '100%', minHeight: '500px' }}
           zoomControl={true}
@@ -218,12 +235,12 @@ const MapMonitoring = () => {
                   {/* Time */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#6b7280', marginBottom: '10px' }}>
                     <Clock size={12} />
-                    {hazard.time}
+                    {new Date(hazard.time).toLocaleString()}
                   </div>
 
                   {/* Footer */}
                   <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    display: 'flex', alignItems: 'center', justifycontent: 'space-between',
                     paddingTop: '10px', borderTop: '1px solid #f3f4f6',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', fontWeight: 700, color: '#111' }}>
