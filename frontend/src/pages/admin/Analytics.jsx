@@ -1,11 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line
 } from 'recharts';
-import { areaChartData, hazardTypeData } from '../../utils/dummyData';
+import api from '../../services/api';
 
 const Analytics = () => {
+  const [areaChartData, setAreaChartData] = useState([]);
+  const [hazardTypeData, setHazardTypeData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await api.get('/analytics/trends');
+        if (response.data.success) {
+          setAreaChartData(response.data.areaChartData || []);
+          setHazardTypeData(response.data.hazardTypeData || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch analytics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-10rem)] items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 p-4 lg:p-0 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
@@ -23,11 +52,11 @@ const Analytics = () => {
               <LineChart data={areaChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
                 <XAxis
-                        dataKey="name"
-                        stroke="var(--color-admin-text)"
+                  dataKey="name"
+                  stroke="var(--color-admin-text)"
                 />
                 <YAxis
-                        stroke="var(--color-admin-text)"
+                  stroke="var(--color-admin-text)"
                 />
                 <Tooltip contentStyle={{ backgroundColor: 'var(--admin-card)', borderColor: 'var(--admin-border)', color: 'var(--admin-text)' }} />
                 <Line type="monotone" dataKey="resolutions" stroke="#10B981" strokeWidth={2} />
@@ -43,11 +72,11 @@ const Analytics = () => {
               <BarChart data={hazardTypeData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
                 <XAxis
-                        dataKey="name"
-                        stroke="var(--color-admin-text)"
+                  dataKey="name"
+                  stroke="var(--color-admin-text)"
                 />
                 <YAxis
-                        stroke="var(--color-admin-text)"
+                  stroke="var(--color-admin-text)"
                 />
                 <Tooltip cursor={{ fill: 'var(--admin-bg)' }} contentStyle={{ backgroundColor: 'var(--admin-card)', borderColor: 'var(--admin-border)', color: 'var(--admin-text)' }} />
                 <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />

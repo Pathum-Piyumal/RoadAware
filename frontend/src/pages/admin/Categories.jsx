@@ -1,12 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
-import { hazardTypeData } from '../../utils/dummyData';
+import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 const Categories = () => {
-  const [categories, setCategories] = useState(hazardTypeData);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [formData, setFormData] = useState({ name: '', fill: '#3B82F6', value: 10 });
+  const [formData, setFormData] = useState({ name: '', fill: '#3B82F6', value: 0 });
+
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/categories');
+      if (response.data.success) {
+        const mapped = response.data.categories.map((c) => ({
+          id: c.id,
+          name: c.name,
+          fill: c.color || '#3B82F6',
+          value: parseInt(c.value || 0),
+        }));
+        setCategories(mapped);
+      }
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      toast.error('Failed to load categories.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleOpenModal = (index = null) => {
     if (index !== null) {
@@ -14,7 +41,7 @@ const Categories = () => {
       setFormData(categories[index]);
     } else {
       setEditingIndex(null);
-      setFormData({ name: '', fill: '#3B82F6', value: 10 });
+      setFormData({ name: '', fill: '#3B82F6', value: 0 });
     }
     setIsModalOpen(true);
   };
@@ -24,23 +51,47 @@ const Categories = () => {
     setEditingIndex(null);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (editingIndex !== null) {
-      const newCategories = [...categories];
-      newCategories[editingIndex] = formData;
-      setCategories(newCategories);
-    } else {
-      setCategories([...categories, formData]);
+    try {
+      if (editingIndex !== null) {
+        const cat = categories[editingIndex];
+        const response = await api.put(`/categories/${cat.id}`, {
+          name: formData.name,
+          color: formData.fill,
+        });
+        if (response.data.success) {
+          toast.success('Category updated successfully.');
+        }
+      } else {
+        const response = await api.post('/categories', {
+          name: formData.name,
+          color: formData.fill,
+        });
+        if (response.data.success) {
+          toast.success('Category created successfully.');
+        }
+      }
+      fetchCategories();
+      handleCloseModal();
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to save category.';
+      toast.error(message);
     }
-    handleCloseModal();
   };
 
-  const handleDelete = (index) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      const newCategories = [...categories];
-      newCategories.splice(index, 1);
-      setCategories(newCategories);
+  const handleDelete = async (index) => {
+    if (!window.confirm('Are you sure you want to delete this category?')) return;
+    const cat = categories[index];
+    try {
+      const response = await api.delete(`/categories/${cat.id}`);
+      if (response.data.success) {
+        toast.success('Category deleted successfully.');
+        fetchCategories();
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to delete category.';
+      toast.error(message);
     }
   };
 
@@ -70,34 +121,48 @@ const Categories = () => {
             </tr>
           </thead>
           <tbody>
-            {categories.map((cat, index) => (
-              <tr key={index} className="border-b border-admin-border last:border-0 hover:bg-admin-bg transition-colors">
-                <td className="p-4 text-sm text-admin-text font-medium">{cat.name}</td>
-                <td className="p-4 text-sm text-admin-text">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: cat.fill }}></div>
-                    <span className="text-xs text-admin-text-muted">{cat.fill}</span>
-                  </div>
-                </td>
-                <td className="p-4 text-sm text-admin-text">{cat.value * 12}</td> {/* Faking total historical numbers */}
-                <td className="p-4 text-sm text-admin-text">
-                  <div className="flex gap-2 justify-end">
-                    <button 
-                      onClick={() => handleOpenModal(index)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors bg-transparent border border-admin-border text-admin-text hover:bg-admin-bg hover:text-blue-500 hover:border-blue-500"
-                    >
-                      <Edit2 size={14} /> Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(index)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors bg-transparent border border-admin-border text-admin-text hover:bg-admin-bg hover:text-red-500 hover:border-red-500 text-red-500 border-red-500/30 hover:bg-red-500/10"
-                    >
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
+            {loading ? (
+              <tr>
+                <td colSpan="4" className="p-8 text-center text-admin-text-muted">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                 </td>
               </tr>
-            ))}
+            ) : categories.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="p-8 text-center text-admin-text-muted">
+                  No hazard categories configured.
+                </td>
+              </tr>
+            ) : (
+              categories.map((cat, index) => (
+                <tr key={cat.id} className="border-b border-admin-border last:border-0 hover:bg-admin-bg transition-colors">
+                  <td className="p-4 text-sm text-admin-text font-medium">{cat.name}</td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded" style={{ backgroundColor: cat.fill }}></div>
+                      <span className="text-xs text-admin-text-muted">{cat.fill}</span>
+                    </div>
+                  </td>
+                  <td className="p-4 text-sm text-admin-text">{cat.value}</td>
+                  <td className="p-4 text-sm text-admin-text">
+                    <div className="flex gap-2 justify-end">
+                      <button 
+                        onClick={() => handleOpenModal(index)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors bg-transparent border border-admin-border text-admin-text hover:bg-admin-bg hover:text-blue-500 hover:border-blue-500"
+                      >
+                        <Edit2 size={14} /> Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(index)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium cursor-pointer transition-colors bg-transparent border border-admin-border text-admin-text hover:bg-admin-bg hover:text-red-500 hover:border-red-500 text-red-500 border-red-500/30 hover:bg-red-500/10"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

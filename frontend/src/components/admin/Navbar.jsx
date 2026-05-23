@@ -3,12 +3,15 @@ import { Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Moon, Sun, User, LogOut, Settings } from 'lucide-react';
 import logoImg from '../../assets/logo.png';
+import AuthService from '../../services/auth.service';
 
 const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
   const navigate = useNavigate();
+  const adminUser = AuthService.getCurrentAdmin() || {};
+  const adminName = adminUser.name || 'Admin User';
 
   const handleSignOut = () => {
-    // Add real sign out logic here in the future
+    AuthService.adminLogout();
     navigate('/admin/login');
   };
 
@@ -59,9 +62,9 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
           <div>
             <Menu.Button className="flex items-center rounded-full border-none bg-transparent cursor-pointer p-0 focus:outline-none focus:ring-2 focus:ring-admin-bg focus:ring-offset-2 focus:ring-offset-blue-500">
               <img
-                className="h-8 w-8 rounded-full border border-admin-border"
-                src="https://ui-avatars.com/api/?name=Admin+User&background=3B82F6&color=fff"
-                alt="Admin profile"
+                className="h-8 w-8 rounded-full border border-admin-border object-cover"
+                src={adminUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(adminName)}&background=3B82F6&color=fff`}
+                alt={adminName}
               />
             </Menu.Button>
           </div>
