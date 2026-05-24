@@ -16,7 +16,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
   };
 
   return (
-    <nav className="glass-panel border-b-0 border-b border-admin-border h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-40">
+    <nav className="admin-navbar glass-panel border-b-0 border-b border-admin-border h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-40">
       {/* Left side */}
       <div className="flex items-center flex-1">
         <button
@@ -49,9 +49,9 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
 
       {/* Right side */}
       <div className="flex items-center gap-4">
-        <button 
-          className="text-admin-text-muted hover:text-admin-text hover:bg-admin-bg bg-transparent border-none p-2 rounded-lg cursor-pointer transition-colors relative flex" 
-          onClick={toggleTheme} 
+        <button
+          className="text-admin-text-muted hover:text-admin-text hover:bg-admin-bg bg-transparent border-none p-2 rounded-lg cursor-pointer transition-colors relative flex"
+          onClick={toggleTheme}
           title="Toggle Theme"
         >
           {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}

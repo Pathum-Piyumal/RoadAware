@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, setSidebarOpen }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed top-16 bottom-0 left-0 z-30 w-64 glass-panel border-r-0 border-r border-admin-border transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`admin-sidebar fixed top-16 bottom-0 left-0 z-30 w-64 glass-panel border-r-0 border-r border-admin-border transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         
         <div className="h-full flex flex-col">
           <ul className="flex-1 py-6 flex flex-col gap-2 overflow-y-auto m-0 p-0 list-none admin-scrollbar">

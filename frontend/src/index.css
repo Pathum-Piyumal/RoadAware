@@ -336,3 +336,19 @@
 .stagger-5 {
   animation-delay: 500ms;
 }
+
+/* Custom styling for navbar and sidebar in light mode (charcoal background with #808080 gray accents) */
+html:not(.dark) .admin-navbar,
+html:not(.dark) .admin-sidebar {
+  background-color: #1e1e1e !important;
+  --color-admin-card: rgba(30, 30, 30, 0.95);
+  --color-admin-sidebar: #1e1e1e;
+  --color-admin-text: #f8fafc;
+  --color-admin-text-muted: #808080;
+  --color-admin-border: rgba(128, 128, 128, 0.3);
+  --color-glass-border: rgba(128, 128, 128, 0.2);
+  --color-admin-input-bg: rgba(255, 255, 255, 0.08);
+  --color-admin-sidebar-active: rgba(128, 128, 128, 0.15);
+  --color-admin-bg: rgba(128, 128, 128, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+}
