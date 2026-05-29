@@ -9,6 +9,7 @@ import Activity from './Activity.js';
 import Hotspot from './Hotspot.js';
 import Session from './Session.js';
 import Notification from './Notification.js';
+import Comment from './Comment.js';
 
 // Setup Associations
 
@@ -27,6 +28,12 @@ HazardReport.belongsTo(User, { foreignKey: 'userId', as: 'reporter' });
 HazardReport.belongsTo(HazardCategory, { foreignKey: 'categoryId', as: 'category' });
 HazardReport.hasMany(ReportImage, { foreignKey: 'reportId', as: 'images', onDelete: 'CASCADE' });
 HazardReport.hasMany(ReportUpvote, { foreignKey: 'reportId', as: 'upvotes', onDelete: 'CASCADE' });
+HazardReport.hasMany(Comment, { foreignKey: 'reportId', as: 'comments', onDelete: 'CASCADE' });
+
+// Comment associations
+Comment.belongsTo(HazardReport, { foreignKey: 'reportId', as: 'report' });
+Comment.belongsTo(User, { foreignKey: 'userId', as: 'author' });
+User.hasMany(Comment, { foreignKey: 'userId', as: 'comments', onDelete: 'CASCADE' });
 
 // ReportImage associations
 ReportImage.belongsTo(HazardReport, { foreignKey: 'reportId', as: 'report' });
@@ -56,4 +63,5 @@ export {
   Hotspot,
   Session,
   Notification,
+  Comment,
 };
