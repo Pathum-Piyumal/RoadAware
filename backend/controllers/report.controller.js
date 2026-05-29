@@ -185,3 +185,26 @@ export const toggleUpvote = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getMyReports = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const reports = await HazardReport.findAll({
+      where: { userId },
+      include: [
+        { model: HazardCategory, as: 'category', attributes: ['id', 'name', 'color'] },
+        { model: ReportImage, as: 'images', attributes: ['id', 'imageUrl'] },
+        { model: ReportUpvote, as: 'upvotes', attributes: ['id', 'userId'] },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json({
+      success: true,
+      reports,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

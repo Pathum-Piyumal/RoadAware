@@ -11,6 +11,7 @@ import adminRoutes from '../routes/admin.routes.js';
 import reportRoutes from '../routes/report.routes.js';
 import analyticsRoutes from '../routes/analytics.routes.js';
 import categoryRoutes from '../routes/category.routes.js';
+import commentRoutes from '../routes/comment.routes.js';
 
 // Import Error Handler
 import { errorHandler } from '../middleware/error.middleware.js';
@@ -38,6 +39,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/reports/:id/comments', commentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/categories', categoryRoutes);
 
