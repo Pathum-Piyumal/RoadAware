@@ -9,14 +9,14 @@ const DetailsStep = ({ formData, updateData }) => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateData({ image: reader.result });
+        updateData({ image: reader.result, imageFile: file }); // base64 preview + real File
       };
       reader.readAsDataURL(file);
     }
   };
 
   const removeImage = () => {
-    updateData({ image: null });
+    updateData({ image: null, imageFile: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
