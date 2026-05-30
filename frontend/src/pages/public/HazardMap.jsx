@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -7,6 +7,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import UpvoteButton from '../../components/hazard-report/UpvoteButton';
 import CommentsSection from '../../components/hazard-report/CommentsSection';
+import HazardService from '../../services/hazard.service';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -77,25 +78,20 @@ const ScrollReveal = ({ children, delay = 0, className = "" }) => {
   );
 };
 
-const initialHazards = [
-  { id: 1, lat: 6.9271, lng: 79.8612, type: "Pothole", severity: "Critical", status: "Reported", title: "Massive Pothole on Galle Road", location: "102 Galle Road, Colombo", time: "2 hours ago by User A", upvotes: 130, description: "A very deep, dangerous pothole measuring roughly 2 feet wide right in the middle of the active lane." },
-  { id: 2, lat: 6.9340, lng: 79.8500, type: "Flooding", severity: "High", status: "In Progress", title: "Central station fully submerged", location: "Town Hall, Colombo", time: "5 hours ago by User B", upvotes: 98, description: "Main terminal access street is completely flooded due to heavy downpours and blocked drains." },
-  { id: 3, lat: 6.9157, lng: 79.8636, type: "Streetlight", severity: "Medium", status: "Reported", title: "Broken Streetlight Series", location: "Marine Drive, Colombo", time: "1 day ago by User C", upvotes: 45, description: "At least four streetlights in a row are completely offline, leaving a dark blindspot on the bypass." },
-  { id: 4, lat: 6.9390, lng: 79.8700, type: "Debris", severity: "High", status: "Reported", title: "Construction Debris on Road", location: "Bauddhaloka Mawatha, Colombo", time: "12 hours ago by User D", upvotes: 82, description: "Sands, bricks, and concrete waste scattered along the primary travel path." },
-  { id: 5, lat: 6.9200, lng: 79.8750, type: "Construction", severity: "Critical", status: "In Progress", title: "Open Manhole Cover", location: "Duplication Road, Colombo", time: "3 hours ago by User E", upvotes: 140, description: "A hazardous open sewer hole without proper barricades or safety cones." },
-  { id: 6, lat: 6.9450, lng: 79.8580, type: "Pothole", severity: "Low", status: "Reported", title: "Minor Road Cracks", location: "Independence Avenue, Colombo", time: "3 days ago by User F", upvotes: 22, description: "Asphalt is beginning to degrade. Best to fix early before it deepens." },
-  { id: 7, lat: 6.9100, lng: 79.8520, type: "Flooding", severity: "High", status: "Reported", title: "Waterlogged Junction", location: "Bambalapitiya Junction, Colombo", time: "8 hours ago by User G", upvotes: 67, description: "Heavy surface water runoff is creating hydroplane risks." },
-  { id: 8, lat: 6.9500, lng: 79.8650, type: "Debris", severity: "Medium", status: "Resolved", title: "Fallen Tree Branch", location: "Horton Place, Colombo", time: "2 days ago by User H", upvotes: 34, description: "A large bough broke during high winds and blocked a portion of the lane." },
-  { id: 9, lat: 6.9050, lng: 79.8700, type: "Animal", severity: "Low", status: "Reported", title: "Stray Animal Warning", location: "Wellawatte, Colombo", time: "1 day ago by User I", upvotes: 18, description: "A pack of stray dogs frequently nesting near the sharp turn." },
-  { id: 10, lat: 6.9320, lng: 79.8400, type: "Construction", severity: "High", status: "In Progress", title: "Unmarked Road Work Zone", location: "Baseline Road, Colombo", time: "6 hours ago by User J", upvotes: 71, description: "Active pipe repairs without clear advanced warning signage." },
-  { id: 11, lat: 6.9550, lng: 79.8550, type: "Pothole", severity: "Critical", status: "Reported", title: "Deep Pothole near Bridge", location: "Orugodawatte, Colombo", time: "4 hours ago by User K", upvotes: 112, description: "Deep suspension-damaging road hole right near the bridge expansion seam." },
-  { id: 12, lat: 6.9230, lng: 79.8450, type: "Construction", severity: "Medium", status: "Reported", title: "Damaged Road Barrier", location: "Havelock Road, Colombo", time: "1 day ago by User L", upvotes: 56, description: "A metal crash cushion is severely crumpled and protruding slightly into traffic." },
-];
-
 export default function HazardMap() {
+  const [hazards, setHazards] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
   const [isHeatmap, setIsHeatmap] = useState(false);
   const [selectedHazard, setSelectedHazard] = useState(null);
+
+  // Fetch real hazard data from backend
+  useEffect(() => {
+    HazardService.getMapMarkers()
+      .then(data => setHazards(data.markers || []))
+      .catch(err => console.error('Failed to load hazards:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleOpenPanel = (hazard) => {
     setSelectedHazard(hazard);
@@ -153,20 +149,19 @@ export default function HazardMap() {
   const [severityFilter, setSeverityFilter] = useState('All severities');
 
   const filteredHazards = useMemo(() => {
-    return initialHazards.filter(hazard => {
-      const matchSearch = hazard.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    return hazards.filter(hazard => {
+      const matchSearch = hazard.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           hazard.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           hazard.id.toString() === searchQuery;
       const matchType = typeFilter === 'All types' || hazard.type === typeFilter;
       const matchStatus = statusFilter === 'All statuses' || hazard.status === statusFilter;
       const matchSeverity = severityFilter === 'All severities' || hazard.severity === severityFilter;
-      
       return matchSearch && matchType && matchStatus && matchSeverity;
     });
-  }, [searchQuery, typeFilter, statusFilter, severityFilter]);
+  }, [hazards, searchQuery, typeFilter, statusFilter, severityFilter]);
 
-  const types = ['All types', ...new Set(initialHazards.map(h => h.type))];
-  const statuses = ['All statuses', ...new Set(initialHazards.map(h => h.status))];
+  const types = ['All types', ...new Set(hazards.map(h => h.type))];
+  const statuses = ['All statuses', ...new Set(hazards.map(h => h.status))];
   const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
 
   return (
