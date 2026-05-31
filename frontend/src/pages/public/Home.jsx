@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import HazardService from '../../services/hazard.service';
 import {
   AlertTriangle,
   MapPin,
@@ -788,45 +789,36 @@ const CTASection = () => (
 /* ─── PAGE ────────────────────────────────────────────────── */
 export default function Home() {
   const [selectedHazard, setSelectedHazard] = useState(null);
-  const [hazards, setHazards] = useState([
-    {
-      id: 1,
-      title: "Pothole: Main Street",
-      category: "Pothole",
-      location: "102 Main Road, Colombo",
-      description: "A deep, dangerous pothole measuring roughly 2 feet wide right in the middle of the active lane. Vehicles are swerving into oncoming traffic to avoid it, creating extreme collision risks.",
-      status: "Pending",
-      upvotes: 122,
-      date: "Reported 2 hours ago",
-      image: "https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      title: "Flooding: A1 Highway",
-      category: "Flooding",
-      location: "A1 Highway km 45, Kandy",
-      description: "Severe heavy drainage blockage causing water pooling across two lanes of the highway. Reduced speed limits are active, but hydroplaning hazards remain extremely high.",
-      status: "Pending",
-      upvotes: 150,
-      date: "Reported 5 hours ago",
-      image: "https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 3,
-      title: "Hazardous Debris",
-      category: "Debris",
-      location: "88 Galle Road, Bentota",
-      description: "Large container cargo fragments and wood debris blocking the shoulder and left lane. Needs immediate street sweeper crew dispatch.",
-      status: "Verified",
-      upvotes: 98,
-      date: "Reported 1 day ago",
-      image: "https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=600&auto=format&fit=crop"
-    }
-  ]);
+  const [hazards, setHazards] = useState([]);
 
-  const handleUpvote = (id) => {
-    setHazards(prev => prev.map(h => h.id === id ? { ...h, upvotes: h.upvotes + 1 } : h));
-    setSelectedHazard(prev => prev && prev.id === id ? { ...prev, upvotes: prev.upvotes + 1 } : prev);
+  // Fetch top 3 most upvoted reports for the Featured Hazards section
+  useEffect(() => {
+    HazardService.getAllReports()
+      .then(data => {
+        const sorted = (data.reports || [])
+          .sort((a, b) => (b.upvotes?.length || 0) - (a.upvotes?.length || 0))
+          .slice(0, 3)
+          .map(r => ({
+            id: r.id,
+            title: r.title,
+            category: r.category?.name || 'Other',
+            location: r.locationName,
+            description: r.description,
+            status: r.status,
+            upvotes: r.upvotes?.length || 0,
+            date: `Reported ${timeAgo(r.createdAt)}`,
+            image: r.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop',
+          }));
+        setHazards(sorted);
+      })
+      .catch(err => console.error('Failed to load featured hazards:', err));
+  }, []);
+
+  const timeAgo = (dateStr) => {
+    const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    return `${Math.floor(diff / 86400)} days ago`;
   };
 
   return (
