@@ -3,21 +3,25 @@ import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import Step1Details from '../../components/hazard-report/DetailsStep';
 import Step2Location from '../../components/hazard-report/LocationStep';
 import Step3Review from '../../components/hazard-report/ReviewStep';
+import HazardService from '../../services/hazard.service';
 
 const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+  const [submitError, setSubmitError] = useState(null);
+
   const [formData, setFormData] = useState({
     type: '',
-    severity: 'Medium',
+    categoryId: '',
+    severity: 'medium',
     title: '',
     description: '',
     location: null,
     address: '',
     city: '',
-    image: null,
+    image: null,      // base64 preview (for ReviewStep display)
+    imageFile: null,  // actual File object (for upload)
   });
 
   const totalSteps = 3;
@@ -30,7 +34,7 @@ const ReportHazard = () => {
     // Basic validation
     if (currentStep === 1 && (!formData.type || !formData.title)) return;
     if (currentStep === 2 && !formData.address) return;
-    
+
     if (currentStep === totalSteps) {
       handleSubmission();
       return;
@@ -44,9 +48,28 @@ const ReportHazard = () => {
 
   const handleSubmission = async () => {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSuccess(true);
+    setSubmitError(null);
+    try {
+      const data = new FormData();
+      data.append('title', formData.title);
+      data.append('description', formData.description || '');
+      data.append('categoryId', formData.categoryId);
+      data.append('severity', formData.severity);
+      data.append('latitude', formData.location?.lat || 0);
+      data.append('longitude', formData.location?.lng || 0);
+      data.append('locationName', formData.address || 'Unknown Location');
+      if (formData.imageFile) {
+        data.append('image', formData.imageFile);
+      }
+
+      await HazardService.createReport(data);
+      setIsSuccess(true);
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to submit report. Please try again.';
+      setSubmitError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -68,12 +91,12 @@ const ReportHazard = () => {
             <div className="flex justify-center items-center gap-4 mt-12">
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center">
-                  <div 
+                  <div
                     className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-extrabold transition-all duration-500 ${
-                      currentStep === step 
-                        ? 'bg-slate-900 text-white shadow-xl scale-110 border-2 border-slate-900' 
-                        : currentStep > step 
-                          ? 'bg-slate-900 text-white border-2 border-slate-900' 
+                      currentStep === step
+                        ? 'bg-slate-900 text-white shadow-xl scale-110 border-2 border-slate-900'
+                        : currentStep > step
+                          ? 'bg-slate-900 text-white border-2 border-slate-900'
                           : 'bg-white border-2 border-slate-200 text-slate-400'
                     }`}
                   >
@@ -81,8 +104,8 @@ const ReportHazard = () => {
                   </div>
                   {step < 3 && (
                     <div className="w-16 md:w-20 h-[3px] mx-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-slate-900 transition-all duration-500" 
+                      <div
+                        className="h-full bg-slate-900 transition-all duration-500"
                         style={{ width: currentStep > step ? '100%' : '0%' }}
                       />
                     </div>
@@ -103,8 +126,15 @@ const ReportHazard = () => {
             <div className="flex-grow animate-fade-in-up" key={currentStep}>
               {currentStep === 1 && <Step1Details formData={formData} updateData={updateData} />}
               {currentStep === 2 && <Step2Location formData={formData} updateData={updateData} />}
-              {currentStep === 3 && <Step3Review formData={formData} updateData={updateData} />}
+              {currentStep === 3 && <Step3Review formData={formData} isSubmitting={isSubmitting} isSuccess={isSuccess} />}
             </div>
+
+            {/* Error message */}
+            {submitError && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium">
+                {submitError}
+              </div>
+            )}
 
             {/* Navigation */}
             <div className="flex justify-between mt-12 pt-8 border-t border-slate-100">
@@ -113,13 +143,13 @@ const ReportHazard = () => {
                 disabled={currentStep === 1 || isSubmitting}
                 className={`flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all ${
                   currentStep === 1 || isSubmitting
-                    ? 'text-gray-300 cursor-not-allowed opacity-0 pointer-events-none' 
+                    ? 'text-gray-300 cursor-not-allowed opacity-0 pointer-events-none'
                     : 'text-gray-600 hover:bg-gray-100 cursor-pointer'
                 }`}
               >
                 <ChevronLeft className="mr-1.5" size={18} /> Back
               </button>
-              
+
               <button
                 onClick={nextStep}
                 disabled={isSubmitting || (currentStep === 1 && (!formData.type || !formData.title)) || (currentStep === 2 && !formData.address)}
