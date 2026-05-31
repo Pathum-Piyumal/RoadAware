@@ -1,36 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, MapPin, Clock, ChevronRight, AlertTriangle } from 'lucide-react';
+import HazardService from '../../services/hazard.service';
 
-const MOCK_REPORTS = [
-  {
-    id: 'REP-1029',
-    title: 'Massive Pothole on A4006',
-    type: 'Pothole',
-    date: '2026-05-14T08:30:00Z',
-    location: 'A4006 Wembley, London',
-    status: 'In Progress',
-    statusColor: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
-  },
-  {
-    id: 'REP-1025',
-    title: 'Streetlight completely out',
-    type: 'Infrastructure',
-    date: '2026-05-10T19:45:00Z',
-    location: 'High St & Park Ave',
-    status: 'Resolved',
-    statusColor: 'bg-green-500/10 text-green-600 border-green-500/20'
-  },
-  {
-    id: 'REP-1031',
-    title: 'Debris blocking left lane',
-    type: 'Debris',
-    date: '2026-05-15T14:20:00Z',
-    location: 'M4 Eastbound, near J2',
-    status: 'Pending',
-    statusColor: 'bg-orange-500/10 text-orange-600 border-orange-500/20'
-  }
-];
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -77,6 +49,33 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 
 export default function MyReports() {
   const navigate = useNavigate();
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    HazardService.getMyHazards()
+      .then(data => setReports(data.reports || []))
+      .catch(err => console.error('Failed to load reports:', err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'resolved':    return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'in_progress': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+      case 'rejected':    return 'bg-red-500/10 text-red-600 border-red-500/20';
+      default:            return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'resolved':    return 'Resolved';
+      case 'in_progress': return 'In Progress';
+      case 'rejected':    return 'Rejected';
+      default:            return 'Reported';
+    }
+  };
 
   const formatDate = (dateString) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -109,7 +108,21 @@ export default function MyReports() {
       {/* Content Area */}
       <main className="flex-grow p-6 md:p-12">
         <div className="max-w-5xl mx-auto">
-          {MOCK_REPORTS.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1,2,3].map(i => (
+            <div key={i} className="bg-white border border-gray-100 rounded-3xl p-6 animate-pulse">
+              <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
+              <div className="h-5 bg-gray-100 rounded w-3/4 mb-6" />
+              <div className="space-y-2">
+                <div className="h-3 bg-gray-100 rounded w-1/2" />
+                <div className="h-3 bg-gray-100 rounded w-2/3" />
+                <div className="h-3 bg-gray-100 rounded w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : reports.length === 0 ? (
             <ScrollReveal>
               <div className="bg-white border border-dashed border-gray-300 rounded-[32px] p-20 flex flex-col items-center text-center shadow-sm">
                 <div className="bg-slate-50 p-5 rounded-2xl mb-6 border border-slate-100">
@@ -129,39 +142,39 @@ export default function MyReports() {
             </ScrollReveal>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {MOCK_REPORTS.map((report, idx) => (
+              {reports.map((report, idx) => (
                 <ScrollReveal key={report.id} delay={idx * 80}>
-                  <div 
+                  <div
                     onClick={() => navigate(`/hazard/${report.id}`)}
                     className="bg-white border border-gray-100 rounded-3xl p-6 cursor-pointer hover:shadow-2xl hover:border-slate-200 hover:-translate-y-1.5 transition-all duration-300 group flex flex-col h-full relative overflow-hidden shadow-md shadow-slate-100/45"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-full opacity-60 pointer-events-none" />
-                    
+
                     <div className="flex justify-between items-start mb-5 relative z-10">
-                      <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${report.statusColor}`}>
-                        {report.status}
+                      <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${getStatusStyle(report.status)}`}>
+                        {getStatusLabel(report.status)}
                       </span>
                       <span className="text-[10px] font-black text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
-                        {report.id}
+                        HZ-{report.id}
                       </span>
                     </div>
 
                     <h3 className="text-lg font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-snug">
                       {report.title}
                     </h3>
-                    
+
                     <div className="space-y-2 mt-auto pt-5 border-t border-slate-50 relative z-10">
                       <div className="flex items-center text-slate-500 text-xs font-medium">
                         <AlertTriangle size={14} className="mr-2 opacity-70 text-blue-500 shrink-0" />
-                        {report.type}
+                        {report.category?.name || 'Uncategorized'}
                       </div>
                       <div className="flex items-center text-slate-500 text-xs font-medium">
                         <MapPin size={14} className="mr-2 opacity-70 text-blue-500 shrink-0" />
-                        <span className="truncate">{report.location}</span>
+                        <span className="truncate">{report.locationName}</span>
                       </div>
                       <div className="flex items-center text-slate-500 text-xs font-medium">
                         <Clock size={14} className="mr-2 opacity-70 text-blue-500 shrink-0" />
-                        {formatDate(report.date)}
+                        {formatDate(report.createdAt)}
                       </div>
                     </div>
 
