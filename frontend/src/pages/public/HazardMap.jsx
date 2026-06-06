@@ -9,6 +9,7 @@ import UpvoteButton from '../../components/hazard-report/UpvoteButton';
 import CommentsSection from '../../components/hazard-report/CommentsSection';
 import HazardService from '../../services/hazard.service';
 import AuthService from '../../services/auth.service';
+import RadarLoader from '../../components/common/RadarLoader';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -338,8 +339,8 @@ export function HazardMapContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
+        <RadarLoader size="medium" message="Scanning infrastructure records..." />
       </div>
     );
   }
