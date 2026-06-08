@@ -227,7 +227,7 @@ export default function HazardMap() {
             <div className="flex justify-between items-center mt-8 mb-6 px-2">
               <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
                 <Filter size={15} />
-                <span>Showing <strong>{filteredHazards.length}</strong> of {initialHazards.length} hazards</span>
+                <span>Showing <strong>{filteredHazards.length}</strong> of {hazards.length} hazards</span>
               </div>
               <button
                 className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl cursor-pointer transition-all duration-300 ${
