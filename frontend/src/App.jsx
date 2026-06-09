@@ -57,6 +57,7 @@ import Contact from './pages/public/Contact';
 import PrivacyPolicy from './pages/public/PrivacyPolicy';
 import TermsOfService from './pages/public/TermsOfService';
 import Status from './pages/public/Status';
+import Leaderboard from './pages/public/Leaderboard';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -104,6 +105,7 @@ function AppContent() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/status" element={<Status />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/hazard/:id" element={<HazardDetails />} />
           <Route path="/map" element={<ProtectedRoute><HazardMap /></ProtectedRoute>} />
 
