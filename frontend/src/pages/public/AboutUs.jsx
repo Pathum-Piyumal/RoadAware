@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Shield, Target, Users, Eye, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AuthService from '../../services/auth.service';
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -99,6 +100,8 @@ const CountUp = ({ to, suffix = "", duration = 1200 }) => {
 };
 
 export default function AboutUs() {
+  const currentUser = AuthService.getCurrentUser();
+
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 pb-24 selection:bg-orange-100 selection:text-orange-900">
       {/* Hero Section */}
@@ -120,7 +123,7 @@ export default function AboutUs() {
               infrastructure intelligence platform, powered by the people who use it every day.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link to="/register" className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-orange-950/20 flex items-center gap-2 group">
+              <Link to={currentUser ? "/dashboard" : "/register"} className="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-orange-950/20 flex items-center gap-2 group">
                 Join the Mission <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
