@@ -12,9 +12,11 @@ import reportRoutes from '../routes/report.routes.js';
 import analyticsRoutes from '../routes/analytics.routes.js';
 import categoryRoutes from '../routes/category.routes.js';
 import commentRoutes from '../routes/comment.routes.js';
+import contactRoutes from '../routes/contact.routes.js';
 
 // Import Error Handler
 import { errorHandler } from '../middleware/error.middleware.js';
+import sequelize from '../config/database.js';
 
 const app = express();
 
@@ -26,6 +28,21 @@ app.use(cors({
 
 app.use(helmet({
   crossOriginResourcePolicy: false, // Allow static images to be served across origins
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: [
+        "'self'", 
+        "data:", 
+        "*.openstreetmap.org", 
+        "images.unsplash.com", 
+        "res.cloudinary.com"
+      ],
+      connectSrc: ["'self'", "*.openstreetmap.org"],
+    },
+  },
 }));
 app.use(morgan('dev'));
 app.use(express.json());
@@ -42,10 +59,25 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/reports/:id/comments', commentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health Check
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ success: true, message: 'RoadAware API is healthy.' });
+app.get('/api/health', async (req, res) => {
+  try {
+    await sequelize.authenticate();
+    res.status(200).json({
+      success: true,
+      message: 'RoadAware API is healthy.',
+      database: 'Connected',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'RoadAware API is unhealthy.',
+      database: 'Disconnected',
+      error: error.message,
+    });
+  }
 });
 
 // Fallback 404 Route

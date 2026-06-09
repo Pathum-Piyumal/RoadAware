@@ -10,6 +10,7 @@ import Hotspot from './Hotspot.js';
 import Session from './Session.js';
 import Notification from './Notification.js';
 import Comment from './Comment.js';
+import Contact from './Contact.js';
 
 // Setup Associations
 
@@ -64,4 +65,5 @@ export {
   Session,
   Notification,
   Comment,
+  Contact,
 };
