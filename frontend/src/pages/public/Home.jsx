@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import HazardService from '../../services/hazard.service';
 import AuthService from '../../services/auth.service';
+import api from '../../services/api';
 import {
   AlertTriangle,
   MapPin,
@@ -140,6 +141,44 @@ const CountUp = ({ end, suffix = '' }) => {
 /* ─── HERO ────────────────────────────────────────────────── */
 const Hero = () => {
   const currentUser = AuthService.getCurrentUser();
+  const [stats, setStats] = useState({ total: 34, resolved: 9 });
+  const [topUsers, setTopUsers] = useState([]);
+
+  useEffect(() => {
+    // Fetch live reports and resolved counts
+    api.get('/reports/stats')
+      .then(res => {
+        if (res.data && res.data.stats) {
+          setStats({
+            total: res.data.stats.totalReports || 0,
+            resolved: res.data.stats.resolvedReports || 0
+          });
+        }
+      })
+      .catch(err => console.error('Failed to load stats for homepage hero:', err));
+
+    // Fetch leaderboard top users to show their avatars or initials
+    api.get('/reports/leaderboard?timeframe=all-time')
+      .then(res => {
+        if (res.data && res.data.leaderboard) {
+          setTopUsers(res.data.leaderboard.slice(0, 4));
+        }
+      })
+      .catch(err => console.error('Failed to load leaderboard users for homepage hero:', err));
+  }, []);
+
+  // Fallback mock safety reporters in case the database is empty or sparse
+  const fallbackAvatars = [
+    { initial: 'PP', name: 'Pathum Piyumal', avatar: null },
+    { initial: 'TS', name: 'Tharusha Sangeeth', avatar: null },
+    { initial: 'LR', name: 'Lochani Ridimaliyadda', avatar: null },
+    { initial: 'AS', name: 'Amara de Silva', avatar: null }
+  ];
+
+  const displayUsers = topUsers.length > 0
+    ? [...topUsers, ...fallbackAvatars].slice(0, 4)
+    : fallbackAvatars;
+
   return (
     <section style={{ position: 'relative', minHeight: '100vh', background: '#050505', overflow: 'hidden', paddingTop: 80, display: 'flex', alignItems: 'center' }}>
       {/* Glowing Mesh Blobs */}
@@ -257,13 +296,46 @@ const Hero = () => {
             {/* Active members */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ display: 'flex' }}>
-                {[0, 1, 2, 3].map(i => (
-                  <div key={i} style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: `hsl(${i * 40 + 200},45%,45%)`,
-                    border: '2px solid #050505', marginLeft: i === 0 ? 0 : -10,
-                  }} />
-                ))}
+                {displayUsers.map((u, i) => {
+                  const initialLetter = u.initial || (u.name ? u.name[0].toUpperCase() : 'U');
+                  return (
+                    <div 
+                      key={i} 
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        border: '2px solid #050505',
+                        marginLeft: i === 0 ? 0 : -10,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 11,
+                        fontWeight: 900,
+                        color: '#fff',
+                        background: u.avatar ? 'none' : `hsl(${(i * 45 + 20) % 360}, 65%, 45%)`,
+                        position: 'relative',
+                        zIndex: 4 - i
+                      }}
+                      title={u.name}
+                    >
+                      {u.avatar ? (
+                        <img 
+                          src={u.avatar} 
+                          alt={u.name} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement.innerHTML = initialLetter;
+                          }}
+                        />
+                      ) : (
+                        initialLetter
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -282,7 +354,7 @@ const Hero = () => {
               border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20,
               backdropFilter: 'blur(12px)', padding: '8px 4px',
             }}>
-              {[{ val: 34, label: 'Reports' }, { val: 9, label: 'Resolved' }].map((s, i) => (
+              {[{ val: stats.total, label: 'Reports' }, { val: stats.resolved, label: 'Resolved' }].map((s, i) => (
                 <div key={i} style={{
                   padding: '0 18px', textAlign: 'center',
                   borderRight: i === 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
