@@ -1,5 +1,6 @@
 import { HazardReport, HazardCategory, ReportImage, ReportUpvote, User, Activity } from '../models/index.js';
 import { uploadBufferToCloudinary } from '../config/cloudinary.js';
+import { Op } from 'sequelize';
 
 export const createReport = async (req, res, next) => {
   try {
@@ -203,6 +204,158 @@ export const getMyReports = async (req, res, next) => {
     res.json({
       success: true,
       reports,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPublicStats = async (req, res, next) => {
+  try {
+    const totalReports = await HazardReport.count();
+    const resolvedReports = await HazardReport.count({
+      where: { status: 'resolved' },
+    });
+
+    res.json({
+      success: true,
+      stats: {
+        totalReports,
+        resolvedReports,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getLeaderboard = async (req, res, next) => {
+  try {
+    const { timeframe } = req.query;
+    let dateFilter = {};
+
+    if (timeframe === 'weekly') {
+      dateFilter = {
+        createdAt: {
+          [Op.gte]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        }
+      };
+    } else if (timeframe === 'monthly') {
+      dateFilter = {
+        createdAt: {
+          [Op.gte]: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        }
+      };
+    }
+
+    // 1. Fetch all active users in a single query
+    const users = await User.findAll({
+      where: { status: 'active' },
+      attributes: ['id', 'name', 'avatar', 'role'],
+    });
+
+    const userIds = users.map(u => u.id);
+
+    // 2. Fetch all reports within timeframe in a single query
+    const reports = await HazardReport.findAll({
+      where: {
+        userId: userIds,
+        ...dateFilter
+      },
+      attributes: ['id', 'userId', 'status', 'locationName']
+    });
+
+    // Group reports by userId for quick memory lookup
+    const reportsByUserId = {};
+    for (const r of reports) {
+      if (!reportsByUserId[r.userId]) {
+        reportsByUserId[r.userId] = [];
+      }
+      reportsByUserId[r.userId].push(r);
+    }
+
+    // 3. Fetch all upvotes within timeframe in a single query
+    const reportIds = reports.map(r => r.id);
+    const upvotes = reportIds.length > 0
+      ? await ReportUpvote.findAll({
+          where: {
+            reportId: reportIds,
+            ...dateFilter
+          },
+          attributes: ['reportId']
+        })
+      : [];
+
+    // Group upvotes by reportId for quick memory lookup
+    const upvoteCountByReportId = {};
+    for (const up of upvotes) {
+      upvoteCountByReportId[up.reportId] = (upvoteCountByReportId[up.reportId] || 0) + 1;
+    }
+
+    const leaderboardData = [];
+
+    for (const user of users) {
+      const reportsOfUser = reportsByUserId[user.id] || [];
+      const resolvedCount = reportsOfUser.filter(r => r.status === 'resolved').length;
+
+      let upvotesCount = 0;
+      for (const r of reportsOfUser) {
+        upvotesCount += upvoteCountByReportId[r.id] || 0;
+      }
+
+      // Score formula: 100 points per report, 50 points per upvote, 200 points per resolved report
+      const score = (reportsOfUser.length * 100) + (upvotesCount * 50) + (resolvedCount * 200);
+
+      // Badge determination
+      let badge = 'Observer';
+      if (score >= 2000) {
+        badge = 'Road Warden';
+      } else if (score >= 1000 || resolvedCount >= 30) {
+        badge = 'Safety Sentinel';
+      } else if (score >= 500 || reportsOfUser.length >= 15) {
+        badge = 'Active Observer';
+      } else if (score >= 200 || reportsOfUser.length >= 5) {
+        badge = 'Pothole Patrol';
+      } else if (score >= 100) {
+        badge = 'Community Helper';
+      }
+
+      // Region determination based on report locations
+      let region = 'Citizen';
+      if (reportsOfUser.length > 0) {
+        const locations = reportsOfUser.map(r => r.locationName || '');
+        const validLocs = locations.filter(l => l.trim().length > 0);
+        if (validLocs.length > 0) {
+          const parts = validLocs[0].split(',');
+          const lastPart = parts[parts.length - 1].trim();
+          region = lastPart.replace(/^\d+\s*|\s*\d+$/g, '') || 'Citizen';
+        }
+      }
+
+      leaderboardData.push({
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        score,
+        reports: reportsOfUser.length,
+        resolved: resolvedCount,
+        badge,
+        region,
+        initial: user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+      });
+    }
+
+    // Sort by score descending
+    leaderboardData.sort((a, b) => b.score - a.score);
+
+    // Assign rank positions
+    leaderboardData.forEach((item, index) => {
+      item.rank = index + 1;
+    });
+
+    res.json({
+      success: true,
+      leaderboard: leaderboardData,
     });
   } catch (error) {
     next(error);
