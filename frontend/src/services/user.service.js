@@ -2,12 +2,12 @@ import api from './api';
 
 const UserService = {
   getProfile: async () => {
-    const response = await api.get('/users/profile');
+    const response = await api.get('/auth/profile');
     return response.data;
   },
 
   updateProfile: async (userData) => {
-    const response = await api.put('/users/profile', userData);
+    const response = await api.put('/auth/profile', userData);
     // Update local storage if user data changes
     if (response.data.user) {
       localStorage.setItem('user', JSON.stringify(response.data.user));
