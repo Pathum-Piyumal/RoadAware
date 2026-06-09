@@ -19,6 +19,7 @@ import {
 import AuthService from '../../services/auth.service';
 import HazardService from '../../services/hazard.service';
 import UserService from '../../services/user.service';
+import RadarLoader from '../../components/common/RadarLoader';
 
 // Viewport Scroll Reveal Component for Smooth Animations
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -172,6 +173,14 @@ export default function CitizenDashboard() {
   };
 
   const recentReports = reports.slice(0, 3);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 flex items-center justify-center">
+        <RadarLoader size="medium" message="Retrieving safety profile & log coordinates..." />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 font-sans text-gray-900 dark:text-slate-100 pb-24 selection:bg-orange-100 selection:text-orange-950">

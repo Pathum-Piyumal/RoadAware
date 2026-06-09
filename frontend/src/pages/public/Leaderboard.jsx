@@ -3,6 +3,7 @@ import { Award, Trophy, Star, Search, Shield, Heart, MapPin, Flame, ArrowRight, 
 import { Link } from 'react-router-dom';
 import AuthService from '../../services/auth.service';
 import api from '../../services/api';
+import RadarLoader from '../../components/common/RadarLoader';
 
 // Viewport Scroll Reveal Component
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -138,6 +139,14 @@ export default function Leaderboard() {
     { title: "Active Observer", desc: "Awarded for consistent reporting and upvote validations.", requirement: "15+ Reports", icon: Star, color: "text-emerald-500", bg: "bg-emerald-50 border-emerald-100" },
     { title: "Pothole Patrol", desc: "Granted after reporting and resolving 5 structural potholes.", requirement: "5+ Potholes", icon: Flame, color: "text-purple-500", bg: "bg-purple-50 border-purple-100" }
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
+        <RadarLoader size="medium" message="Retrieving safety champion rankings..." />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 font-sans text-gray-900 dark:text-slate-100 pb-24 selection:bg-orange-100 selection:text-orange-900">
