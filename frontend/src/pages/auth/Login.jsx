@@ -9,6 +9,7 @@ const Login = () => {
     e.preventDefault();
     // Simulating a login so you can view protected pages
     localStorage.setItem('user', JSON.stringify({ name: 'Test User', email: 'test@example.com' }));
+    localStorage.setItem('token', 'mock_test_token_2026');
     navigate('/');
   };
 
