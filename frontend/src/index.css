@@ -352,3 +352,28 @@ html:not(.dark) .admin-sidebar {
   --color-admin-bg: rgba(128, 128, 128, 0.1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
+
+/* --- Homepage Hero Animations & Layout Additions --- */
+.hero-grid-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@keyframes custom-radar-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+.custom-pulsing-icon .radar-ping-ring {
+  animation: custom-radar-ping 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.custom-pulsing-icon .radar-ping-ring-delayed {
+  animation: custom-radar-ping 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  animation-delay: 0.8s;
+}

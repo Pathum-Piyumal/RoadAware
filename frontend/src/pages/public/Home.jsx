@@ -144,6 +144,25 @@ const Hero = () => {
   const [stats, setStats] = useState({ total: 34, resolved: 9 });
   const [topUsers, setTopUsers] = useState([]);
 
+  // 1. Mouse Spotlight tracking state
+  const heroRef = useRef(null);
+  const [spotlightPos, setSpotlightPos] = useState({ x: -1000, y: -1000 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  // 2. 3D Tilt perspective state
+  const mapWrapperRef = useRef(null);
+  const [tiltStyle, setTiltStyle] = useState({});
+
+  // 3. Word-cycling text transition state
+  const phrases = [
+    "people who use them.",
+    "drivers on them.",
+    "commuters on them.",
+    "citizens near them."
+  ];
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [fadeState, setFadeState] = useState('visible'); // 'visible', 'fading-out', 'fading-in'
+
   useEffect(() => {
     // Fetch live reports and resolved counts
     api.get('/reports/stats')
@@ -167,6 +186,73 @@ const Hero = () => {
       .catch(err => console.error('Failed to load leaderboard users for homepage hero:', err));
   }, []);
 
+  // Word cycler interval logic
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFadeState('fading-out');
+      setTimeout(() => {
+        setPhraseIndex((prev) => (prev + 1) % phrases.length);
+        setFadeState('fading-in');
+        setTimeout(() => {
+          setFadeState('visible');
+        }, 150);
+      }, 350);
+    }, 3800);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Spotlight mouse track handlers
+  const handleHeroMouseMove = (e) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    setSpotlightPos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  // 3D perspective tilt handlers
+  const handleMapMouseMove = (e) => {
+    if (!mapWrapperRef.current) return;
+    const rect = mapWrapperRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const px = (x / rect.width) - 0.5;
+    const py = (y / rect.height) - 0.5;
+
+    const tiltX = -(py * 14).toFixed(2);
+    const tiltY = (px * 14).toFixed(2);
+
+    setTiltStyle({
+      transform: `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.015, 1.015, 1.015)`,
+      transition: 'transform 0.15s ease-out',
+      boxShadow: `${-px * 40}px ${-py * 40 + 50}px 100px rgba(0,0,0,0.85)`
+    });
+  };
+
+  const handleMapMouseLeave = () => {
+    setTiltStyle({
+      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+      transition: 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+      boxShadow: '0 40px 100px rgba(0,0,0,0.7)'
+    });
+  };
+
+  // Custom pulsing radar marker icon
+  const pulsingIcon = L.divIcon({
+    className: 'custom-pulsing-icon',
+    html: `
+      <div class="relative flex items-center justify-center w-8 h-8">
+        <div class="absolute w-8 h-8 rounded-full bg-orange-500/20 border border-orange-500/30 radar-ping-ring"></div>
+        <div class="absolute w-8 h-8 rounded-full bg-orange-500/10 border border-orange-500/20 radar-ping-ring-delayed"></div>
+        <div class="relative w-3.5 h-3.5 rounded-full bg-gradient-to-br from-orange-500 to-red-600 border-2 border-white shadow-[0_0_8px_rgba(234,88,12,0.6)] z-10"></div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16]
+  });
+
   // Fallback mock safety reporters in case the database is empty or sparse
   const fallbackAvatars = [
     { initial: 'PP', name: 'Pathum Piyumal', avatar: null },
@@ -180,7 +266,35 @@ const Hero = () => {
     : fallbackAvatars;
 
   return (
-    <section style={{ position: 'relative', minHeight: '100vh', background: '#050505', overflow: 'hidden', paddingTop: 80, display: 'flex', alignItems: 'center' }}>
+    <section 
+      ref={heroRef}
+      onMouseMove={handleHeroMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setIsHovered(false); setSpotlightPos({ x: -1000, y: -1000 }); }}
+      style={{ position: 'relative', minHeight: '100vh', background: '#050505', overflow: 'hidden', paddingTop: 80, display: 'flex', alignItems: 'center' }}
+    >
+      {/* Dynamic Cursor-Tracking spotlight backdrop */}
+      <div 
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: 550,
+          height: 550,
+          background: 'radial-gradient(circle, rgba(249,115,22,0.1) 0%, rgba(59,130,246,0.05) 60%, transparent 100%)',
+          borderRadius: '50%',
+          transform: `translate3d(${spotlightPos.x - 275}px, ${spotlightPos.y - 275}px, 0)`,
+          pointerEvents: 'none',
+          filter: 'blur(80px)',
+          zIndex: 0,
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.6s ease-in-out'
+        }}
+      />
+
+      {/* Grid Pattern overlay */}
+      <div className="absolute inset-0 hero-grid-pattern opacity-[0.8] pointer-events-none z-0" />
+
       {/* Glowing Mesh Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[140px] animate-pulse-glow pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-blue-600/10 rounded-full blur-[130px] animate-pulse-glow-reverse pointer-events-none z-0" />
@@ -225,7 +339,17 @@ const Hero = () => {
           >
             Safer roads,<br />
             built by the<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400">people who use them.</span>
+            <span 
+              style={{
+                display: 'inline-block',
+                opacity: fadeState === 'fading-out' ? 0 : 1,
+                transform: fadeState === 'fading-out' ? 'translateY(-10px)' : fadeState === 'fading-in' ? 'translateY(10px)' : 'translateY(0)',
+                transition: 'opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400"
+            >
+              {phrases[phraseIndex]}
+            </span>
           </h1>
 
           {/* Subtext */}
@@ -349,11 +473,25 @@ const Hero = () => {
             </div>
 
             {/* Stats quick pill */}
-            <div style={{
-              display: 'inline-flex', background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20,
-              backdropFilter: 'blur(12px)', padding: '8px 4px',
-            }}>
+            <div 
+              className="animate-shimmer"
+              style={{
+                display: 'inline-flex', background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20,
+                backdropFilter: 'blur(12px)', padding: '8px 4px',
+                transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, border-color 0.3s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+              }}
+            >
               {[{ val: stats.total, label: 'Reports' }, { val: stats.resolved, label: 'Resolved' }].map((s, i) => (
                 <div key={i} style={{
                   padding: '0 18px', textAlign: 'center',
@@ -372,36 +510,46 @@ const Hero = () => {
         {/* Right column — Animated Floating Map Container */}
         <div 
           className="animate-float" 
-          style={{ 
-            position: 'relative', borderRadius: 32, overflow: 'hidden', 
-            border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
-            animationDelay: '300ms'
-          }}
+          style={{ animationDelay: '300ms' }}
         >
-          <div className="h-[320px] sm:h-[400px] lg:h-[480px]">
-            <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[51.556, -0.297]}>
-                <Popup>Hazard Reported: A4006 Wembley</Popup>
-              </Marker>
-            </MapContainer>
-          </div>
-
-          {/* Floating Top Indicator Badge */}
-          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 shadow-lg z-[1000]">
-            <div style={{ width: 40, height: 40, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <AlertTriangle size={20} color="#ef4444" />
+          <div
+            ref={mapWrapperRef}
+            onMouseMove={handleMapMouseMove}
+            onMouseLeave={handleMapMouseLeave}
+            style={{ 
+              position: 'relative', borderRadius: 32, overflow: 'hidden', 
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
+              transition: 'transform 0.15s ease-out, box-shadow 0.15s ease-out',
+              transformStyle: 'preserve-3d',
+              ...tiltStyle
+            }}
+          >
+            <div className="h-[320px] sm:h-[400px] lg:h-[480px]">
+              <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <Marker position={[51.556, -0.297]} icon={pulsingIcon}>
+                  <Popup>Hazard Reported: A4006 Wembley</Popup>
+                </Marker>
+              </MapContainer>
             </div>
-            <div>
-              <p style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Live Alert</p>
-              <p style={{ fontSize: 13, fontWeight: 800, color: '#111', margin: 0 }}>Pothole: A4006 Wembley</p>
-            </div>
-          </div>
 
-          {/* Floating Bottom Tracker Badge */}
-          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-emerald-500 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 shadow-emerald-500/40 shadow-lg z-[1000]">
-            <CheckCircle2 size={16} color="#fff" />
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verification Live</span>
+            {/* Floating Top Indicator Badge */}
+            <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 shadow-lg z-[1000]">
+              <div style={{ width: 40, height: 40, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <AlertTriangle size={20} color="#ef4444" />
+              </div>
+              <div>
+                <p style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Live Alert</p>
+                <p style={{ fontSize: 13, fontWeight: 800, color: '#111', margin: 0 }}>Pothole: A4006 Wembley</p>
+              </div>
+            </div>
+
+            {/* Floating Bottom Tracker Badge */}
+            <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-emerald-500 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 shadow-emerald-500/40 shadow-lg z-[1000]">
+              <CheckCircle2 size={16} color="#fff" />
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verification Live</span>
+            </div>
           </div>
         </div>
       </div>
