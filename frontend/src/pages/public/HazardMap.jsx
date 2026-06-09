@@ -160,8 +160,8 @@ export default function HazardMap() {
     });
   }, [hazards, searchQuery, typeFilter, statusFilter, severityFilter]);
 
-  const types = ['All types', ...new Set(hazards.map(h => h.type))];
-  const statuses = ['All statuses', ...new Set(hazards.map(h => h.status))];
+  const types = ['All types', 'Pothole', 'Debris', 'Flooding', 'Broken Light', 'Damaged Signage', 'Construction', 'Other'];
+  const statuses = ['All statuses', 'Reported', 'In Progress', 'Resolved'];
   const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
 
   return (

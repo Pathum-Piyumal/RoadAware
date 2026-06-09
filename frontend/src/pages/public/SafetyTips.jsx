@@ -134,7 +134,7 @@ export default function SafetyTips() {
       bg: "bg-red-50",
       border: "border-red-100",
       severity: "Risk",
-      image: "https://images.unsplash.com/photo-1615840287214-7fe58a8b668f?q=80&w=600&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop"
     }
   ];
 
@@ -180,21 +180,35 @@ export default function SafetyTips() {
             <ScrollReveal key={i} delay={i * 120}>
               <div 
                 onClick={() => setSelectedTip(tip)}
-                className="group bg-white rounded-[32px] p-10 border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:border-orange-100 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full"
+                className="group bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden border border-gray-100 dark:border-slate-800 shadow-xl shadow-gray-200/40 dark:shadow-none hover:shadow-2xl hover:border-orange-100 transition-all duration-500 cursor-pointer flex flex-col justify-between h-full"
               >
                 <div>
-                  <div className="flex justify-between items-center mb-8">
-                    <div className={`w-16 h-16 rounded-2xl ${tip.bg} ${tip.color} ${tip.border} border flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                      <tip.icon size={32} />
+                  {/* Card Cover Image */}
+                  <div className="h-48 overflow-hidden relative border-b border-gray-50 dark:border-slate-800 bg-gray-100">
+                    <img 
+                      src={tip.image} 
+                      alt={tip.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-red-500 bg-white/95 dark:bg-slate-900/95 px-3 py-1.5 rounded-xl shadow-sm border border-red-50/50">
+                        {tip.severity}
+                      </span>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 px-3 py-1 rounded-full">
-                      {tip.severity}
-                    </span>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-orange-600 transition-colors">{tip.title}</h3>
-                  <p className="text-gray-500 leading-relaxed mb-8 text-sm">{tip.desc}</p>
+
+                  <div className="p-8">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className={`w-12 h-12 rounded-xl ${tip.bg} ${tip.color} ${tip.border} border flex items-center justify-center shrink-0`}>
+                        <tip.icon size={24} />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-orange-600 transition-colors">{tip.title}</h3>
+                    </div>
+                    <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm mb-2">{tip.desc}</p>
+                  </div>
                 </div>
-                <div className="pt-6 border-t border-gray-50 flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-orange-600 transition-colors">
+                
+                <div className="mx-8 mb-8 pt-6 border-t border-gray-50 dark:border-slate-800 flex items-center gap-2 text-sm font-bold text-gray-400 group-hover:text-orange-600 transition-colors">
                   <span>Read Detailed Guide</span> <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
