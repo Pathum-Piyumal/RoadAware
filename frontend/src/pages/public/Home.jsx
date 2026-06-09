@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import HazardService from '../../services/hazard.service';
+import AuthService from '../../services/auth.service';
 import {
   AlertTriangle,
   MapPin,
@@ -137,201 +138,204 @@ const CountUp = ({ end, suffix = '' }) => {
 
 
 /* ─── HERO ────────────────────────────────────────────────── */
-const Hero = () => (
-  <section style={{ position: 'relative', minHeight: '100vh', background: '#050505', overflow: 'hidden', paddingTop: 80, display: 'flex', alignItems: 'center' }}>
-    {/* Glowing Mesh Blobs */}
-    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[140px] animate-pulse-glow pointer-events-none z-0" />
-    <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-blue-600/10 rounded-full blur-[130px] animate-pulse-glow-reverse pointer-events-none z-0" />
+const Hero = () => {
+  const currentUser = AuthService.getCurrentUser();
+  return (
+    <section style={{ position: 'relative', minHeight: '100vh', background: '#050505', overflow: 'hidden', paddingTop: 80, display: 'flex', alignItems: 'center' }}>
+      {/* Glowing Mesh Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[140px] animate-pulse-glow pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-blue-600/10 rounded-full blur-[130px] animate-pulse-glow-reverse pointer-events-none z-0" />
 
-    {/* Background Image Texture */}
-    <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-      <img
-        src="/assets/hero-bg.png"
-        alt="Road background"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.3 }}
-      />
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(5,5,5,0.4) 0%, rgba(5,5,5,0.9) 70%, #050505 100%)' }} />
-    </div>
+      {/* Background Image Texture */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <img
+          src="/assets/hero-bg.png"
+          alt="Road background"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.3 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(5,5,5,0.4) 0%, rgba(5,5,5,0.9) 70%, #050505 100%)' }} />
+      </div>
 
-    <div 
-      className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center px-6 md:px-8 py-16 lg:py-24"
-      style={{ maxWidth: 1280, width: '100%', margin: '0 auto', position: 'relative', zIndex: 1 }}
-    >
-      {/* Left column */}
-      <div className="space-y-8">
-        {/* Live pulsing badge */}
-        <div 
-          className="animate-fade-in-up" 
-          style={{ display: 'flex', alignItems: 'center', gap: 10, animationDelay: '0ms', animationFillMode: 'both' }}
-        >
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
-          </span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: '#34d399', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            Live traffic safety monitoring
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1 
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-[950] tracking-tight leading-[1.02] text-white animate-fade-in-up"
-          style={{ 
-            margin: 0,
-            animationDelay: '150ms', animationFillMode: 'both'
-          }}
-        >
-          Safer roads,<br />
-          built by the<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400">people who use them.</span>
-        </h1>
-
-        {/* Subtext */}
-        <p 
-          className="text-base sm:text-lg text-white/55 leading-relaxed max-w-lg animate-fade-in-up"
-          style={{ 
-            margin: 0,
-            animationDelay: '300ms', animationFillMode: 'both'
-          }}
-        >
-          Report potholes, street flooding, broken lights and more. Your reports alert 
-          dispatch crews and protect other drivers in real time.
-        </p>
-
-        {/* CTAs */}
-        <div 
-          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-fade-in-up"
-          style={{ animationDelay: '450ms', animationFillMode: 'both' }}
-        >
-          <Link to="/login" style={{
-            background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-            color: '#fff',
-            padding: '18px 40px',
-            borderRadius: 20,
-            fontWeight: 800,
-            fontSize: 15,
-            textDecoration: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-            boxShadow: '0 12px 32px rgba(249,115,22,0.35)',
-            transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(249,115,22,0.45)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(249,115,22,0.35)'; }}
+      <div 
+        className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center px-6 md:px-8 py-16 lg:py-24"
+        style={{ maxWidth: 1280, width: '100%', margin: '0 auto', position: 'relative', zIndex: 1 }}
+      >
+        {/* Left column */}
+        <div className="space-y-8">
+          {/* Live pulsing badge */}
+          <div 
+            className="animate-fade-in-up" 
+            style={{ display: 'flex', alignItems: 'center', gap: 10, animationDelay: '0ms', animationFillMode: 'both' }}
           >
-            Get started <ArrowRight size={18} strokeWidth={2.5} />
-          </Link>
-          <Link to="/map" style={{
-            background: 'rgba(255,255,255,0.06)',
-            backdropFilter: 'blur(16px)',
-            color: '#fff',
-            padding: '18px 40px',
-            borderRadius: 20,
-            fontWeight: 700,
-            fontSize: 15,
-            textDecoration: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-            border: '1px solid rgba(255,255,255,0.12)',
-            transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-          >
-            <MapIcon size={18} /> Explore the map
-          </Link>
-        </div>
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#34d399', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              Live traffic safety monitoring
+            </span>
+          </div>
 
-        {/* Ratings and Stats Combined Row */}
-        <div 
-          className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-6 sm:gap-8 pt-4 animate-fade-in-up"
-          style={{ animationDelay: '600ms', animationFillMode: 'both' }}
-        >
-          {/* Active members */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ display: 'flex' }}>
-              {[0, 1, 2, 3].map(i => (
+          {/* Headline */}
+          <h1 
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-[950] tracking-tight leading-[1.02] text-white animate-fade-in-up"
+            style={{ 
+              margin: 0,
+              animationDelay: '150ms', animationFillMode: 'both'
+            }}
+          >
+            Safer roads,<br />
+            built by the<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400">people who use them.</span>
+          </h1>
+
+          {/* Subtext */}
+          <p 
+            className="text-base sm:text-lg text-white/55 leading-relaxed max-w-lg animate-fade-in-up"
+            style={{ 
+              margin: 0,
+              animationDelay: '300ms', animationFillMode: 'both'
+            }}
+          >
+            Report potholes, street flooding, broken lights and more. Your reports alert 
+            dispatch crews and protect other drivers in real time.
+          </p>
+
+          {/* CTAs */}
+          <div 
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-fade-in-up"
+            style={{ animationDelay: '450ms', animationFillMode: 'both' }}
+          >
+            <Link to={currentUser ? "/report-hazard" : "/login"} style={{
+              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+              color: '#fff',
+              padding: '18px 40px',
+              borderRadius: 20,
+              fontWeight: 800,
+              fontSize: 15,
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              boxShadow: '0 12px 32px rgba(249,115,22,0.35)',
+              transition: 'transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(249,115,22,0.45)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(249,115,22,0.35)'; }}
+            >
+              Get started <ArrowRight size={18} strokeWidth={2.5} />
+            </Link>
+            <Link to="/map" style={{
+              background: 'rgba(255,255,255,0.06)',
+              backdropFilter: 'blur(16px)',
+              color: '#fff',
+              padding: '18px 40px',
+              borderRadius: 20,
+              fontWeight: 700,
+              fontSize: 15,
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              border: '1px solid rgba(255,255,255,0.12)',
+              transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <MapIcon size={18} /> Explore the map
+            </Link>
+          </div>
+
+          {/* Ratings and Stats Combined Row */}
+          <div 
+            className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-6 sm:gap-8 pt-4 animate-fade-in-up"
+            style={{ animationDelay: '600ms', animationFillMode: 'both' }}
+          >
+            {/* Active members */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex' }}>
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: `hsl(${i * 40 + 200},45%,45%)`,
+                    border: '2px solid #050505', marginLeft: i === 0 ? 0 : -10,
+                  }} />
+                ))}
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  {[1,2,3,4,5].map(s => <Star key={s} size={12} fill="#f97316" color="#f97316" />)}
+                  <span style={{ fontSize: 12, fontWeight: 900, color: '#fff', marginLeft: 4 }}>5.0</span>
+                </div>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+                  Loved by <strong style={{ color: '#fff' }}><CountUp end={12} suffix="k+" /> citizens</strong>
+                </p>
+              </div>
+            </div>
+
+            {/* Stats quick pill */}
+            <div style={{
+              display: 'inline-flex', background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20,
+              backdropFilter: 'blur(12px)', padding: '8px 4px',
+            }}>
+              {[{ val: 34, label: 'Reports' }, { val: 9, label: 'Resolved' }].map((s, i) => (
                 <div key={i} style={{
-                  width: 36, height: 36, borderRadius: '50%',
-                  background: `hsl(${i * 40 + 200},45%,45%)`,
-                  border: '2px solid #050505', marginLeft: i === 0 ? 0 : -10,
-                }} />
+                  padding: '0 18px', textAlign: 'center',
+                  borderRight: i === 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                }}>
+                  <p style={{ fontSize: 18, fontWeight: 900, color: '#fff', margin: 0 }}>
+                    <CountUp end={s.val} />
+                  </p>
+                  <p style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{s.label}</p>
+                </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Right column — Animated Floating Map Container */}
+        <div 
+          className="animate-float" 
+          style={{ 
+            position: 'relative', borderRadius: 32, overflow: 'hidden', 
+            border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
+            animationDelay: '300ms'
+          }}
+        >
+          <div className="h-[320px] sm:h-[400px] lg:h-[480px]">
+            <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <Marker position={[51.556, -0.297]}>
+                <Popup>Hazard Reported: A4006 Wembley</Popup>
+              </Marker>
+            </MapContainer>
+          </div>
+
+          {/* Floating Top Indicator Badge */}
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 shadow-lg z-[1000]">
+            <div style={{ width: 40, height: 40, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <AlertTriangle size={20} color="#ef4444" />
+            </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                {[1,2,3,4,5].map(s => <Star key={s} size={12} fill="#f97316" color="#f97316" />)}
-                <span style={{ fontSize: 12, fontWeight: 900, color: '#fff', marginLeft: 4 }}>5.0</span>
-              </div>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
-                Loved by <strong style={{ color: '#fff' }}><CountUp end={12} suffix="k+" /> citizens</strong>
-              </p>
+              <p style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Live Alert</p>
+              <p style={{ fontSize: 13, fontWeight: 800, color: '#111', margin: 0 }}>Pothole: A4006 Wembley</p>
             </div>
           </div>
 
-          {/* Stats quick pill */}
-          <div style={{
-            display: 'inline-flex', background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20,
-            backdropFilter: 'blur(12px)', padding: '8px 4px',
-          }}>
-            {[{ val: 34, label: 'Reports' }, { val: 9, label: 'Resolved' }].map((s, i) => (
-              <div key={i} style={{
-                padding: '0 18px', textAlign: 'center',
-                borderRight: i === 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
-              }}>
-                <p style={{ fontSize: 18, fontWeight: 900, color: '#fff', margin: 0 }}>
-                  <CountUp end={s.val} />
-                </p>
-                <p style={{ fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{s.label}</p>
-              </div>
-            ))}
+          {/* Floating Bottom Tracker Badge */}
+          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-emerald-500 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 shadow-emerald-500/40 shadow-lg z-[1000]">
+            <CheckCircle2 size={16} color="#fff" />
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verification Live</span>
           </div>
         </div>
       </div>
-
-      {/* Right column — Animated Floating Map Container */}
-      <div 
-        className="animate-float" 
-        style={{ 
-          position: 'relative', borderRadius: 32, overflow: 'hidden', 
-          border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
-          animationDelay: '300ms'
-        }}
-      >
-        <div className="h-[320px] sm:h-[400px] lg:h-[480px]">
-          <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker position={[51.556, -0.297]}>
-              <Popup>Hazard Reported: A4006 Wembley</Popup>
-            </Marker>
-          </MapContainer>
-        </div>
-
-        {/* Floating Top Indicator Badge */}
-        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-white rounded-2xl p-3 sm:p-4 flex items-center gap-3 shadow-lg z-[1000]">
-          <div style={{ width: 40, height: 40, background: '#fee2e2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <AlertTriangle size={20} color="#ef4444" />
-          </div>
-          <div>
-            <p style={{ fontSize: 9, fontWeight: 800, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Live Alert</p>
-            <p style={{ fontSize: 13, fontWeight: 800, color: '#111', margin: 0 }}>Pothole: A4006 Wembley</p>
-          </div>
-        </div>
-
-        {/* Floating Bottom Tracker Badge */}
-        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-emerald-500 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 shadow-emerald-500/40 shadow-lg z-[1000]">
-          <CheckCircle2 size={16} color="#fff" />
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verification Live</span>
-        </div>
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 
 
@@ -547,6 +551,7 @@ const FeaturedHazards = ({ hazards, onDetailsClick }) => (
 );
 
 const CommunityLeaderboard = () => {
+  const currentUser = AuthService.getCurrentUser();
   const users = [
     { rank: 1, name: 'Pathum Piyumal', score: '2,450', reports: 48, badge: 'Road Warden', color: 'from-amber-400 to-orange-500', text: 'text-amber-500' },
     { rank: 2, name: 'Tharusha Sangeeth', score: '1,980', reports: 36, badge: 'Safety Sentinel', color: 'from-slate-300 to-slate-400', text: 'text-slate-400' },
@@ -573,7 +578,7 @@ const CommunityLeaderboard = () => {
               <p style={{ fontSize: 16, color: 'var(--color-admin-text-muted)', lineHeight: 1.8, marginBottom: 36 }}>
                 Road safety is a collaborative effort. Our gamified leaderboard celebrates active citizens who submit coordinates, upload photo evidence, and upvote hazards. 
               </p>
-              <Link to="/register" style={{
+              <Link to="/leaderboard" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--color-admin-text)', color: 'var(--color-admin-card-solid)',
                 padding: '16px 36px', borderRadius: 16, fontWeight: 800, fontSize: 14, textDecoration: 'none',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.1)', transition: 'all 0.3s'
@@ -581,7 +586,7 @@ const CommunityLeaderboard = () => {
               onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                Join the leaderboard <Plus size={16} />
+                View Leaderboard <ArrowRight size={16} />
               </Link>
             </div>
           </ScrollReveal>
@@ -659,7 +664,7 @@ const SafetyInsights = () => {
       title: 'Identifying road hazards in nighttime conditions', 
       category: 'Night Safety', 
       date: 'May 08, 2026', 
-      image: 'https://images.unsplash.com/photo-1509316975850-ff9c5edd0cd9?q=80&w=600&auto=format&fit=crop',
+      image: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?q=80&w=600&auto=format&fit=crop',
       doc: 'Nighttime Driving'
     }
   ];
