@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, MapPin, Clock, ChevronRight, AlertTriangle } from 'lucide-react';
 import HazardService from '../../services/hazard.service';
+import RadarLoader from '../../components/common/RadarLoader';
 
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
@@ -109,18 +110,8 @@ export default function MyReports() {
       <main className="flex-grow p-6 md:p-12">
         <div className="max-w-5xl mx-auto">
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1,2,3].map(i => (
-            <div key={i} className="bg-white border border-gray-100 rounded-3xl p-6 animate-pulse">
-              <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
-              <div className="h-5 bg-gray-100 rounded w-3/4 mb-6" />
-              <div className="space-y-2">
-                <div className="h-3 bg-gray-100 rounded w-1/2" />
-                <div className="h-3 bg-gray-100 rounded w-2/3" />
-                <div className="h-3 bg-gray-100 rounded w-1/3" />
-              </div>
-            </div>
-          ))}
+        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-16 shadow-xl shadow-gray-200/35 dark:shadow-none">
+          <RadarLoader size="medium" message="Scanning local municipal hazard database..." />
         </div>
       ) : reports.length === 0 ? (
             <ScrollReveal>
