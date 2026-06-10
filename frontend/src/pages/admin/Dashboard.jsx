@@ -29,7 +29,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await api.get('/analytics/dashboard');
+        const response = await api.get('/stats/dashboard');
         if (response.data.success) {
           const s = response.data.stats;
           setStats({

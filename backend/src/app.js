@@ -9,7 +9,7 @@ import path from 'path';
 import authRoutes from '../routes/auth.routes.js';
 import adminRoutes from '../routes/admin.routes.js';
 import reportRoutes from '../routes/report.routes.js';
-import analyticsRoutes from '../routes/analytics.routes.js';
+import statsRoutes from '../routes/stats.routes.js';
 import categoryRoutes from '../routes/category.routes.js';
 import commentRoutes from '../routes/comment.routes.js';
 import contactRoutes from '../routes/contact.routes.js';
@@ -57,7 +57,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/reports/:id/comments', commentRoutes);
-app.use('/api/analytics', analyticsRoutes);
+app.use('/api/stats', statsRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/contact', contactRoutes);
 

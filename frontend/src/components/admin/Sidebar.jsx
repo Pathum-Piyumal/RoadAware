@@ -15,7 +15,7 @@ const Sidebar = ({ isOpen, setSidebarOpen }) => {
     { name: 'Dashboard', to: '/admin', icon: LayoutDashboard, exact: true },
     { name: 'Reports', to: '/admin/reports', icon: FileText },
     { name: 'Users', to: '/admin/users', icon: Users },
-    { name: 'Analytics', to: '/admin/analytics', icon: BarChart3 },
+    { name: 'Analytics', to: '/admin/stats', icon: BarChart3 },
     { name: 'Hazard Categories', to: '/admin/categories', icon: AlertTriangle },
     { name: 'Map Monitoring', to: '/admin/map', icon: Map },
     { name: 'Settings', to: '/admin/settings', icon: Settings },

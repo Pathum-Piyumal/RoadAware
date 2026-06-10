@@ -5,26 +5,26 @@ import {
 } from 'recharts';
 import api from '../../services/api';
 
-const Analytics = () => {
+const Stats = () => {
   const [areaChartData, setAreaChartData] = useState([]);
   const [hazardTypeData, setHazardTypeData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
+    const fetchStats = async () => {
       try {
-        const response = await api.get('/analytics/trends');
+        const response = await api.get('/stats/trends');
         if (response.data.success) {
           setAreaChartData(response.data.areaChartData || []);
           setHazardTypeData(response.data.hazardTypeData || []);
         }
       } catch (error) {
-        console.error('Failed to fetch analytics:', error);
+        console.error('Failed to fetch stats:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchAnalytics();
+    fetchStats();
   }, []);
 
   if (loading) {
@@ -39,7 +39,7 @@ const Analytics = () => {
     <div className="flex flex-col gap-6 p-4 lg:p-0 pb-8 animate-[fadeIn_0.5s_ease-in-out]">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-admin-text tracking-tight m-0">Analytics Overview</h1>
+          <h1 className="text-2xl font-bold text-admin-text tracking-tight m-0">Stats Overview</h1>
           <p className="text-admin-text-muted text-sm mt-1 mb-0">Deep dive into hazard resolution metrics.</p>
         </div>
       </div>
@@ -89,4 +89,4 @@ const Analytics = () => {
   );
 };
 
-export default Analytics;
+export default Stats;

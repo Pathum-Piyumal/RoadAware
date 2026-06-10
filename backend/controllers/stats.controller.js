@@ -178,10 +178,10 @@ export const getDashboardStats = async (req, res, next) => {
   }
 };
 
-export const getTrendAnalytics = async (req, res, next) => {
+export const getTrendStats = async (req, res, next) => {
   try {
     // Return structured trend analytics for deep-dive
-    // Same structure used in Recharts in Analytics.jsx
+    // Same structure used in Recharts in Stats.jsx
     const categories = await HazardCategory.findAll({
       attributes: [
         'name',

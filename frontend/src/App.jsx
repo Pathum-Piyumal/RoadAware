@@ -36,7 +36,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import Reports from './pages/admin/Reports';
 import Users from './pages/admin/Users';
-import Analytics from './pages/admin/Analytics';
+import Stats from './pages/admin/Stats';
 import Categories from './pages/admin/Categories';
 import MapMonitoring from './pages/admin/MapMonitoring';
 import Settings from './pages/admin/Settings';
@@ -131,7 +131,7 @@ function AppContent() {
             <Route path="profile" element={<AdminProfile />} />
             <Route path="reports" element={<Reports />} />
             <Route path="users" element={<Users />} />
-            <Route path="analytics" element={<Analytics />} />
+            <Route path="stats" element={<Stats />} />
             <Route path="categories" element={<Categories />} />
             <Route path="map" element={<MapMonitoring />} />
             <Route path="settings" element={<Settings />} />
