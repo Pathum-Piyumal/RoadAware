@@ -39,6 +39,33 @@ const getBadgeStyles = (key) => {
   return `px-2 py-1 rounded text-[9px] font-extrabold uppercase tracking-wider ${mapping[normalized] || "bg-gray-100 text-gray-600"}`;
 };
 
+// Helper to retrieve category-specific realistic cover photos from Unsplash as fallback
+const getCategoryFallbackImage = (categoryName) => {
+  const name = (categoryName || '').toLowerCase().trim();
+  if (name.includes('pothole') || name.includes('crack') || name.includes('hole')) {
+    return 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop';
+  }
+  if (name.includes('flood') || name.includes('water') || name.includes('rain')) {
+    return 'https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=600&auto=format&fit=crop';
+  }
+  if (name.includes('light') || name.includes('bulb') || name.includes('lamp') || name.includes('darkness') || name.includes('streetlight')) {
+    return 'https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=600&auto=format&fit=crop';
+  }
+  if (name.includes('debris') || name.includes('tree') || name.includes('branch') || name.includes('block') || name.includes('road blockage')) {
+    return 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop';
+  }
+  if (name.includes('construction') || name.includes('work') || name.includes('barrier') || name.includes('cone')) {
+    return 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop';
+  }
+  if (name.includes('sign') || name.includes('signage') || name.includes('post') || name.includes('board') || name.includes('marker')) {
+    return 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=600&auto=format&fit=crop';
+  }
+  if (name.includes('animal') || name.includes('dog') || name.includes('cat') || name.includes('cow') || name.includes('stray') || name.includes('pet')) {
+    return 'https://images.unsplash.com/photo-1484557052118-f32bd25b45b5?q=80&w=600&auto=format&fit=crop';
+  }
+  return 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=600&auto=format&fit=crop';
+};
+
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
 const ScrollReveal = ({ children, delay = 0, className = "" }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -589,17 +616,13 @@ export function HazardMapContent() {
                       <span className={getBadgeStyles(hazard.severity)}>{hazard.severity}</span>
                     </div>
                     
-                    {/* Dynamic cover photo or category-specific animated graphic */}
+                    {/* Dynamic cover photo or category-specific cover photo fallback */}
                     <div className="h-32 rounded-2xl mb-5 overflow-hidden relative flex items-center justify-center bg-gradient-to-br transition-all duration-300">
-                      {hazard.imageUrl ? (
-                        <img 
-                          src={hazard.imageUrl} 
-                          alt={hazard.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-                        />
-                      ) : (
-                        renderAnimatedIllustration(hazard.type)
-                      )}
+                      <img 
+                        src={hazard.imageUrl || getCategoryFallbackImage(hazard.type)} 
+                        alt={hazard.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                      />
                     </div>
 
                     <h3 className="text-base font-bold text-gray-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">{hazard.title}</h3>
@@ -676,16 +699,13 @@ export function HazardMapContent() {
               ) : (
                 <>
                   {/* Cover Photo */}
-                  {selectedHazard.imageUrl ? (
-                    <div className="h-64 w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
-                      <img src={selectedHazard.imageUrl} alt={selectedHazard.title} className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="h-56 w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-100">
-                      <MapPin size={36} className="text-slate-300 mb-2" />
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Coordinate View</span>
-                    </div>
-                  )}
+                  <div className="h-64 w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                    <img 
+                      src={selectedHazard.imageUrl || getCategoryFallbackImage(selectedHazard.type)} 
+                      alt={selectedHazard.title} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
 
                   {/* Metadata */}
                   <div className="grid grid-cols-2 gap-4">

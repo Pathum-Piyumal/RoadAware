@@ -1071,6 +1071,29 @@ export default function Home() {
   const [selectedHazard, setSelectedHazard] = useState(null);
   const [hazards, setHazards] = useState([]);
 
+  const getCategoryFallbackImage = (categoryName) => {
+    const name = (categoryName || '').toLowerCase().trim();
+    if (name.includes('pothole') || name.includes('crack') || name.includes('hole')) {
+      return 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('flood') || name.includes('water') || name.includes('rain')) {
+      return 'https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('light') || name.includes('bulb') || name.includes('lamp') || name.includes('darkness') || name.includes('streetlight')) {
+      return 'https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('debris') || name.includes('tree') || name.includes('branch') || name.includes('block') || name.includes('road blockage')) {
+      return 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('construction') || name.includes('work') || name.includes('barrier') || name.includes('cone')) {
+      return 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('sign') || name.includes('signage') || name.includes('post') || name.includes('board') || name.includes('marker')) {
+      return 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=600&auto=format&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=600&auto=format&fit=crop';
+  };
+
   // Fetch top 3 most upvoted reports for the Featured Hazards section
   useEffect(() => {
     HazardService.getAllReports()
@@ -1078,17 +1101,20 @@ export default function Home() {
         const sorted = (data.reports || [])
           .sort((a, b) => (b.upvotes?.length || 0) - (a.upvotes?.length || 0))
           .slice(0, 3)
-          .map(r => ({
-            id: r.id,
-            title: r.title,
-            category: r.category?.name || 'Other',
-            location: r.locationName,
-            description: r.description,
-            status: r.status,
-            upvotes: r.upvotes?.length || 0,
-            date: `Reported ${timeAgo(r.createdAt)}`,
-            image: r.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop',
-          }));
+          .map(r => {
+            const catName = r.category?.name || 'Other';
+            return {
+              id: r.id,
+              title: r.title,
+              category: catName,
+              location: r.locationName,
+              description: r.description,
+              status: r.status,
+              upvotes: r.upvotes?.length || 0,
+              date: `Reported ${timeAgo(r.createdAt)}`,
+              image: r.images?.[0]?.imageUrl || getCategoryFallbackImage(catName),
+            };
+          });
         setHazards(sorted);
       })
       .catch(err => console.error('Failed to load featured hazards:', err));
