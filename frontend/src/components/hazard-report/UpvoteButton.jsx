@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import HazardService from '../../services/hazard.service';
 import AuthService from '../../services/auth.service';
 
-const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
+const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted, onUpvoteToggle }) => {
   const [upvotes, setUpvotes] = useState(initialUpvotes || 0);
   const [hasUpvoted, setHasUpvoted] = useState(initialHasUpvoted || false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialUpvotes !== undefined) {
+      setUpvotes(initialUpvotes);
+    }
+  }, [initialUpvotes]);
+
+  useEffect(() => {
+    if (initialHasUpvoted !== undefined) {
+      setHasUpvoted(initialHasUpvoted);
+    }
+  }, [initialHasUpvoted]);
 
   const handleUpvote = async () => {
     if (loading) return;
@@ -18,29 +30,30 @@ const UpvoteButton = ({ hazardId, initialUpvotes, initialHasUpvoted }) => {
       return;
     }
 
+    // Save current values for rollback
+    const previousUpvotes = upvotes;
+    const previousHasUpvoted = hasUpvoted;
+
     // Optimistic update
-    if (hasUpvoted) {
-      setUpvotes(prev => prev - 1);
-      setHasUpvoted(false);
-    } else {
-      setUpvotes(prev => prev + 1);
-      setHasUpvoted(true);
+    const updatedUpvoted = !hasUpvoted;
+    setUpvotes(prev => updatedUpvoted ? prev + 1 : Math.max(0, prev - 1));
+    setHasUpvoted(updatedUpvoted);
+
+    if (updatedUpvoted) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 300);
     }
 
     try {
       setLoading(true);
-      await HazardService.upvoteHazard(hazardId);
+      const data = await HazardService.upvoteHazard(hazardId);
+      if (onUpvoteToggle) {
+        onUpvoteToggle(hazardId, data.upvoted);
+      }
     } catch (err) {
       // Revert on failure
-      if (hasUpvoted) {
-        setUpvotes(prev => prev + 1);
-        setHasUpvoted(true);
-      } else {
-        setUpvotes(prev => prev - 1);
-        setHasUpvoted(false);
-      }
+      setUpvotes(previousUpvotes);
+      setHasUpvoted(previousHasUpvoted);
       console.error('Upvote failed:', err);
     } finally {
       setLoading(false);
