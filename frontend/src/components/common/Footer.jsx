@@ -1,22 +1,36 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaFacebook, FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 
-const Footer = () => (
-  <footer style={{ background: '#050505', color: '#94a3b8', padding: '100px 0 40px', borderTop: '1px solid rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
-    {/* Background Decorative Element */}
-    <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '400px', background: 'rgba(249, 115, 22, 0.03)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
-    
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 mb-20">
-        
-        {/* Brand Section */}
-        <div className="col-span-1 sm:col-span-2">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
-            <img src={logo} alt="RoadAware Logo" style={{ height: 32, width: 'auto' }} />
-            <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em' }}>ROADAWARE</span>
-          </div>
-          <p style={{ fontSize: 15, lineHeight: 1.6, color: '#64748b', maxWidth: 320, marginBottom: 32 }}>
+const Footer = () => {
+  const location = useLocation();
+
+  const handleLogoClick = (e) => {
+    if (location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <footer style={{ background: '#050505', color: '#94a3b8', padding: '100px 0 40px', borderTop: '1px solid rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
+      {/* Background Decorative Element */}
+      <div style={{ position: 'absolute', top: 0, right: 0, width: '400px', height: '400px', background: 'rgba(249, 115, 22, 0.03)', filter: 'blur(100px)', borderRadius: '50%', pointerEvents: 'none' }} />
+      
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 mb-20">
+          
+          {/* Brand Section */}
+          <div className="col-span-1 sm:col-span-2">
+            <Link 
+              to="/" 
+              onClick={handleLogoClick}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 28, textDecoration: 'none', cursor: 'pointer' }}
+            >
+              <img src={logo} alt="RoadAware Logo" style={{ height: 32, width: 'auto' }} />
+              <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.05em' }}>ROADAWARE</span>
+            </Link>
+            <p style={{ fontSize: 15, lineHeight: 1.6, color: '#64748b', maxWidth: 320, marginBottom: 32 }}>
             Building safer communities through real-time infrastructure intelligence and community vigilance.
           </p>
           <div style={{ display: 'flex', gap: 16 }}>
@@ -112,6 +126,7 @@ const Footer = () => (
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;

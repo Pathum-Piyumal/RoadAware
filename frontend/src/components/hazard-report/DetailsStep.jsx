@@ -51,7 +51,22 @@ const DetailsStep = ({ formData, updateData }) => {
           </label>
           <select
             value={formData.type}
-            onChange={(e) => updateData({ type: e.target.value })}
+            onChange={(e) => {
+              const selectedType = e.target.value;
+              const categoryMap = {
+                'Pothole': 1,
+                'Debris': 2,
+                'Flooding': 3,
+                'Streetlight': 4,
+                'Construction': 6,
+                'Animal': 7,
+                'Other': 7
+              };
+              updateData({
+                type: selectedType,
+                categoryId: categoryMap[selectedType] || 7
+              });
+            }}
             className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all shadow-sm appearance-none"
           >
             <option value="" disabled>Select a hazard type...</option>

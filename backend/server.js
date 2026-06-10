@@ -1,10 +1,8 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import app from './src/app.js';
 import { sequelize } from './models/index.js';
 import { connectDB } from './config/database.js';
 import { seedDatabase } from './seeders/db.seeder.js';
-
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 

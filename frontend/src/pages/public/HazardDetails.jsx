@@ -60,6 +60,29 @@ export default function HazardDetails() {
     </div>
   );
 
+  const getCategoryFallbackImage = (categoryName) => {
+    const name = (categoryName || '').toLowerCase().trim();
+    if (name.includes('pothole') || name.includes('crack') || name.includes('hole')) {
+      return 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('flood') || name.includes('water') || name.includes('rain')) {
+      return 'https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('light') || name.includes('bulb') || name.includes('lamp') || name.includes('darkness') || name.includes('streetlight')) {
+      return 'https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('debris') || name.includes('tree') || name.includes('branch') || name.includes('block') || name.includes('road blockage')) {
+      return 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('construction') || name.includes('work') || name.includes('barrier') || name.includes('cone')) {
+      return 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop';
+    }
+    if (name.includes('sign') || name.includes('signage') || name.includes('post') || name.includes('board') || name.includes('marker')) {
+      return 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=600&auto=format&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=600&auto=format&fit=crop';
+  };
+
   const timeline = buildTimeline(report.status);
   const imageUrl = report.images?.[0]?.imageUrl || null;
   const upvoteCount = report.upvotes?.length || 0;
@@ -100,10 +123,11 @@ export default function HazardDetails() {
           {/* Image Placeholder */}
           <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm relative group">
             <div className="h-72 w-full bg-slate-100 flex flex-col items-center justify-center text-slate-400 overflow-hidden">
-              {imageUrl
-                ? <img src={imageUrl} alt={report.title} className="w-full h-full object-cover" />
-                : <><ImageIcon size={48} strokeWidth={1} className="mb-2" /><span className="text-sm font-semibold">No image attached</span></>
-              }
+              <img 
+                src={imageUrl || getCategoryFallbackImage(report.category?.name)} 
+                alt={report.title} 
+                className="w-full h-full object-cover" 
+              />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent pointer-events-none" />
             <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-white">

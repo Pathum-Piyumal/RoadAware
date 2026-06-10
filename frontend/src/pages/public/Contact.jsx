@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mail, MapPin, Phone, MessageSquare, Send, ArrowRight, Globe, Clock, ShieldCheck } from 'lucide-react';
+import api from '../../services/api';
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -47,13 +48,23 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setTimeout(() => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await api.post('/contact', formData);
       setIsSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 1000);
+    } catch (err) {
+      console.error('Failed to submit contact request:', err);
+      setError(err.response?.data?.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -224,11 +235,18 @@ export default function Contact() {
                       ></textarea>
                     </div>
 
+                    {error && (
+                      <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-semibold">
+                        {error}
+                      </div>
+                    )}
+
                     <button
                       type="submit"
-                      className="w-full py-5 bg-gray-900 text-white font-black rounded-[24px] shadow-xl hover:bg-blue-600 hover:-translate-y-1 transition-all flex items-center justify-center gap-3"
+                      disabled={isSubmitting}
+                      className="w-full py-5 bg-gray-900 text-white font-black rounded-[24px] shadow-xl hover:bg-blue-600 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Send Message <Send size={20} />
+                      {isSubmitting ? 'Sending...' : 'Send Message'} <Send size={20} />
                     </button>
                   </form>
                 )}

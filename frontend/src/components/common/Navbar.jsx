@@ -23,6 +23,14 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleLogoClick = (e) => {
+    closeMobileMenu();
+    if (location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Hazard Map', path: '/map' },
@@ -41,7 +49,7 @@ const Navbar = () => {
     }}>
       <div className="max-w-7xl mx-auto px-6 md:px-8 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to="/" onClick={closeMobileMenu} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+        <Link to="/" onClick={handleLogoClick} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <img src={logo} alt="RoadAware Logo" style={{ width: 34, height: 34, objectFit: 'contain', borderRadius: 8 }} />
           <span style={{ fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '-0.5px' }}>RoadAware</span>
         </Link>

@@ -41,20 +41,6 @@ const createMockReportForUser = async (userId, region, catIds, isResolved, creat
     updatedAt: createdAt
   });
 
-  // Create image
-  const mockImages = [
-    'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=600&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?q=80&w=600&auto=format&fit=crop'
-  ];
-  const imageUrl = mockImages[Math.floor(Math.random() * mockImages.length)];
-  await ReportImage.create({
-    reportId: report.id,
-    imageUrl,
-    createdAt,
-    updatedAt: createdAt
-  });
-
   // Pick random users to upvote this report
   const upvoteCount = Math.floor(Math.random() * 4) + 1; // 1 to 4 upvotes
   const shuffledUsers = allUserIds.filter(id => id !== userId).sort(() => 0.5 - Math.random());
@@ -126,16 +112,15 @@ export const seedDatabase = async () => {
       console.log('✔ Admin user account already exists (credentials verified/updated).');
     }
 
-    // 4. Seed dynamic safety reporters (citizens)
     const seedCitizens = [
-      { name: 'Pathum Piyumal', email: 'pathum@roadaware.com', region: 'Colombo 03', reportsConfig: { total: 15, resolved: 10, weekly: 3, weeklyResolved: 2, monthly: 8, monthlyResolved: 6 } },
-      { name: 'Tharusha Sangeeth', email: 'tharusha@roadaware.com', region: 'Gampaha', reportsConfig: { total: 12, resolved: 8, weekly: 2, weeklyResolved: 1, monthly: 7, monthlyResolved: 5 } },
-      { name: 'Lochani Ridimaliyadda', email: 'lochani@roadaware.com', region: 'Kandy', reportsConfig: { total: 9, resolved: 6, weekly: 0, weeklyResolved: 0, monthly: 5, monthlyResolved: 4 } },
-      { name: 'Amara de Silva', email: 'amara@roadaware.com', region: 'Colombo 07', reportsConfig: { total: 8, resolved: 5, weekly: 0, weeklyResolved: 0, monthly: 4, monthlyResolved: 3 } },
-      { name: 'Roshan Gunawardena', email: 'roshan@roadaware.com', region: 'Negombo', reportsConfig: { total: 6, resolved: 4, weekly: 2, weeklyResolved: 1, monthly: 3, monthlyResolved: 2 } },
-      { name: 'Nisansala Perera', email: 'nisansala@roadaware.com', region: 'Galle', reportsConfig: { total: 5, resolved: 3, weekly: 0, weeklyResolved: 0, monthly: 3, monthlyResolved: 2 } },
-      { name: 'Dinesh Fernando', email: 'dinesh@roadaware.com', region: 'Colombo 05', reportsConfig: { total: 4, resolved: 2, weekly: 1, weeklyResolved: 1, monthly: 2, monthlyResolved: 1 } },
-      { name: 'Sanduni Jayasekara', email: 'sanduni@roadaware.com', region: 'Kurunegala', reportsConfig: { total: 3, resolved: 1, weekly: 1, weeklyResolved: 0, monthly: 2, monthlyResolved: 1 } },
+      { name: 'Pathum Piyumal', email: 'pathum@roadaware.com', region: 'Colombo 03', reportsConfig: { total: 7, resolved: 4, weekly: 2, weeklyResolved: 1, monthly: 4, monthlyResolved: 2 } },
+      { name: 'Tharusha Sangeeth', email: 'tharusha@roadaware.com', region: 'Gampaha', reportsConfig: { total: 5, resolved: 3, weekly: 1, weeklyResolved: 1, monthly: 3, monthlyResolved: 2 } },
+      { name: 'Lochani Ridimaliyadda', email: 'lochani@roadaware.com', region: 'Kandy', reportsConfig: { total: 4, resolved: 2, weekly: 1, weeklyResolved: 0, monthly: 2, monthlyResolved: 1 } },
+      { name: 'Amara de Silva', email: 'amara@roadaware.com', region: 'Colombo 07', reportsConfig: { total: 3, resolved: 2, weekly: 0, weeklyResolved: 0, monthly: 2, monthlyResolved: 1 } },
+      { name: 'Roshan Gunawardena', email: 'roshan@roadaware.com', region: 'Negombo', reportsConfig: { total: 2, resolved: 1, weekly: 1, weeklyResolved: 0, monthly: 1, monthlyResolved: 0 } },
+      { name: 'Nisansala Perera', email: 'nisansala@roadaware.com', region: 'Galle', reportsConfig: { total: 2, resolved: 1, weekly: 0, weeklyResolved: 0, monthly: 1, monthlyResolved: 1 } },
+      { name: 'Dinesh Fernando', email: 'dinesh@roadaware.com', region: 'Colombo 05', reportsConfig: { total: 1, resolved: 1, weekly: 0, weeklyResolved: 0, monthly: 1, monthlyResolved: 1 } },
+      { name: 'Sanduni Jayasekara', email: 'sanduni@roadaware.com', region: 'Kurunegala', reportsConfig: { total: 1, resolved: 0, weekly: 1, weeklyResolved: 0, monthly: 1, monthlyResolved: 0 } },
     ];
 
     const categories = await HazardCategory.findAll();
