@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import HazardService from '../../services/hazard.service';
 import AuthService from '../../services/auth.service';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 import {
   AlertTriangle,
   MapPin,
@@ -143,6 +144,7 @@ const Hero = () => {
   const currentUser = AuthService.getCurrentUser();
   const [stats, setStats] = useState({ total: 34, resolved: 9 });
   const [topUsers, setTopUsers] = useState([]);
+  const [mapMarkers, setMapMarkers] = useState([]);
 
   // 1. Mouse Spotlight tracking state
   const heroRef = useRef(null);
@@ -184,6 +186,15 @@ const Hero = () => {
         }
       })
       .catch(err => console.error('Failed to load leaderboard users for homepage hero:', err));
+
+    // Fetch map markers
+    HazardService.getMapMarkers()
+      .then(data => {
+        if (data && data.markers) {
+          setMapMarkers(data.markers);
+        }
+      })
+      .catch(err => console.error('Failed to load map markers for homepage hero:', err));
   }, []);
 
   // Word cycler interval logic
@@ -526,11 +537,31 @@ const Hero = () => {
             }}
           >
             <div className="h-[320px] sm:h-[400px] lg:h-[480px]">
-              <MapContainer center={[51.556, -0.297]} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+              <MapContainer center={[6.9271, 79.8612]} zoom={12} style={{ height: '100%', width: '100%' }} zoomControl={false}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <Marker position={[51.556, -0.297]} icon={pulsingIcon}>
-                  <Popup>Hazard Reported: A4006 Wembley</Popup>
-                </Marker>
+                {mapMarkers.map(marker => (
+                  <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={pulsingIcon}>
+                    <Popup>
+                      <div className="text-slate-900 font-sans p-1">
+                        <strong className="text-sm font-bold block mb-1">{marker.title}</strong>
+                        <p className="text-xs text-slate-500 m-0 mb-1">{marker.location}</p>
+                        <div className="flex gap-1.5 mt-2">
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: 'rgba(249,115,22,0.1)', color: '#f97316', fontWeight: 700 }}>
+                            {marker.type}
+                          </span>
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: marker.status === 'Resolved' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', color: marker.status === 'Resolved' ? '#10b981' : '#ef4444', fontWeight: 700 }}>
+                            {marker.status}
+                          </span>
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+                {mapMarkers.length === 0 && (
+                  <Marker position={[6.9271, 79.8612]} icon={pulsingIcon}>
+                    <Popup>RoadAware Active Monitoring Colombo</Popup>
+                  </Marker>
+                )}
               </MapContainer>
             </div>
 
@@ -772,11 +803,31 @@ const FeaturedHazards = ({ hazards, onDetailsClick }) => (
 
 const CommunityLeaderboard = () => {
   const currentUser = AuthService.getCurrentUser();
-  const users = [
-    { rank: 1, name: 'Pathum Piyumal', score: '2,450', reports: 48, badge: 'Road Warden', color: 'from-amber-400 to-orange-500', text: 'text-amber-500' },
-    { rank: 2, name: 'Tharusha Sangeeth', score: '1,980', reports: 36, badge: 'Safety Sentinel', color: 'from-slate-300 to-slate-400', text: 'text-slate-400' },
-    { rank: 3, name: 'Lochani Ridimaliyadda', score: '1,420', reports: 22, badge: 'Active Observer', color: 'from-amber-600 to-amber-700', text: 'text-amber-700' },
-  ];
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/reports/leaderboard?timeframe=all-time')
+      .then(res => {
+        if (res.data && res.data.leaderboard) {
+          const rawUsers = res.data.leaderboard.slice(0, 3);
+          const colors = [
+            { color: 'from-amber-400 to-orange-500', text: 'text-amber-500' },
+            { color: 'from-slate-300 to-slate-400', text: 'text-slate-400' },
+            { color: 'from-amber-600 to-amber-700', text: 'text-amber-700' }
+          ];
+          const mapped = rawUsers.map((u, i) => ({
+            ...u,
+            color: colors[i]?.color || 'from-slate-500 to-slate-600',
+            text: colors[i]?.text || 'text-slate-500',
+            scoreFormatted: Number(u.score).toLocaleString()
+          }));
+          setUsers(mapped);
+        }
+      })
+      .catch(err => console.error('Failed to load leaderboard for homepage:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <section 
@@ -812,43 +863,47 @@ const CommunityLeaderboard = () => {
           </ScrollReveal>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {users.map((u, i) => (
-              <ScrollReveal key={u.rank} delay={i * 150}>
-                <div 
-                  className="p-5 sm:p-6 md:p-8 flex items-center justify-between gap-4 hover:scale-[1.03] hover:shadow-xl hover:border-slate-200/60 group duration-300"
-                  style={{
-                    background: 'var(--color-admin-card-solid)', borderRadius: 28,
-                    border: '1px solid var(--color-admin-border)', transition: 'all 0.4s'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                    {/* Rank Indicator */}
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontWeight: 900, fontSize: 16, color: '#fff'
-                    }} className={`bg-gradient-to-br ${u.color} shadow-sm group-hover:scale-110 transition-transform`}>
-                      {u.rank}
-                    </div>
+            {loading ? (
+              <div className="text-center py-8 text-slate-400">Loading dynamic leaderboard...</div>
+            ) : (
+              users.map((u, i) => (
+                <ScrollReveal key={u.id || u.rank} delay={i * 150}>
+                  <div 
+                    className="p-5 sm:p-6 md:p-8 flex items-center justify-between gap-4 hover:scale-[1.03] hover:shadow-xl hover:border-slate-200/60 group duration-300"
+                    style={{
+                      background: 'var(--color-admin-card-solid)', borderRadius: 28,
+                      border: '1px solid var(--color-admin-border)', transition: 'all 0.4s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                      {/* Rank Indicator */}
+                      <div style={{
+                        width: 44, height: 44, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 900, fontSize: 16, color: '#fff'
+                      }} className={`bg-gradient-to-br ${u.color} shadow-sm group-hover:scale-110 transition-transform`}>
+                        {u.rank}
+                      </div>
 
-                    {/* Meta info */}
-                    <div>
-                      <h4 style={{ fontSize: 17, fontWeight: 900, color: 'var(--color-admin-text)', margin: '0 0 4px 0' }}>{u.name}</h4>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, color: 'var(--color-admin-text-muted)' }}>
-                        <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md font-extrabold`}>{u.badge}</span>
-                        <span>•</span>
-                        <span>{u.reports} Reports</span>
+                      {/* Meta info */}
+                      <div>
+                        <h4 style={{ fontSize: 17, fontWeight: 900, color: 'var(--color-admin-text)', margin: '0 0 4px 0' }}>{u.name}</h4>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, color: 'var(--color-admin-text-muted)' }}>
+                          <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md font-extrabold`}>{u.badge}</span>
+                          <span>•</span>
+                          <span>{u.reports} Reports</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Reputation points */}
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: 18, fontWeight: 950, color: 'var(--color-admin-text)', margin: 0 }}>{u.score}</p>
-                    <p style={{ fontSize: 9, fontWeight: 800, color: 'var(--color-admin-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Reputation Pts</p>
+                    {/* Reputation points */}
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontSize: 18, fontWeight: 950, color: 'var(--color-admin-text)', margin: 0 }}>{u.scoreFormatted}</p>
+                      <p style={{ fontSize: 9, fontWeight: 800, color: 'var(--color-admin-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Reputation Pts</p>
+                    </div>
                   </div>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              ))
+            )}
           </div>
 
         </div>
@@ -1044,6 +1099,44 @@ export default function Home() {
     if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
     return `${Math.floor(diff / 86400)} days ago`;
+  };
+
+  const handleUpvote = async (id) => {
+    const currentUser = AuthService.getCurrentUser();
+    if (!currentUser) {
+      toast.error('You must be logged in to upvote a report.');
+      return;
+    }
+
+    try {
+      const data = await HazardService.upvoteHazard(id);
+      
+      // Update in hazards list
+      setHazards(prevHazards => 
+        prevHazards.map(h => {
+          if (h.id === id) {
+            const currentUpvotes = h.upvotes;
+            const updatedUpvotes = data.upvoted ? currentUpvotes + 1 : Math.max(0, currentUpvotes - 1);
+            return { ...h, upvotes: updatedUpvotes };
+          }
+          return h;
+        })
+      );
+
+      // Update in selected modal
+      if (selectedHazard && selectedHazard.id === id) {
+        setSelectedHazard(prevSelected => {
+          const updatedUpvotes = data.upvoted ? prevSelected.upvotes + 1 : Math.max(0, prevSelected.upvotes - 1);
+          return { ...prevSelected, upvotes: updatedUpvotes };
+        });
+      }
+
+      toast.success(data.message || 'Upvote status updated.');
+    } catch (err) {
+      console.error('Failed to toggle upvote:', err);
+      const message = err.response?.data?.message || 'Failed to register upvote. Please try again.';
+      toast.error(message);
+    }
   };
 
   return (
