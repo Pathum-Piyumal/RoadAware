@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, Component } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2 } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2, AlertTriangle, Droplets, Lightbulb, AlertCircle, PawPrint, Construction, HelpCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -69,15 +69,133 @@ const ScrollReveal = ({ children, delay = 0, className = "" }) => {
       className={className}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
-        transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
-        willChange: 'opacity, transform'
+        transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(24px)',
+        filter: isVisible ? 'blur(0px)' : 'blur(4px)',
+        transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'opacity, transform, filter'
       }}
     >
       {children}
     </div>
   );
 };
+
+// Helper for Category Cover Gradients & Icons
+// Helper to render high-fidelity animated CSS vector illustrations for each category
+const renderAnimatedIllustration = (type) => {
+  const normalized = (type || '').toLowerCase().trim();
+
+  // 1. Pothole / Road Crack
+  if (normalized.includes('pothole') || normalized.includes('crack') || normalized.includes('hole') || normalized.includes('tarmac')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-amber-500/10 to-orange-600/20 border border-orange-500/20 overflow-hidden">
+        {/* Road strip */}
+        <div className="absolute bottom-6 w-full h-4 bg-slate-800 flex items-center justify-around overflow-hidden opacity-90">
+          <div className="w-4 h-0.5 bg-white opacity-60" />
+          <div className="w-4 h-0.5 bg-white opacity-60" />
+          <div className="w-4 h-0.5 bg-white opacity-60" />
+        </div>
+        {/* Pothole ring */}
+        <div className="absolute bottom-6 w-6 h-3 bg-slate-950 rounded-full border border-orange-500/30 flex items-center justify-center">
+          <div className="absolute w-12 h-6 border-2 border-orange-500/40 rounded-full animate-pulse-ring" />
+        </div>
+        {/* Bouncing Warning Sign */}
+        <AlertTriangle size={32} className="text-orange-500 animate-bounce mb-3 relative z-10 filter drop-shadow-[0_2px_8px_rgba(249,115,22,0.3)]" />
+      </div>
+    );
+  }
+
+  // 2. Flooding / Water Accumulation
+  if (normalized.includes('flood') || normalized.includes('water') || normalized.includes('rain') || normalized.includes('puddle') || normalized.includes('overflow')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-blue-500/10 to-cyan-600/20 border border-blue-500/20 overflow-hidden">
+        {/* Falling Raindrops */}
+        <div className="absolute inset-0 flex justify-around opacity-60 pointer-events-none">
+          <Droplets size={12} className="text-blue-400 animate-raindrop" style={{ animationDelay: '0.2s' }} />
+          <Droplets size={10} className="text-blue-300 animate-raindrop" style={{ animationDelay: '0.8s' }} />
+          <Droplets size={14} className="text-blue-400 animate-raindrop" style={{ animationDelay: '1.4s' }} />
+        </div>
+        {/* Animated swell wave */}
+        <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-blue-500/40 to-cyan-400/20 rounded-t-xl animate-wave-swell" />
+        {/* Main Icon */}
+        <Droplets size={32} className="text-blue-500 mb-2 relative z-10 animate-pulse" />
+      </div>
+    );
+  }
+
+  // 3. Streetlight / Broken Light
+  if (normalized.includes('light') || normalized.includes('bulb') || normalized.includes('lamp') || normalized.includes('darkness') || normalized.includes('streetlight')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-purple-900/10 to-indigo-950/20 border border-purple-500/20 overflow-hidden">
+        {/* Glowing aura */}
+        <div className="absolute w-20 h-20 bg-yellow-500/10 rounded-full blur-xl animate-pulse" />
+        {/* Lamp Post Head */}
+        <div className="w-12 h-1 bg-slate-700 rounded-full mb-1 opacity-70" />
+        {/* Flickering light bulb */}
+        <div className="animate-flicker">
+          <Lightbulb size={32} className="text-yellow-500 filter drop-shadow-[0_0_12px_rgba(234,179,8,0.7)]" />
+        </div>
+      </div>
+    );
+  }
+
+  // 4. Debris / Road Blockage
+  if (normalized.includes('debris') || normalized.includes('tree') || normalized.includes('branch') || normalized.includes('block') || normalized.includes('rock') || normalized.includes('stone') || normalized.includes('garbage') || normalized.includes('trash')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-slate-500/10 to-zinc-600/20 border border-slate-500/20 overflow-hidden">
+        {/* Spinning scanning ring */}
+        <div className="absolute w-16 h-16 border border-dashed border-slate-400/40 rounded-full animate-spin" style={{ animationDuration: '8s' }} />
+        {/* Blockage graphic */}
+        <AlertCircle size={32} className="text-slate-500 mb-2 relative z-10 animate-pulse" />
+      </div>
+    );
+  }
+
+  // 5. Construction / Roadworks
+  if (normalized.includes('construction') || normalized.includes('work') || normalized.includes('barrier') || normalized.includes('cone') || normalized.includes('excavation')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-orange-500/10 to-yellow-600/20 border border-orange-500/20 overflow-hidden">
+        {/* Safety hazard stripes bg */}
+        <div 
+          className="absolute inset-x-0 bottom-0 h-4 bg-yellow-500/20 animate-stripe-slide" 
+          style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px)',
+            backgroundSize: '40px 40px'
+          }}
+        />
+        {/* Construction cone */}
+        <Construction size={32} className="text-orange-500 mb-4 relative z-10 filter drop-shadow-[0_2px_8px_rgba(249,115,22,0.2)]" />
+      </div>
+    );
+  }
+
+  // 6. Animal Hazard
+  if (normalized.includes('animal') || normalized.includes('dog') || normalized.includes('cat') || normalized.includes('cow') || normalized.includes('stray') || normalized.includes('pet')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-pink-500/10 to-rose-600/20 border border-pink-500/20 overflow-hidden">
+        {/* Stepping paw tracks */}
+        <div className="absolute inset-0 flex items-center justify-around opacity-30">
+          <PawPrint size={12} className="animate-pulse" style={{ animationDelay: '0.1s' }} />
+          <PawPrint size={10} className="animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <PawPrint size={14} className="animate-pulse" style={{ animationDelay: '0.9s' }} />
+        </div>
+        {/* Main Paw */}
+        <PawPrint size={32} className="text-pink-500 mb-2 relative z-10 animate-bounce" style={{ animationDuration: '2.5s' }} />
+      </div>
+    );
+  }
+
+  // 7. General / Other Hazards
+  return (
+    <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-gray-500/10 to-slate-600/20 border border-gray-500/20 overflow-hidden">
+      {/* Radar scanning line */}
+      <div className="absolute top-0 w-full h-[1px] bg-sky-500/40 animate-[bounce_4s_infinite]" />
+      <HelpCircle size={32} className="text-gray-500 mb-2 relative z-10 animate-pulse" />
+    </div>
+  );
+};
+
+
 
 // Custom Dropdown Component
 const CustomDropdown = ({ options, value, onChange }) => {
@@ -278,6 +396,44 @@ export function HazardMapContent() {
 
   return (
     <div className="font-sans bg-white min-h-screen flex flex-col selection:bg-orange-100 selection:text-orange-950">
+      <style>{`
+        @keyframes wave-swell {
+          0%, 100% { transform: translateY(0) scaleY(1); }
+          50% { transform: translateY(-4px) scaleY(1.06); }
+        }
+        @keyframes raindrop-fall {
+          0% { transform: translateY(-12px); opacity: 0; }
+          50% { opacity: 0.8; }
+          100% { transform: translateY(16px); opacity: 0; }
+        }
+        @keyframes light-flicker {
+          0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 0.99; filter: drop-shadow(0 0 8px rgba(234,179,8,0.6)); }
+          20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.25; filter: none; }
+        }
+        @keyframes stripe-slide {
+          0% { background-position: 0 0; }
+          100% { background-position: 40px 0; }
+        }
+        @keyframes pulse-ring {
+          0% { transform: scale(0.65); opacity: 0.8; }
+          100% { transform: scale(1.6); opacity: 0; }
+        }
+        .animate-wave-swell {
+          animation: wave-swell 3.5s ease-in-out infinite;
+        }
+        .animate-raindrop {
+          animation: raindrop-fall 1.8s linear infinite;
+        }
+        .animate-flicker {
+          animation: light-flicker 4s linear infinite;
+        }
+        .animate-stripe-slide {
+          animation: stripe-slide 2s linear infinite;
+        }
+        .animate-pulse-ring {
+          animation: pulse-ring 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+      `}</style>
       {/* Header Section */}
       <header className="bg-gray-50 pt-16 pb-20 border-b border-gray-200 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[80px] -mr-48 -mt-48" />
@@ -400,17 +556,25 @@ export function HazardMapContent() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredHazards.map((hazard, idx) => (
-                <ScrollReveal key={hazard.id} delay={idx * 60}>
-                  <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-lg shadow-slate-100/50 flex flex-col hover:shadow-2xl hover:border-slate-200 hover:-translate-y-1.5 transition-all duration-300 h-full group relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-full opacity-60 pointer-events-none" />
+                <ScrollReveal key={hazard.id} delay={(idx % 4) * 80}>
+                  <div className="bg-white dark:bg-slate-900/60 rounded-3xl border border-gray-100 dark:border-slate-800/80 p-5 shadow-lg shadow-slate-100/50 dark:shadow-none flex flex-col hover:shadow-2xl hover:border-blue-200/60 dark:hover:border-blue-900/40 hover:-translate-y-1.5 transition-all duration-500 ease-out h-full group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/5 to-transparent rounded-bl-full opacity-60 pointer-events-none group-hover:scale-125 transition-transform duration-700 ease-out" />
                     <div className="flex gap-2 mb-4 relative z-10">
                       <span className={getBadgeStyles(hazard.type)}>{hazard.type}</span>
                       <span className={getBadgeStyles(hazard.severity)}>{hazard.severity}</span>
                     </div>
                     
-                    {/* Atmospheric background graphic */}
-                    <div className="h-28 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100/80 mb-5 border border-slate-100 flex items-center justify-center">
-                      <MapPin size={24} className="text-slate-400/80 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500" />
+                    {/* Dynamic cover photo or category-specific animated graphic */}
+                    <div className="h-32 rounded-2xl mb-5 overflow-hidden relative flex items-center justify-center bg-gradient-to-br transition-all duration-300">
+                      {hazard.imageUrl ? (
+                        <img 
+                          src={hazard.imageUrl} 
+                          alt={hazard.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                        />
+                      ) : (
+                        renderAnimatedIllustration(hazard.type)
+                      )}
                     </div>
 
                     <h3 className="text-base font-bold text-gray-900 mb-3 leading-snug group-hover:text-blue-600 transition-colors">{hazard.title}</h3>
