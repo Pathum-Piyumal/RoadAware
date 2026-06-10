@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, Component } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2, AlertTriangle, Droplets, Lightbulb, AlertCircle, PawPrint, Construction, HelpCircle } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2, AlertTriangle, Droplets, Lightbulb, AlertCircle, PawPrint, Construction, HelpCircle, Milestone } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -20,19 +20,22 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 // Helper to resolve badge styles based on type or severity using Tailwind
 const getBadgeStyles = (key) => {
+  const normalized = (key || '').toLowerCase().trim();
   const mapping = {
-    Pothole: "bg-sky-100 text-sky-700",
-    Low: "bg-slate-100 text-slate-500",
-    Flooding: "bg-blue-100 text-blue-800",
-    High: "bg-yellow-100 text-yellow-700",
-    Debris: "bg-green-100 text-green-700",
-    Critical: "bg-red-100 text-red-600",
-    Medium: "bg-orange-100 text-orange-600",
-    Streetlight: "bg-purple-100 text-purple-700",
-    Construction: "bg-orange-50 text-orange-700",
-    Animal: "bg-pink-100 text-pink-700",
+    pothole: "bg-sky-100 text-sky-700",
+    low: "bg-slate-100 text-slate-500",
+    flooding: "bg-blue-100 text-blue-800",
+    high: "bg-yellow-100 text-yellow-700",
+    debris: "bg-green-100 text-green-700",
+    critical: "bg-red-100 text-red-600",
+    medium: "bg-orange-100 text-orange-600",
+    streetlight: "bg-purple-100 text-purple-700",
+    'broken light': "bg-purple-100 text-purple-700",
+    'damaged signage': "bg-amber-100 text-amber-700",
+    construction: "bg-orange-50 text-orange-700",
+    animal: "bg-pink-100 text-pink-700",
   };
-  return `px-2 py-1 rounded text-[9px] font-extrabold uppercase tracking-wider ${mapping[key] || "bg-gray-100 text-gray-600"}`;
+  return `px-2 py-1 rounded text-[9px] font-extrabold uppercase tracking-wider ${mapping[normalized] || "bg-gray-100 text-gray-600"}`;
 };
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
@@ -169,7 +172,21 @@ const renderAnimatedIllustration = (type) => {
     );
   }
 
-  // 6. Animal Hazard
+  // 6. Damaged Signage / Signpost
+  if (normalized.includes('sign') || normalized.includes('signage') || normalized.includes('post') || normalized.includes('board') || normalized.includes('marker')) {
+    return (
+      <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-amber-500/10 to-red-600/20 border border-red-500/20 overflow-hidden">
+        {/* Trembling warning signpost */}
+        <div className="animate-wiggle">
+          <Milestone size={32} className="text-red-500 filter drop-shadow-[0_2px_8px_rgba(239,68,68,0.3)] mb-2 relative z-10" />
+        </div>
+        {/* Ground cracks/warning ring */}
+        <div className="absolute bottom-4 w-8 h-2 bg-slate-900/10 rounded-full blur-sm animate-pulse" />
+      </div>
+    );
+  }
+
+  // 7. Animal Hazard
   if (normalized.includes('animal') || normalized.includes('dog') || normalized.includes('cat') || normalized.includes('cow') || normalized.includes('stray') || normalized.includes('pet')) {
     return (
       <div className="w-full h-full relative flex flex-col items-center justify-center bg-gradient-to-br from-pink-500/10 to-rose-600/20 border border-pink-500/20 overflow-hidden">
@@ -304,9 +321,9 @@ export function HazardMapContent() {
       const matchSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           id === searchQuery;
-      const matchType = typeFilter === 'All types' || type === typeFilter;
-      const matchStatus = statusFilter === 'All statuses' || status === statusFilter;
-      const matchSeverity = severityFilter === 'All severities' || severity === severityFilter;
+      const matchType = typeFilter === 'All types' || type.toLowerCase() === typeFilter.toLowerCase();
+      const matchStatus = statusFilter === 'All statuses' || status.toLowerCase() === statusFilter.toLowerCase();
+      const matchSeverity = severityFilter === 'All severities' || severity.toLowerCase() === severityFilter.toLowerCase();
       return matchSearch && matchType && matchStatus && matchSeverity;
     });
   }, [hazards, searchQuery, typeFilter, statusFilter, severityFilter]);
@@ -432,6 +449,13 @@ export function HazardMapContent() {
         }
         .animate-pulse-ring {
           animation: pulse-ring 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        }
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(-3deg); }
+          50% { transform: rotate(3deg); }
+        }
+        .animate-wiggle {
+          animation: wiggle 1.5s ease-in-out infinite;
         }
       `}</style>
       {/* Header Section */}
