@@ -118,6 +118,7 @@ export const getMapMarkers = async (req, res, next) => {
       include: [
         { model: HazardCategory, as: 'category', attributes: ['name'] },
         { model: ReportUpvote, as: 'upvotes', attributes: ['userId'] },
+        { model: ReportImage, as: 'images', attributes: ['imageUrl'] },
       ],
       where: {
         status: ['reported', 'in_progress', 'resolved'],
@@ -138,6 +139,7 @@ export const getMapMarkers = async (req, res, next) => {
         severity: r.severity.charAt(0).toUpperCase() + r.severity.slice(1), // capitalize
         upvotes: upvotesCount,
         time: r.createdAt,
+        imageUrl: r.images && r.images.length > 0 ? r.images[0].imageUrl : null,
       };
     });
 
