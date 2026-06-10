@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, Component } from 'react';
 import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,6 +8,7 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import UpvoteButton from '../../components/hazard-report/UpvoteButton';
 import CommentsSection from '../../components/hazard-report/CommentsSection';
 import HazardService from '../../services/hazard.service';
+import AuthService from '../../services/auth.service';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -78,12 +79,119 @@ const ScrollReveal = ({ children, delay = 0, className = "" }) => {
   );
 };
 
-export default function HazardMap() {
+// Custom Dropdown Component
+const CustomDropdown = ({ options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <div 
+      className="relative outline-none"
+      tabIndex={0}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setIsOpen(false);
+        }
+      }}
+    >
+      <div 
+        className={`flex items-center gap-2 py-2.5 px-4 bg-gray-50 border rounded-lg text-sm font-medium text-gray-700 cursor-pointer min-w-[140px] justify-between hover:bg-gray-100 transition-all ${
+          isOpen ? 'border-blue-600 ring-4 ring-blue-600/10' : 'border-gray-200'
+        }`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{value}</span>
+        <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+      {isOpen && (
+        <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[100] max-h-[240px] overflow-y-auto p-1.5 animate-fade-in-up">
+          {options.map(opt => (
+            <div 
+              key={opt}
+              className={`px-3.5 py-2 text-xs font-semibold cursor-pointer rounded-lg transition-colors flex items-center justify-between ${
+                value === opt ? 'bg-sky-50 text-sky-700' : 'text-gray-600 hover:bg-gray-50'
+              }`}
+              onClick={() => { onChange(opt); setIsOpen(false); }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const types = ['All types', 'Pothole', 'Debris', 'Flooding', 'Broken Light', 'Damaged Signage', 'Construction', 'Other'];
+const statuses = ['All statuses', 'Reported', 'In Progress', 'Resolved'];
+const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error in HazardMap:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '24px', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '12px', margin: '24px', fontFamily: 'sans-serif' }}>
+          <h2 style={{ color: '#991b1b', fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>Hazard Map Render Error:</h2>
+          <p style={{ color: '#7f1d1d', fontSize: '14px', marginBottom: '16px' }}>{this.state.error?.toString()}</p>
+          <pre style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', overflowX: 'auto', fontSize: '12px', color: '#334155', whiteSpace: 'pre-wrap' }}>
+            {this.state.error?.stack}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export function HazardMapContent() {
   const [hazards, setHazards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
   const [isHeatmap, setIsHeatmap] = useState(false);
   const [selectedHazard, setSelectedHazard] = useState(null);
+
+  const currentUser = AuthService.getCurrentUser();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('All types');
+  const [statusFilter, setStatusFilter] = useState('All statuses');
+  const [severityFilter, setSeverityFilter] = useState('All severities');
+
+  const filteredHazards = useMemo(() => {
+    return hazards.filter(hazard => {
+      if (!hazard) return false;
+      const lat = parseFloat(hazard.lat);
+      const lng = parseFloat(hazard.lng);
+      if (isNaN(lat) || isNaN(lng)) return false; // Filter out invalid coordinates
+
+      const title = hazard.title || '';
+      const location = hazard.location || '';
+      const id = hazard.id ? hazard.id.toString() : '';
+      const type = hazard.type || '';
+      const status = hazard.status || '';
+      const severity = hazard.severity || '';
+
+      const matchSearch = title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          id === searchQuery;
+      const matchType = typeFilter === 'All types' || type === typeFilter;
+      const matchStatus = statusFilter === 'All statuses' || status === statusFilter;
+      const matchSeverity = severityFilter === 'All severities' || severity === severityFilter;
+      return matchSearch && matchType && matchStatus && matchSeverity;
+    });
+  }, [hazards, searchQuery, typeFilter, statusFilter, severityFilter]);
 
   // Fetch real hazard data from backend
   useEffect(() => {
@@ -93,76 +201,80 @@ export default function HazardMap() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleOpenPanel = (hazard) => {
-    setSelectedHazard(hazard);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const handleOpenPanel = async (hazard) => {
+    // Show basic marker properties first with details loading flag
+    setSelectedHazard({
+      ...hazard,
+      loadingDetails: true,
+      description: '',
+      imageUrl: null,
+      hasUpvoted: false
+    });
+
+    try {
+      const data = await HazardService.getHazardById(hazard.id);
+      if (data && data.report) {
+        setSelectedHazard({
+          id: data.report.id,
+          title: data.report.title,
+          description: data.report.description,
+          lat: parseFloat(data.report.latitude),
+          lng: parseFloat(data.report.longitude),
+          location: data.report.locationName,
+          type: data.report.category?.name || 'Other',
+          status: data.report.status === 'in_progress' ? 'In Progress' : data.report.status === 'resolved' ? 'Resolved' : 'Reported',
+          severity: data.report.severity.charAt(0).toUpperCase() + data.report.severity.slice(1),
+          upvotes: data.report.upvotes?.length || 0,
+          time: new Date(data.report.createdAt).toLocaleDateString(),
+          imageUrl: data.report.images?.[0]?.imageUrl || null,
+          reporter: data.report.reporter,
+          hasUpvoted: currentUser ? data.report.upvotes?.some(up => up.userId === currentUser.id) : false,
+          loadingDetails: false
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load full hazard details:', err);
+      setSelectedHazard({
+        ...hazard,
+        loadingDetails: false
+      });
+    }
   };
 
   const handleClosePanel = () => {
     setSelectedHazard(null);
   };
 
-  // Custom Dropdown Component
-  const CustomDropdown = ({ options, value, onChange }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    
-    return (
-      <div 
-        className="relative outline-none"
-        tabIndex={0}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget)) {
-            setIsOpen(false);
-          }
-        }}
-      >
-        <div 
-          className={`flex items-center gap-2 py-2.5 px-4 bg-gray-50 border rounded-lg text-sm font-medium text-gray-700 cursor-pointer min-w-[140px] justify-between hover:bg-gray-100 transition-all ${
-            isOpen ? 'border-blue-600 ring-4 ring-blue-600/10' : 'border-gray-200'
-          }`}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span>{value}</span>
-          <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-        </div>
-        {isOpen && (
-          <div className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[100] max-h-[240px] overflow-y-auto p-1.5 animate-fade-in-up">
-            {options.map(opt => (
-              <div 
-                key={opt}
-                className={`px-3.5 py-2 text-xs font-semibold cursor-pointer rounded-lg transition-colors flex items-center justify-between ${
-                  value === opt ? 'bg-sky-50 text-sky-700' : 'text-gray-600 hover:bg-gray-50'
-                }`}
-                onClick={() => { onChange(opt); setIsOpen(false); }}
-              >
-                {opt}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+  const handleUpvoteToggleInList = (id, upvoted) => {
+    setHazards(prev => prev.map(h => {
+      if (h.id === id) {
+        return {
+          ...h,
+          upvotes: upvoted ? h.upvotes + 1 : Math.max(0, h.upvotes - 1),
+          hasUpvoted: upvoted
+        };
+      }
+      return h;
+    }));
+
+    if (selectedHazard && selectedHazard.id === id) {
+      setSelectedHazard(prev => ({
+        ...prev,
+        upvotes: upvoted ? prev.upvotes + 1 : Math.max(0, prev.upvotes - 1),
+        hasUpvoted: upvoted
+      }));
+    }
   };
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('All types');
-  const [statusFilter, setStatusFilter] = useState('All statuses');
-  const [severityFilter, setSeverityFilter] = useState('All severities');
 
-  const filteredHazards = useMemo(() => {
-    return hazards.filter(hazard => {
-      const matchSearch = hazard.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          hazard.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          hazard.id.toString() === searchQuery;
-      const matchType = typeFilter === 'All types' || hazard.type === typeFilter;
-      const matchStatus = statusFilter === 'All statuses' || hazard.status === statusFilter;
-      const matchSeverity = severityFilter === 'All severities' || hazard.severity === severityFilter;
-      return matchSearch && matchType && matchStatus && matchSeverity;
-    });
-  }, [hazards, searchQuery, typeFilter, statusFilter, severityFilter]);
 
-  const types = ['All types', 'Pothole', 'Debris', 'Flooding', 'Broken Light', 'Damaged Signage', 'Construction', 'Other'];
-  const statuses = ['All statuses', 'Reported', 'In Progress', 'Resolved'];
-  const severities = ['All severities', 'Critical', 'High', 'Medium', 'Low'];
 
   return (
     <div className="font-sans bg-white min-h-screen flex flex-col selection:bg-orange-100 selection:text-orange-950">
@@ -267,7 +379,18 @@ export default function HazardMap() {
                       </CircleMarker>
                     ) : (
                       <Marker key={hazard.id} position={[hazard.lat, hazard.lng]}>
-                        <Popup>{hazard.title}</Popup>
+                        <Popup>
+                          <div className="p-1 font-sans min-w-[150px]">
+                            <strong className="text-slate-900 block mb-1 text-sm">{hazard.title}</strong>
+                            <p className="text-xs text-slate-500 m-0 mb-2">{hazard.location}</p>
+                            <button
+                              onClick={() => handleOpenPanel(hazard)}
+                              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-lg text-xs font-bold border-none cursor-pointer text-center block transition-colors"
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </Popup>
                       </Marker>
                     )
                   ))}
@@ -302,7 +425,7 @@ export default function HazardMap() {
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-slate-50 flex justify-between items-center relative z-10">
-                      <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} />
+                      <UpvoteButton hazardId={hazard.id} initialUpvotes={hazard.upvotes} initialHasUpvoted={hazard.hasUpvoted} onUpvoteToggle={handleUpvoteToggleInList} />
                       <button
                         onClick={() => handleOpenPanel(hazard)}
                         className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-0.5 cursor-pointer bg-transparent border-none"
@@ -356,53 +479,94 @@ export default function HazardMap() {
 
             {/* Panel Body */}
             <div className="flex-grow px-8 py-8 space-y-8">
-
-              {/* Cover Photo */}
-              <div className="h-56 w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-100">
-                <MapPin size={36} className="text-slate-300 mb-2" />
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Coordinate View</span>
-              </div>
-
-              {/* Metadata */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Location</span>
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <MapPin size={14} className="text-blue-500 shrink-0" />
-                    <span className="truncate">{selectedHazard.location}</span>
-                  </div>
+              {selectedHazard.loadingDetails ? (
+                <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                  <Loader2 size={36} className="animate-spin text-blue-500 mb-3" />
+                  <span className="text-sm font-semibold">Loading details from coordinates...</span>
                 </div>
-                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Reported</span>
-                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <Clock size={14} className="text-blue-500 shrink-0" />
-                    {selectedHazard.time}
+              ) : (
+                <>
+                  {/* Cover Photo */}
+                  {selectedHazard.imageUrl ? (
+                    <div className="h-64 w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                      <img src={selectedHazard.imageUrl} alt={selectedHazard.title} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="h-56 w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-400 border border-slate-100">
+                      <MapPin size={36} className="text-slate-300 mb-2" />
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Coordinate View</span>
+                    </div>
+                  )}
+
+                  {/* Metadata */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Location</span>
+                      <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                        <MapPin size={14} className="text-blue-500 shrink-0" />
+                        <span className="truncate">{selectedHazard.location}</span>
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Reported</span>
+                      <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                        <Clock size={14} className="text-blue-500 shrink-0" />
+                        {selectedHazard.time}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <h3 className="text-base font-black text-slate-900 uppercase tracking-wide">Description</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  {selectedHazard.description || "No detailed description was provided by the reporter. Please exercise extreme caution when approaching this zone."}
-                </p>
-              </div>
+                  {/* Reporter details */}
+                  {selectedHazard.reporter && (
+                    <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                        {selectedHazard.reporter.avatar ? (
+                          <img src={selectedHazard.reporter.avatar} alt={selectedHazard.reporter.name || 'Reporter'} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-bold text-slate-500 text-sm bg-blue-100 text-blue-700 uppercase">
+                            {selectedHazard.reporter.name ? selectedHazard.reporter.name.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-0.5">Reporter</span>
+                        <span className="text-sm font-bold text-slate-800">{selectedHazard.reporter.name || 'Anonymous User'}</span>
+                      </div>
+                    </div>
+                  )}
 
-              {/* Upvote Section */}
-              <div className="flex items-center gap-4 py-6 border-y border-gray-100">
-                <UpvoteButton hazardId={selectedHazard.id} initialUpvotes={selectedHazard.upvotes} />
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Support this report to help prioritize repairs
-                </span>
-              </div>
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <h3 className="text-base font-black text-slate-900 uppercase tracking-wide">Description</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      {selectedHazard.description || "No detailed description was provided by the reporter. Please exercise extreme caution when approaching this zone."}
+                    </p>
+                  </div>
 
-              {/* Comments Section */}
-              <CommentsSection hazardId={selectedHazard.id} />
+                  {/* Upvote Section */}
+                  <div className="flex items-center gap-4 py-6 border-y border-gray-100">
+                    <UpvoteButton hazardId={selectedHazard.id} initialUpvotes={selectedHazard.upvotes} initialHasUpvoted={selectedHazard.hasUpvoted} onUpvoteToggle={handleUpvoteToggleInList} />
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      Support this report to help prioritize repairs
+                    </span>
+                  </div>
+
+                  {/* Comments Section */}
+                  <CommentsSection hazardId={selectedHazard.id} />
+                </>
+              )}
             </div>
           </div>
         </>
       )}
     </div>
+  );
+}
+
+export default function HazardMap() {
+  return (
+    <ErrorBoundary>
+      <HazardMapContent />
+    </ErrorBoundary>
   );
 }
