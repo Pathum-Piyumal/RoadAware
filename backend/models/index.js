@@ -11,6 +11,7 @@ import Session from './Session.js';
 import Notification from './Notification.js';
 import Comment from './Comment.js';
 import Contact from './Contact.js';
+import ReportUpdate from './ReportUpdate.js';
 
 // Setup Associations
 
@@ -30,6 +31,12 @@ HazardReport.belongsTo(HazardCategory, { foreignKey: 'categoryId', as: 'category
 HazardReport.hasMany(ReportImage, { foreignKey: 'reportId', as: 'images', onDelete: 'CASCADE' });
 HazardReport.hasMany(ReportUpvote, { foreignKey: 'reportId', as: 'upvotes', onDelete: 'CASCADE' });
 HazardReport.hasMany(Comment, { foreignKey: 'reportId', as: 'comments', onDelete: 'CASCADE' });
+HazardReport.hasMany(ReportUpdate, { foreignKey: 'reportId', as: 'updates', onDelete: 'CASCADE' });
+
+// ReportUpdate associations
+ReportUpdate.belongsTo(HazardReport, { foreignKey: 'reportId', as: 'report' });
+ReportUpdate.belongsTo(User, { foreignKey: 'updatedBy', as: 'updater' });
+User.hasMany(ReportUpdate, { foreignKey: 'updatedBy', as: 'statusUpdates' });
 
 // Comment associations
 Comment.belongsTo(HazardReport, { foreignKey: 'reportId', as: 'report' });
@@ -66,4 +73,5 @@ export {
   Notification,
   Comment,
   Contact,
+  ReportUpdate,
 };

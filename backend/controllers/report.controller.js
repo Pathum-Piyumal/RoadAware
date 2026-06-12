@@ -1,4 +1,4 @@
-import { HazardReport, HazardCategory, ReportImage, ReportUpvote, User, Activity } from '../models/index.js';
+import { HazardReport, HazardCategory, ReportImage, ReportUpvote, User, Activity, ReportUpdate } from '../models/index.js';
 import { uploadBufferToCloudinary } from '../config/cloudinary.js';
 import { Op } from 'sequelize';
 
@@ -48,6 +48,14 @@ export const createReport = async (req, res, next) => {
       severity,
     });
 
+    // ── Status Tracking: seed the initial 'reported' timeline entry ────────
+    await ReportUpdate.create({
+      reportId: report.id,
+      status: 'reported',
+      comment: 'Report submitted by citizen.',
+      updatedBy: userId,
+    });
+
     res.status(201).json({
       success: true,
       message: 'Hazard report submitted successfully.',
@@ -92,6 +100,15 @@ export const getReportById = async (req, res, next) => {
         { model: User, as: 'reporter', attributes: ['id', 'name', 'email', 'avatar'] },
         { model: ReportImage, as: 'images', attributes: ['id', 'imageUrl'] },
         { model: ReportUpvote, as: 'upvotes', attributes: ['id', 'userId'] },
+        {
+          model: ReportUpdate,
+          as: 'updates',
+          attributes: ['id', 'status', 'comment', 'updatedBy', 'createdAt'],
+          include: [
+            { model: User, as: 'updater', attributes: ['id', 'name', 'avatar'] },
+          ],
+          order: [['createdAt', 'ASC']],
+        },
       ],
     });
 
