@@ -8,6 +8,7 @@ import {
   Setting,
   Activity,
   sequelize,
+  ReportUpdate,
 } from '../models/index.js';
 
 export const getAdminReports = async (req, res, next) => {
@@ -131,6 +132,15 @@ export const updateReportStatus = async (req, res, next) => {
     const oldStatus = report.status;
     report.status = status.toLowerCase().replace(' ', '_');
     await report.save();
+
+    // ── Status Tracking: log a timeline entry ──────────────────────────
+    await ReportUpdate.create({
+      reportId: cleanId,
+      status: report.status,
+      comment: req.body.comment ||
+        `Status updated from "${oldStatus}" to "${report.status}".`,
+      updatedBy: req.user.id,
+    });
 
     // Log Activity
     await Activity.create({
