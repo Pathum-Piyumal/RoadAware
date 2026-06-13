@@ -46,6 +46,11 @@ const Login = () => {
       <p className="text-gray-400 text-sm mt-8 text-center">
         Don't have an account? <Link to="/register" className="text-white font-bold hover:underline">Create an account</Link>
       </p>
+
+      <div className="h-px bg-white/10 my-6"></div>
+      <p className="text-gray-500 text-sm text-center">
+        System User? <Link to="/admin/login" className="text-cyan-400 font-bold hover:underline">Sign in as Administrator</Link>
+      </p>
     </AuthLayout>
   );
 };

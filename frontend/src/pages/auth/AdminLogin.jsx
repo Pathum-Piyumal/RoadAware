@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Lock, ArrowRight, Map, BarChart3 } from 'lucide-react';
 import AuthService from '../../services/auth.service';
 import AuthLayout from '../../components/layout/AuthLayout';
@@ -98,6 +98,11 @@ const AdminLogin = () => {
           {loading ? 'Authorizing...' : 'Access Console'} {!loading && <ArrowRight size={18} />}
         </button>
       </form>
+
+      <div className="h-px bg-white/10 my-6"></div>
+      <p className="text-slate-400 text-sm text-center">
+        Are you a citizen? <Link to="/login" className="text-blue-400 font-bold hover:underline">Sign in as Citizen</Link>
+      </p>
     </AuthLayout>
   );
 };
