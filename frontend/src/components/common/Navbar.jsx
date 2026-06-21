@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import AuthService from '../../services/auth.service';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuthModal } from '../../context/AuthModalContext';
 import { Sun, Moon, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
@@ -11,6 +12,7 @@ const Navbar = () => {
   const isHome = location.pathname === '/';
   const currentUser = AuthService.getCurrentUser();
   const { isDarkMode, toggleTheme } = useTheme();
+  const { openLogin, openRegister } = useAuthModal();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -115,11 +117,21 @@ const Navbar = () => {
             }}>Logout</button>
           ) : (
             <>
-              <Link to="/login" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'none' }}>Login</Link>
-              <Link to="/register" style={{
-                background: '#fff', color: '#111', padding: '9px 22px', borderRadius: 999,
-                fontSize: 13, fontWeight: 700, textDecoration: 'none', letterSpacing: '-0.2px',
-              }}>Register</Link>
+              <button 
+                onClick={openLogin}
+                style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer', outline: 'none' }}
+              >
+                Login
+              </button>
+              <button 
+                onClick={openRegister}
+                style={{
+                  background: '#fff', color: '#111', padding: '9px 22px', borderRadius: 999,
+                  fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px', outline: 'none'
+                }}
+              >
+                Register
+              </button>
             </>
           )}
         </div>
@@ -195,27 +207,25 @@ const Navbar = () => {
               </button>
             ) : (
               <>
-                <Link 
-                  to="/login" 
-                  onClick={closeMobileMenu}
+                <button 
+                  onClick={() => { closeMobileMenu(); openLogin(); }}
                   style={{ 
                     fontSize: 14, fontWeight: 600, color: '#fff', background: 'rgba(255,255,255,0.05)', 
                     border: '1px solid rgba(255,255,255,0.1)', padding: '12px 22px', borderRadius: 16,
-                    cursor: 'pointer', textDecoration: 'none', textAlign: 'center' 
+                    cursor: 'pointer', textAlign: 'center', outline: 'none' 
                   }}
                 >
                   Login
-                </Link>
-                <Link 
-                  to="/register" 
-                  onClick={closeMobileMenu}
+                </button>
+                <button 
+                  onClick={() => { closeMobileMenu(); openRegister(); }}
                   style={{
                     background: '#fff', color: '#111', padding: '12px 22px', borderRadius: 16,
-                    fontSize: 14, fontWeight: 700, textDecoration: 'none', textAlign: 'center'
+                    fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', textAlign: 'center', outline: 'none'
                   }}
                 >
                   Register
-                </Link>
+                </button>
               </>
             )}
           </div>

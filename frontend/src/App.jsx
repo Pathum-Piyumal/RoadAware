@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'r
 import { Toaster } from 'react-hot-toast';
 import AuthService from './services/auth.service';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthModalProvider, useAuthModal } from './context/AuthModalContext';
+import AuthModal from './components/common/AuthModal';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -17,8 +19,9 @@ function ScrollToTop() {
 
 const ProtectedRoute = ({ children }) => {
   const currentUser = AuthService.getCurrentUser();
+  const location = useLocation();
   if (!currentUser) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return children;
 };
@@ -76,11 +79,25 @@ import Footer from './components/common/Footer';
 
 function AppContent() {
   const location = useLocation();
+  const { openLogin, openRegister, openForgotPassword, openVerifyCode, openResetPassword } = useAuthModal();
 
-  // Hide navbar and footer on admin and auth pages
+  // Hide navbar and footer on admin pages
   const isAdminPage = location.pathname.startsWith('/admin');
-  const isAuthPage = ['/login', '/register', '/forgot-password', '/verify-code', '/reset-password'].includes(location.pathname);
-  const hideNavAndFooter = isAdminPage || isAuthPage;
+  const hideNavAndFooter = isAdminPage;
+
+  useEffect(() => {
+    if (location.pathname === '/login') {
+      openLogin();
+    } else if (location.pathname === '/register') {
+      openRegister();
+    } else if (location.pathname === '/forgot-password') {
+      openForgotPassword();
+    } else if (location.pathname === '/verify-code') {
+      openVerifyCode();
+    } else if (location.pathname === '/reset-password') {
+      openResetPassword();
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-slate-100 font-sans flex flex-col transition-colors duration-300">
@@ -108,11 +125,11 @@ function AppContent() {
           <Route path="/map" element={<ProtectedRoute><HazardMap /></ProtectedRoute>} />
 
           {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-code" element={<VerifyCode />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/login" element={<Home />} />
+          <Route path="/register" element={<Home />} />
+          <Route path="/forgot-password" element={<Home />} />
+          <Route path="/verify-code" element={<Home />} />
+          <Route path="/reset-password" element={<Home />} />
 
           {/* Citizen Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><CitizenDashboard /></ProtectedRoute>} />
@@ -141,6 +158,7 @@ function AppContent() {
       {!hideNavAndFooter && <Footer />}
 
       <Toaster position="top-right" />
+      <AuthModal />
     </div>
   );
 }
@@ -148,10 +166,12 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
-        <ScrollToTop />
-        <AppContent />
-      </Router>
+      <AuthModalProvider>
+        <Router>
+          <ScrollToTop />
+          <AppContent />
+        </Router>
+      </AuthModalProvider>
     </ThemeProvider>
   );
 }
