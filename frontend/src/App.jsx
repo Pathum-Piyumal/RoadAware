@@ -26,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
 const AdminRoute = ({ children }) => {
   const currentAdmin = AuthService.getCurrentAdmin();
   if (!currentAdmin) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
   return children;
 };
@@ -41,8 +41,6 @@ import Categories from './pages/admin/Categories';
 import MapMonitoring from './pages/admin/MapMonitoring';
 import Settings from './pages/admin/Settings';
 import AdminProfile from './pages/admin/Profile';
-import AdminLogin from './pages/auth/AdminLogin';
-
 // Public Pages
 import Home from './pages/public/Home';
 import HazardDetails from './pages/public/HazardDetails';
@@ -122,8 +120,7 @@ function AppContent() {
           <Route path="/report-hazard" element={<ProtectedRoute><ReportHazard /></ProtectedRoute>} />
           <Route path="/my-reports" element={<ProtectedRoute><MyReports /></ProtectedRoute>} />
 
-          {/* Admin Login */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

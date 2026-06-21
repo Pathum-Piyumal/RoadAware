@@ -4,11 +4,25 @@ const AuthService = {
   login: async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
     if (response.data.token) {
-      localStorage.removeItem('adminUser');
-      sessionStorage.removeItem('adminUser');
-      sessionStorage.removeItem('token');
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (response.data.user && response.data.user.role === 'admin') {
+        // Clear citizen session
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminUser');
+        
+        // Save admin session in sessionStorage
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('adminUser', JSON.stringify(response.data.user));
+      } else {
+        // Clear admin session
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('adminUser');
+        localStorage.removeItem('adminUser');
+        
+        // Save citizen session in localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
     }
     return response.data;
   },

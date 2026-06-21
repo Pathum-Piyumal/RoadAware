@@ -12,7 +12,7 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
 
   const handleSignOut = () => {
     AuthService.adminLogout();
-    navigate('/admin/login');
+    navigate('/login');
   };
 
   return (

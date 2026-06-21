@@ -27,8 +27,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      const isAdmin = localStorage.getItem('adminUser') !== null || sessionStorage.getItem('adminUser') !== null;
-      
       // Purge all authentication keys on unauthorized access
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -36,11 +34,7 @@ api.interceptors.response.use(
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('adminUser');
       
-      if (isAdmin) {
-        window.location.href = '/admin/login';
-      } else {
-        window.location.href = '/login';
-      }
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

@@ -95,7 +95,7 @@ const FEATURE_DATA = {
       "Review the prioritised report queue curated by community upvotes.",
       "Assign internal repair assets and toggle statuses to update the public."
     ],
-    ctaPath: "/admin/login"
+    ctaPath: "/login"
   }
 };
 
