@@ -46,6 +46,77 @@ const AuthModal = () => {
     };
   }, [isAuthModalOpen]);
 
+  const handleGoogleLogin = async (response) => {
+    const credential = response.credential;
+    setLoading(true);
+    try {
+      await AuthService.googleLogin(credential);
+      toast.success('Logged in successfully!');
+      closeAuthModal();
+      const redirectPath = location.state?.from?.pathname || '/';
+      const authPaths = ['/login', '/register', '/forgot-password', '/verify-code', '/reset-password'];
+      if (authPaths.includes(location.pathname)) {
+        navigate(redirectPath);
+      } else {
+        window.location.reload();
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Google Login failed. Please try again.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initializeGoogleSignIn = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('VITE_GOOGLE_CLIENT_ID is not configured.');
+      return;
+    }
+
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleLogin,
+      });
+
+      const containerId = authModalType === 'login' ? 'google-login-btn' : 'google-register-btn';
+      const container = document.getElementById(containerId);
+      if (container) {
+        container.innerHTML = '';
+        window.google.accounts.id.renderButton(container, {
+          theme: 'outline',
+          size: 'large',
+          width: container.parentElement?.clientWidth || 320,
+          text: authModalType === 'login' ? 'signin_with' : 'signup_with',
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthModalOpen && (authModalType === 'login' || authModalType === 'register')) {
+      if (!document.getElementById('google-gsi-client')) {
+        const script = document.createElement('script');
+        script.id = 'google-gsi-client';
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          initializeGoogleSignIn();
+        };
+        document.head.appendChild(script);
+      } else {
+        // Defer slightly to ensure React has mounted the button container divs
+        const timer = setTimeout(() => {
+          initializeGoogleSignIn();
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isAuthModalOpen, authModalType]);
+
   if (!isAuthModalOpen) return null;
 
   const handleLogin = async (e) => {
@@ -290,26 +361,9 @@ const AuthModal = () => {
                   <div className="flex-1 h-px bg-white/10"></div>
                 </div>
 
-                <button 
-                  type="button"
-                  onClick={() => {
-                    localStorage.setItem('user', JSON.stringify({ name: 'Demo User', email: 'demo@roadaware.com', role: 'citizen' }));
-                    localStorage.setItem('token', 'mock_test_token_2026');
-                    toast.success('Logged in successfully (Google Mock)!');
-                    closeAuthModal();
-                    const redirectPath = location.state?.from?.pathname || '/';
-                    const authPaths = ['/login', '/register', '/forgot-password', '/verify-code', '/reset-password'];
-                    if (authPaths.includes(location.pathname)) {
-                      navigate(redirectPath);
-                    } else {
-                      window.location.reload();
-                    }
-                  }}
-                  className="w-full bg-white text-slate-900 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-slate-100 transition-colors cursor-pointer border-none"
-                >
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="google" />
-                  Continue with Google
-                </button>
+                <div className="flex justify-center w-full min-h-[44px]">
+                  <div id="google-login-btn" className="w-full max-w-[320px] flex justify-center"></div>
+                </div>
 
                 <p className="text-slate-400 text-sm text-center mt-4 m-0">
                   Don't have an account?{' '}
@@ -398,26 +452,9 @@ const AuthModal = () => {
                   <div className="flex-1 h-px bg-white/10"></div>
                 </div>
 
-                <button 
-                  type="button"
-                  onClick={() => {
-                    localStorage.setItem('user', JSON.stringify({ name: 'Demo User', email: 'demo@roadaware.com', role: 'citizen' }));
-                    localStorage.setItem('token', 'mock_test_token_2026');
-                    toast.success('Logged in successfully (Google Mock)!');
-                    closeAuthModal();
-                    const redirectPath = location.state?.from?.pathname || '/';
-                    const authPaths = ['/login', '/register', '/forgot-password', '/verify-code', '/reset-password'];
-                    if (authPaths.includes(location.pathname)) {
-                      navigate(redirectPath);
-                    } else {
-                      window.location.reload();
-                    }
-                  }}
-                  className="w-full bg-white text-slate-900 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-slate-100 transition-colors cursor-pointer border-none"
-                >
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="google" />
-                  Continue with Google
-                </button>
+                <div className="flex justify-center w-full min-h-[44px]">
+                  <div id="google-register-btn" className="w-full max-w-[320px] flex justify-center"></div>
+                </div>
 
                 <p className="text-slate-400 text-sm text-center mt-4 m-0">
                   Already have an account?{' '}

@@ -11,6 +11,7 @@ import {
   forgotPassword,
   verifyResetCode,
   resetPassword,
+  googleLogin,
 } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { upload } from '../middleware/upload.middleware.js';
@@ -36,6 +37,9 @@ router.post('/login', loginValidation, validateRequest, login);
 
 // Admin-specific Login
 router.post('/admin/login', loginValidation, validateRequest, adminLogin);
+
+// Google OAuth Login
+router.post('/google', googleLogin);
 
 // Password Reset Flow
 router.post('/forgot-password', forgotPasswordValidation, validateRequest, forgotPassword);

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { OAuth2Client } from 'google-auth-library';
 import { User, Session, Activity } from '../models/index.js';
 import { uploadBufferToCloudinary } from '../config/cloudinary.js';
 
@@ -523,5 +524,117 @@ export const uploadAvatar = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+// ─────────────────────────────────────────────
+//  MODULE 1L: Google OAuth2 Login / Registration
+//  POST /api/auth/google
+// ─────────────────────────────────────────────
+let googleClient;
+const getGoogleClient = () => {
+  if (!googleClient) {
+    const clientId = process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('⚠️ GOOGLE_CLIENT_ID is not configured in environment variables.');
+    }
+    googleClient = new OAuth2Client(clientId);
+  }
+  return googleClient;
+};
+
+export const googleLogin = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google ID token is required.',
+      });
+    }
+
+    const client = getGoogleClient();
+    const clientId = process.env.VITE_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+    
+    // Verify Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: clientId,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture: avatar } = payload;
+
+    // 1. Find user by googleId
+    let user = await User.findOne({ where: { googleId } });
+
+    // 2. If not found by googleId, check by email to link account (e.g. they registered manually before)
+    if (!user) {
+      user = await User.findOne({ where: { email } });
+      if (user) {
+        user.googleId = googleId;
+        if (!user.avatar && avatar) {
+          user.avatar = avatar;
+        }
+        await user.save();
+      }
+    }
+
+    // 3. If still not found, register new user
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        role: 'citizen',
+        status: 'active',
+        avatar,
+        password: null,
+      });
+
+      // Log registration activity
+      await Activity.create({
+        userId: user.id,
+        action: 'Account Registered',
+        details: `New citizen account registered via Google with email ${email}.`,
+      });
+    }
+
+    // 4. Check if suspended
+    if (user.status === 'suspended') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact support.',
+      });
+    }
+
+    // Generate JWT token
+    const appToken = generateToken(user.id);
+
+    // Log login activity
+    await Activity.create({
+      userId: user.id,
+      action: 'Login',
+      details: `${user.name} logged into RoadAware via Google.`,
+    });
+
+    res.json({
+      success: true,
+      token: appToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error('Google Auth Error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Invalid Google ID token.',
+    });
   }
 };

@@ -31,6 +31,18 @@ const startServer = async () => {
       );
       console.log('✔ Migration: added resetCodeExpires column to users table.');
     }
+    if (!usersTableDesc.googleId) {
+      await sequelize.query(
+        'ALTER TABLE `users` ADD COLUMN `googleId` VARCHAR(255) NULL;'
+      );
+      console.log('✔ Migration: added googleId column to users table.');
+    }
+    if (usersTableDesc.password && usersTableDesc.password.allowNull === false) {
+      await sequelize.query(
+        'ALTER TABLE `users` MODIFY COLUMN `password` VARCHAR(255) NULL;'
+      );
+      console.log('✔ Migration: altered password column to allow NULL values.');
+    }
 
     // Create report_updates table if it does not exist
     await sequelize.query(`

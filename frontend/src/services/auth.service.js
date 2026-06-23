@@ -75,6 +75,21 @@ const AuthService = {
     return response.data;
   },
 
+  googleLogin: async (token) => {
+    const response = await api.post('/auth/google', { token });
+    if (response.data.token) {
+      // Clear admin session
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('adminUser');
+      localStorage.removeItem('adminUser');
+      
+      // Save citizen session
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  },
+
   getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
