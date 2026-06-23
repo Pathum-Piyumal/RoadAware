@@ -14,6 +14,7 @@ const Navbar = () => {
   const { isDarkMode, toggleTheme } = useTheme();
   const { openLogin, openRegister } = useAuthModal();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     AuthService.logout();
@@ -111,10 +112,62 @@ const Navbar = () => {
           </button>
 
           {currentUser ? (
-            <button onClick={handleLogout} style={{
-              background: '#f97316', color: '#fff', padding: '9px 22px', borderRadius: 999,
-              fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px',
-            }}>Logout</button>
+            <div className="relative">
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full hover:bg-white/5 transition-all cursor-pointer border border-white/10 text-white select-none focus:outline-none"
+              >
+                {currentUser.avatar ? (
+                  <img 
+                    src={currentUser.avatar} 
+                    alt={currentUser.name} 
+                    className="w-6 h-6 rounded-full object-cover border border-white/20"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs">
+                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+                <span className="text-sm font-semibold max-w-[120px] truncate">{currentUser.name}</span>
+                <span className="text-[10px] text-white/50" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform 0.2s' }}>▼</span>
+              </button>
+
+              {isDropdownOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40 bg-transparent cursor-default" 
+                    onClick={() => setIsDropdownOpen(false)}
+                  ></div>
+
+                  <div className="absolute right-0 mt-2.5 w-48 bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl py-2.5 z-50">
+                    <div className="px-4 py-2 border-b border-white/5">
+                      <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider m-0">Signed in as</p>
+                      <p className="text-sm font-bold text-white m-0 truncate mt-0.5">{currentUser.name}</p>
+                    </div>
+
+                    <Link 
+                      to="/dashboard" 
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="flex items-center px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 no-underline transition-colors mt-1"
+                    >
+                      Dashboard
+                    </Link>
+
+                    <div className="h-px bg-white/5 my-1.5"></div>
+
+                    <button 
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-orange-500 hover:text-orange-400 hover:bg-white/5 border-none bg-transparent cursor-pointer transition-colors font-semibold"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
             <>
               <button 
@@ -196,15 +249,46 @@ const Navbar = () => {
 
           <div className="flex flex-col gap-3 pt-2">
             {currentUser ? (
-              <button 
-                onClick={handleLogout} 
-                style={{
-                  background: '#f97316', color: '#fff', padding: '12px 22px', borderRadius: 16,
-                  fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', textAlign: 'center', width: '100%'
-                }}
-              >
-                Logout
-              </button>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3 px-2">
+                  {currentUser.avatar ? (
+                    <img 
+                      src={currentUser.avatar} 
+                      alt={currentUser.name} 
+                      className="w-10 h-10 rounded-full object-cover border border-white/20"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-lg">
+                      {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                  )}
+                  <div className="flex flex-col">
+                    <span className="text-white font-semibold">{currentUser.name}</span>
+                    <span className="text-white/40 text-xs truncate max-w-[180px]">{currentUser.email}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2.5 px-2">
+                  <Link 
+                    to="/dashboard" 
+                    onClick={closeMobileMenu}
+                    className="text-white/80 hover:text-white text-sm font-semibold no-underline"
+                  >
+                    Dashboard
+                  </Link>
+                </div>
+
+                <button 
+                  onClick={handleLogout} 
+                  style={{
+                    background: '#f97316', color: '#fff', padding: '12px 22px', borderRadius: 16,
+                    fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', textAlign: 'center', width: '100%',
+                    marginTop: 4
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <>
                 <button 
