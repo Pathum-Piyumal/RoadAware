@@ -173,7 +173,7 @@ const AuthModal = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/auth/forgot-password', { email });
+      await AuthService.forgotPassword(email);
       toast.success('Verification code sent to your email.');
       setAuthModalType('verifyCode');
     } catch (error) {
@@ -188,7 +188,7 @@ const AuthModal = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/auth/verify-code', { email, code });
+      await AuthService.verifyResetCode(email, code);
       toast.success('Verification successful! Set your new password.');
       setAuthModalType('resetPassword');
     } catch (error) {
@@ -203,7 +203,7 @@ const AuthModal = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/auth/reset-password', { email, code, newPassword });
+      await AuthService.resetPassword(email, code, newPassword);
       toast.success('Password reset successful! Please log in.');
       setAuthModalType('login');
     } catch (error) {

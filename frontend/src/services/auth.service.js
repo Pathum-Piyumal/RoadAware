@@ -75,6 +75,16 @@ const AuthService = {
     return response.data;
   },
 
+  verifyResetCode: async (email, code) => {
+    const response = await api.post('/auth/verify-code', { email, code });
+    return response.data;
+  },
+
+  resetPassword: async (email, code, newPassword) => {
+    const response = await api.post('/auth/reset-password', { email, code, newPassword });
+    return response.data;
+  },
+
   googleLogin: async (token) => {
     const response = await api.post('/auth/google', { token });
     if (response.data.token) {
