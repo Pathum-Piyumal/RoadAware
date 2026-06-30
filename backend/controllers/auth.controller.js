@@ -31,7 +31,7 @@ const sendResetEmail = async (toEmail, code) => {
     return;
   }
 
-  const transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransporter({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT) || 587,
     secure: false,
