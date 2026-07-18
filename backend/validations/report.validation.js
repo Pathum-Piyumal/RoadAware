@@ -11,5 +11,8 @@ export const reportCreateValidation = [
 ];
 
 export const reportStatusUpdateValidation = [
-  body('status').isIn(['reported', 'in_progress', 'resolved', 'rejected']).withMessage('Invalid report status.'),
+  body('status')
+    .customSanitizer((val) => (typeof val === 'string' ? val.toLowerCase().replace(' ', '_') : val))
+    .isIn(['reported', 'in_progress', 'resolved', 'rejected'])
+    .withMessage('Invalid report status.'),
 ];
