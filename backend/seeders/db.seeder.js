@@ -79,6 +79,28 @@ export const seedDatabase = async () => {
     }
     console.log('✔ Hazard categories verified/seeded.');
 
+    // Check if database is already populated with citizen users
+    const citizenCount = await User.count({ where: { role: 'citizen' } });
+    if (citizenCount > 0) {
+      console.log('✔ Database already contains citizen users. Skipping clear and re-seed to preserve user data.');
+      
+      // Ensure admin user exists and is up-to-date
+      const adminEmail = 'admin@roadaware.com';
+      let adminUser = await User.findOne({ where: { email: adminEmail } });
+      if (!adminUser) {
+        const hashedPassword = await bcrypt.hash('AdminSecure123!', 10);
+        await User.create({
+          name: 'Admin User',
+          email: adminEmail,
+          password: hashedPassword,
+          role: 'admin',
+          status: 'active',
+        });
+        console.log(`✔ Admin user successfully seeded (${adminEmail} / AdminSecure123!)`);
+      }
+      return;
+    }
+
     // 2. Clear old data to avoid duplication and constraint violations
     console.log('⌛ Cleaning old report, user, and upvote records...');
     await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
