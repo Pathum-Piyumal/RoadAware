@@ -240,11 +240,10 @@ export const forgotPassword = async (req, res, next) => {
     const { email } = req.body;
 
     const user = await User.findOne({ where: { email } });
-    // Always respond with success to prevent email enumeration attacks
     if (!user) {
-      return res.json({
-        success: true,
-        message: 'If an account exists with this email, a reset code has been sent.',
+      return res.status(404).json({
+        success: false,
+        message: 'This email address is not registered.',
       });
     }
 

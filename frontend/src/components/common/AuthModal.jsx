@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Mail, Lock, User, Eye, EyeOff, ArrowRight, Shield, Key } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, ArrowRight, Shield, Key, AlertCircle } from 'lucide-react';
 import { useAuthModal } from '../../context/AuthModalContext';
 import AuthService from '../../services/auth.service';
 import api from '../../services/api';
@@ -20,9 +20,11 @@ const AuthModal = () => {
   
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Clear fields on open / view transition
   useEffect(() => {
+    setErrorMsg('');
     // Only keep email when transitioning to verifyCode / resetPassword, otherwise clear
     if (authModalType !== 'verifyCode' && authModalType !== 'resetPassword') {
       setEmail('');
@@ -174,12 +176,14 @@ const AuthModal = () => {
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg('');
     try {
       await AuthService.forgotPassword(email);
       toast.success('Verification code sent to your email.');
       setAuthModalType('verifyCode');
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to send code. Verify your email.';
+      setErrorMsg(message);
       toast.error(message);
     } finally {
       setLoading(false);
@@ -473,6 +477,12 @@ const AuthModal = () => {
 
             {authModalType === 'forgotPassword' && (
               <form onSubmit={handleForgotPasswordSubmit} className="flex flex-col gap-4">
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium flex items-center gap-2">
+                    <AlertCircle size={16} className="shrink-0 text-red-400" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-slate-400 text-xs font-bold uppercase tracking-wider">Email Address</label>
                   <div className="relative">
@@ -484,7 +494,10 @@ const AuthModal = () => {
                       placeholder="you@example.com"
                       className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all box-border"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (errorMsg) setErrorMsg('');
+                      }}
                       required
                     />
                   </div>
