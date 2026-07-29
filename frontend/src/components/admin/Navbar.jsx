@@ -1,18 +1,31 @@
 import { Menu, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, Fragment } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Moon, Sun, User, LogOut, Settings } from 'lucide-react';
 import logoImg from '../../assets/logo.png';
 import AuthService from '../../services/auth.service';
 
 const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const adminUser = AuthService.getCurrentAdmin() || {};
   const adminName = adminUser.name || 'Admin User';
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSignOut = () => {
     AuthService.adminLogout();
     navigate('/login');
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      if (location.pathname.startsWith('/admin/users')) {
+        navigate(`/admin/users?search=${encodeURIComponent(searchQuery.trim())}`);
+      } else {
+        navigate(`/admin/reports?search=${encodeURIComponent(searchQuery.trim())}`);
+      }
+    }
   };
 
   return (
@@ -35,16 +48,18 @@ const Navbar = ({ toggleSidebar, isDarkMode, toggleTheme }) => {
           </span>
         </Link>
 
-        <div className="max-w-md w-full relative hidden sm:block ml-[18rem]">
+        <form onSubmit={handleSearchSubmit} className="max-w-md w-full relative hidden sm:block ml-[18rem]">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-admin-text-muted">
             <Search size={16} />
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-admin-border rounded-full leading-5 bg-admin-input-bg/50 backdrop-blur-sm text-admin-text text-sm box-border placeholder:text-admin-text-muted focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-300"
             placeholder="Search reports, users..."
           />
-        </div>
+        </form>
       </div>
 
       {/* Right side */}

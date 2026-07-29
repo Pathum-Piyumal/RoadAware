@@ -205,3 +205,14 @@ export const seedDatabase = async () => {
     console.error('❌ Database seeding failed:', error);
   }
 };
+
+// Run standalone if executed directly via CLI
+if (process.argv[1] && (process.argv[1].endsWith('db.seeder.js') || process.argv[1].includes('seeders'))) {
+  seedDatabase().then(() => {
+    console.log('✔ Standalone database seeding finished.');
+    process.exit(0);
+  }).catch((err) => {
+    console.error('❌ Standalone database seeding failed:', err);
+    process.exit(1);
+  });
+}

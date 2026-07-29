@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Download, Search, Eye, Lightbulb, AlertTriangle, Construction, Droplets, AlertCircle, X, Heart } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const Reports = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
   const getIcon = (type) => {
     switch(type.toLowerCase()) {
       case 'light': return <Lightbulb size={18} />;
@@ -19,12 +23,19 @@ const Reports = () => {
 
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [typeFilter, setTypeFilter] = useState('All types');
   const [statusFilter, setStatusFilter] = useState('All statuses');
   const [severityFilter, setSeverityFilter] = useState('All severities');
   const [sortOrder, setSortOrder] = useState('Newest first');
   const [selectedReport, setSelectedReport] = useState(null);
+
+  useEffect(() => {
+    const querySearch = searchParams.get('search');
+    if (querySearch !== null) {
+      setSearchTerm(querySearch);
+    }
+  }, [searchParams]);
 
   const fetchReports = async () => {
     setLoading(true);

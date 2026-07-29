@@ -2,7 +2,6 @@ import 'dotenv/config';
 import app from './src/app.js';
 import { sequelize } from './models/index.js';
 import { connectDB } from './config/database.js';
-import { seedDatabase } from './seeders/db.seeder.js';
 
 const PORT = process.env.PORT || 5000;
 
@@ -61,9 +60,6 @@ const startServer = async () => {
     `);
     console.log('✔ Migration: report_updates table verified/created.');
     // ─────────────────────────────────────────────────────────────────────────
-
-    // Seed default admin user and base categories
-    await seedDatabase();
 
     // Start server
     app.listen(PORT, () => {

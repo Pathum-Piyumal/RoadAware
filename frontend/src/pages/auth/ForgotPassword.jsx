@@ -52,7 +52,7 @@ const ForgotPassword = () => {
             </span>
             <input 
               type="email" 
-              placeholder="you@example.com" 
+              placeholder="you@gmail.com" 
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);

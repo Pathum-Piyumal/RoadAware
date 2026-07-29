@@ -1,17 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, ShieldAlert, Shield, RotateCcw } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const Users = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+
+  useEffect(() => {
+    const querySearch = searchParams.get('search');
+    if (querySearch !== null) {
+      setSearchTerm(querySearch);
+    }
+  }, [searchParams]);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/admin/users');
+      const response = await api.get('/admin/users', {
+        params: { search: searchTerm }
+      });
       if (response.data.success) {
         setUsers(response.data.users);
       }
@@ -25,7 +38,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [searchTerm]);
 
   const handleToggleStatus = async (userId, currentStatus) => {
     const actionText = currentStatus === 'SUSPENDED' ? 'activate' : 'suspend';

@@ -26,7 +26,7 @@ const Register = () => {
         </div>
         <div>
           <label className="text-gray-400 text-sm mb-2 block">Email</label>
-          <input type="email" placeholder="you@example.com" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+          <input type="email" placeholder="you@gmail.com" className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" />
         </div>
         <div>
           <label className="text-gray-400 text-sm mb-2 block">Password</label>

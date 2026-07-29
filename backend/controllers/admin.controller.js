@@ -19,11 +19,23 @@ export const getAdminReports = async (req, res, next) => {
 
     // Search filter
     if (search) {
-      where[Op.or] = [
-        { id: { [Op.like]: `%${search}%` } },
-        { title: { [Op.like]: `%${search}%` } },
-        { locationName: { [Op.like]: `%${search}%` } },
+      const cleanSearch = search.trim();
+      const numSearch = cleanSearch.replace(/^HZ-/i, '');
+      const isNum = !isNaN(numSearch) && numSearch !== '';
+
+      const searchConditions = [
+        { title: { [Op.like]: `%${cleanSearch}%` } },
+        { description: { [Op.like]: `%${cleanSearch}%` } },
+        { locationName: { [Op.like]: `%${cleanSearch}%` } },
+        { '$reporter.name$': { [Op.like]: `%${cleanSearch}%` } },
+        { '$reporter.email$': { [Op.like]: `%${cleanSearch}%` } },
       ];
+
+      if (isNum) {
+        searchConditions.push({ id: parseInt(numSearch, 10) });
+      }
+
+      where[Op.or] = searchConditions;
     }
 
     // Type (Category ID or Category Name)
@@ -82,6 +94,7 @@ export const getAdminReports = async (req, res, next) => {
       limit: parseInt(limit),
       offset,
       distinct: true,
+      subQuery: false,
     });
 
     res.json({
@@ -168,11 +181,23 @@ export const exportReportsCSV = async (req, res, next) => {
 
     const where = {};
     if (search) {
-      where[Op.or] = [
-        { id: { [Op.like]: `%${search}%` } },
-        { title: { [Op.like]: `%${search}%` } },
-        { locationName: { [Op.like]: `%${search}%` } },
+      const cleanSearch = search.trim();
+      const numSearch = cleanSearch.replace(/^HZ-/i, '');
+      const isNum = !isNaN(numSearch) && numSearch !== '';
+
+      const searchConditions = [
+        { title: { [Op.like]: `%${cleanSearch}%` } },
+        { description: { [Op.like]: `%${cleanSearch}%` } },
+        { locationName: { [Op.like]: `%${cleanSearch}%` } },
+        { '$reporter.name$': { [Op.like]: `%${cleanSearch}%` } },
+        { '$reporter.email$': { [Op.like]: `%${cleanSearch}%` } },
       ];
+
+      if (isNum) {
+        searchConditions.push({ id: parseInt(numSearch, 10) });
+      }
+
+      where[Op.or] = searchConditions;
     }
     if (type && type !== 'All types') {
       const category = await HazardCategory.findOne({ where: { name: type } });
@@ -193,6 +218,7 @@ export const exportReportsCSV = async (req, res, next) => {
         { model: ReportUpvote, as: 'upvotes', attributes: ['id'] },
       ],
       order: [['createdAt', 'DESC']],
+      subQuery: false,
     });
 
     // Write manual CSV string to avoid json2csv dependencies issues
@@ -223,7 +249,20 @@ export const exportReportsCSV = async (req, res, next) => {
 
 export const getUsers = async (req, res, next) => {
   try {
+    const { search } = req.query;
+
+    const where = {};
+    if (search) {
+      const cleanSearch = search.trim();
+      where[Op.or] = [
+        { name: { [Op.like]: `%${cleanSearch}%` } },
+        { email: { [Op.like]: `%${cleanSearch}%` } },
+        { role: { [Op.like]: `%${cleanSearch}%` } },
+      ];
+    }
+
     const users = await User.findAll({
+      where,
       attributes: [
         'id',
         'name',
