@@ -36,6 +36,12 @@ const startServer = async () => {
       );
       console.log('✔ Migration: added googleId column to users table.');
     }
+    if (!usersTableDesc.avatar) {
+      await sequelize.query(
+        'ALTER TABLE `users` ADD COLUMN `avatar` VARCHAR(255) NULL;'
+      );
+      console.log('✔ Migration: added avatar column to users table.');
+    }
     if (usersTableDesc.password && usersTableDesc.password.allowNull === false) {
       await sequelize.query(
         'ALTER TABLE `users` MODIFY COLUMN `password` VARCHAR(255) NULL;'

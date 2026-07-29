@@ -18,6 +18,7 @@ CREATE TABLE `users` (
   `password` VARCHAR(255) NULL,
   `role` ENUM('citizen', 'admin') NOT NULL DEFAULT 'citizen',
   `status` ENUM('active', 'suspended') NOT NULL DEFAULT 'active',
+  `avatar` VARCHAR(255) NULL,
   `googleId` VARCHAR(255) NULL,
   `resetCode` VARCHAR(6) NULL,
   `resetCodeExpires` DATETIME NULL,
@@ -144,6 +145,65 @@ CREATE TABLE `comments` (
   `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT `fk_com_report` FOREIGN KEY (`reportId`) REFERENCES `hazard_reports` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_com_user` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table structure for `contacts`
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `contacts`;
+CREATE TABLE `contacts` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `subject` VARCHAR(255) NOT NULL,
+  `message` TEXT NOT NULL,
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table structure for `hotspots`
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `hotspots`;
+CREATE TABLE `hotspots` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL UNIQUE,
+  `count` INT NOT NULL DEFAULT 0,
+  `max` INT NOT NULL DEFAULT 10,
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table structure for `sessions`
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `sessions`;
+CREATE TABLE `sessions` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `userId` INT NOT NULL,
+  `refreshToken` VARCHAR(255) NOT NULL,
+  `ipAddress` VARCHAR(255) NULL,
+  `userAgent` VARCHAR(255) NULL,
+  `expiresAt` DATETIME NOT NULL,
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_sess_user` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table structure for `notifications`
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `notifications`;
+CREATE TABLE `notifications` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `userId` INT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `message` TEXT NOT NULL,
+  `isRead` TINYINT(1) NOT NULL DEFAULT 0,
+  `type` VARCHAR(50) NOT NULL DEFAULT 'info',
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_notif_user` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
