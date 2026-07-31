@@ -1,6 +1,12 @@
 import { Sequelize } from 'sequelize';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import dns from 'dns';
+
+// Force IPv4 first DNS lookup to prevent Windows getaddrinfo ENOTFOUND errors on TiDB Cloud
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 dotenv.config();
 

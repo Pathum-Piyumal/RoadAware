@@ -1,4 +1,10 @@
 import 'dotenv/config';
+import dns from 'dns';
+
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 import app from './src/app.js';
 import { sequelize } from './models/index.js';
 import { connectDB } from './config/database.js';
