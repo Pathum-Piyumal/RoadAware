@@ -20,26 +20,34 @@ const generateToken = (userId) => {
 //  Email Helper (Nodemailer)
 // ─────────────────────────────────────────────
 const sendResetEmail = async (toEmail, code) => {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
+  const user = process.env.SMTP_USER;
+  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+
+  if (!user || !pass) {
     throw new Error('SMTP email service is not configured on the server.');
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      connectionTimeout: 8000, // 8 seconds
-      greetingTimeout: 8000,
-      socketTimeout: 10000,
-    });
+    const isGmail = process.env.SMTP_HOST?.includes('gmail') || user.endsWith('@gmail.com');
+    const port = parseInt(process.env.SMTP_PORT) || 465;
+
+    const transportConfig = isGmail
+      ? {
+          service: 'gmail',
+          auth: { user, pass },
+        }
+      : {
+          host: process.env.SMTP_HOST,
+          port: port,
+          secure: port === 465,
+          auth: { user, pass },
+          tls: { rejectUnauthorized: false },
+        };
+
+    const transporter = nodemailer.createTransport(transportConfig);
 
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@roadaware.com',
+      from: process.env.SMTP_FROM || `"RoadAware" <${user}>`,
       to: toEmail,
       subject: 'RoadAware — Password Reset Code',
       html: `
