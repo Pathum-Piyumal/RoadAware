@@ -24,24 +24,22 @@ const sendResetEmail = async (toEmail, code) => {
     throw new Error('SMTP email service is not configured on the server.');
   }
 
-  const cleanPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
-
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: parseInt(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: cleanPass,
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-
   try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      connectionTimeout: 8000, // 8 seconds
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
+    });
+
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || `"RoadAware" <${process.env.SMTP_USER}>`,
+      from: process.env.SMTP_FROM || 'noreply@roadaware.com',
       to: toEmail,
       subject: 'RoadAware — Password Reset Code',
       html: `
@@ -53,16 +51,12 @@ const sendResetEmail = async (toEmail, code) => {
             <span style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #111;">${code}</span>
           </div>
           <p style="color: #888; font-size: 13px;">If you did not request this, please ignore this email.</p>
-
         </div>
       `,
     });
-    console.log(`✔ Password reset email successfully sent to ${toEmail}`);
   } catch (error) {
-    console.error('❌ Failed to send reset email via SMTP:', error.message);
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`📧  FALLBACK RESET CODE FOR ${toEmail}: ${code}`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+    console.error('📧 Nodemailer Error details:', error);
+    throw new Error(`Failed to send password reset email. SMTP connection failed: ${error.message}`);
   }
 };
 
