@@ -1,6 +1,20 @@
-import { AlertTriangle, MapPin, Camera, FileText, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, MapPin, Camera, FileText, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 const ReviewStep = ({ formData, isSubmitting, isSuccess }) => {
+  const getSeverityBadge = (severity) => {
+    switch ((severity || 'medium').toLowerCase()) {
+      case 'low':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'high':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'critical':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium':
+      default:
+        return 'bg-amber-100 text-amber-800 border-amber-200';
+    }
+  };
+
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center text-center animate-in zoom-in duration-500 py-8">
@@ -21,14 +35,28 @@ const ReviewStep = ({ formData, isSubmitting, isSuccess }) => {
       <p className="text-gray-500 mb-8">Make sure everything is correct before submitting.</p>
 
       <div className="space-y-4">
-        {/* Hazard Type Summary */}
-        <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-          <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
-            <AlertTriangle size={20} />
+        {/* Hazard Type & Severity Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
+              <AlertTriangle size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Hazard Type</p>
+              <p className="text-gray-900 font-medium capitalize">{formData.type}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Hazard Type</p>
-            <p className="text-gray-900 font-medium capitalize">{formData.type}</p>
+
+          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="p-2 bg-rose-100 text-rose-600 rounded-lg">
+              <ShieldAlert size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Severity Level</p>
+              <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase border ${getSeverityBadge(formData.severity)}`}>
+                {formData.severity || 'Medium'}
+              </span>
+            </div>
           </div>
         </div>
 
