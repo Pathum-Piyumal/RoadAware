@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Camera, X, FileText, Upload, AlertTriangle, Type } from 'lucide-react';
+import { Camera, X, FileText, Upload, AlertTriangle, Type, ShieldAlert } from 'lucide-react';
 
 const DetailsStep = ({ formData, updateData }) => {
   const fileInputRef = useRef(null);
@@ -21,6 +21,41 @@ const DetailsStep = ({ formData, updateData }) => {
       fileInputRef.current.value = '';
     }
   };
+
+  const severityOptions = [
+    {
+      id: 'low',
+      label: 'Low',
+      description: 'Minor issue; minimal traffic risk',
+      color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+      activeColor: 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20',
+      badgeColor: 'bg-emerald-100 text-emerald-800'
+    },
+    {
+      id: 'medium',
+      label: 'Medium',
+      description: 'Moderate hazard; caution advised',
+      color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+      activeColor: 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/20',
+      badgeColor: 'bg-amber-100 text-amber-800'
+    },
+    {
+      id: 'high',
+      label: 'High',
+      description: 'Significant danger or damage risk',
+      color: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100',
+      activeColor: 'bg-orange-600 text-white border-orange-600 shadow-md shadow-orange-600/20',
+      badgeColor: 'bg-orange-100 text-orange-800'
+    },
+    {
+      id: 'critical',
+      label: 'Critical',
+      description: 'Immediate severe safety emergency',
+      color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
+      activeColor: 'bg-red-600 text-white border-red-600 shadow-md shadow-red-600/20',
+      badgeColor: 'bg-red-100 text-red-800'
+    }
+  ];
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -78,6 +113,37 @@ const DetailsStep = ({ formData, updateData }) => {
             <option value="Animal">Animal</option>
             <option value="Other">Other</option>
           </select>
+        </div>
+
+        {/* Severity Level Area */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <ShieldAlert size={18} className="text-orange-500" />
+            Severity Level <span className="text-red-500">*</span>
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {severityOptions.map((option) => {
+              const isSelected = (formData.severity || 'medium').toLowerCase() === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => updateData({ severity: option.id })}
+                  className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    isSelected ? option.activeColor : `bg-white border-slate-200 text-slate-700 hover:border-slate-300`
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-bold text-sm tracking-wide">{option.label}</span>
+                    <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-white' : option.badgeColor.split(' ')[0].replace('bg-', 'bg-')}`} />
+                  </div>
+                  <span className={`text-[11px] leading-tight ${isSelected ? 'text-white/90' : 'text-slate-500'}`}>
+                    {option.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Image Upload Area */}
