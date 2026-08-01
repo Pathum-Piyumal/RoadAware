@@ -22,26 +22,32 @@ const generateToken = (userId) => {
 const sendResetEmail = async (toEmail, code) => {
   const user = process.env.SMTP_USER;
   const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
 
   if (!user || !pass) {
-    throw new Error('SMTP email service is not configured on the server.');
+    const err = new Error('SMTP_USER or SMTP_PASS environment variable is missing on the server.');
+    err.statusCode = 400;
+    throw err;
   }
 
   try {
-    const port = parseInt(process.env.SMTP_PORT) || 587;
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: port,
-      secure: port === 465, // true for port 465, false for 587/25
-      auth: {
-        user: user,
-        pass: pass,
-      },
-      connectionTimeout: 8000, // 8 seconds
-      greetingTimeout: 8000,
-      socketTimeout: 10000,
-      tls: { rejectUnauthorized: false },
-    });
+    const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
+    const port = parseInt(process.env.SMTP_PORT) || 465;
+
+    const transporter = nodemailer.createTransport(
+      isGmail
+        ? {
+            service: 'gmail',
+            auth: { user, pass },
+          }
+        : {
+            host,
+            port,
+            secure: port === 465,
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false },
+          }
+    );
 
     await transporter.sendMail({
       from: process.env.SMTP_FROM || `"RoadAware" <${user}>`,
@@ -61,7 +67,9 @@ const sendResetEmail = async (toEmail, code) => {
     });
   } catch (error) {
     console.error('📧 Nodemailer Error details:', error);
-    throw new Error(`Failed to send password reset email. SMTP connection failed: ${error.message}`);
+    const err = new Error(`Failed to send email: ${error.message}`);
+    err.statusCode = 500;
+    throw err;
   }
 };
 

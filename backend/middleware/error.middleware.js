@@ -1,7 +1,7 @@
 export const errorHandler = (err, req, res, next) => {
   console.error('Error Details:', err);
 
-  const status = err.status || 500;
+  const status = err.status || err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
   // Handle Sequelize Validation / Unique constraints
