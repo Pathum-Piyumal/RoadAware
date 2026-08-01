@@ -20,15 +20,8 @@ const generateToken = (userId) => {
 //  Email Helper (Nodemailer)
 // ─────────────────────────────────────────────
 const sendResetEmail = async (toEmail, code) => {
-  // If no SMTP credentials are configured, fall back to console logging
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`📧  PASSWORD RESET CODE (dev log)`);
-    console.log(`    To: ${toEmail}`);
-    console.log(`    Code: ${code}`);
-    console.log(`    Expires in: 15 minutes`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
-    return;
+    throw new Error('SMTP email service is not configured on the server.');
   }
 
   const cleanPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
@@ -60,6 +53,7 @@ const sendResetEmail = async (toEmail, code) => {
             <span style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #111;">${code}</span>
           </div>
           <p style="color: #888; font-size: 13px;">If you did not request this, please ignore this email.</p>
+
         </div>
       `,
     });
