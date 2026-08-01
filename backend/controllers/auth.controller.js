@@ -28,23 +28,20 @@ const sendResetEmail = async (toEmail, code) => {
   }
 
   try {
-    const isGmail = process.env.SMTP_HOST?.includes('gmail') || user.endsWith('@gmail.com');
-    const port = parseInt(process.env.SMTP_PORT) || 465;
-
-    const transportConfig = isGmail
-      ? {
-          service: 'gmail',
-          auth: { user, pass },
-        }
-      : {
-          host: process.env.SMTP_HOST,
-          port: port,
-          secure: port === 465,
-          auth: { user, pass },
-          tls: { rejectUnauthorized: false },
-        };
-
-    const transporter = nodemailer.createTransport(transportConfig);
+    const port = parseInt(process.env.SMTP_PORT) || 587;
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: port,
+      secure: port === 465, // true for port 465, false for 587/25
+      auth: {
+        user: user,
+        pass: pass,
+      },
+      connectionTimeout: 8000, // 8 seconds
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
+      tls: { rejectUnauthorized: false },
+    });
 
     await transporter.sendMail({
       from: process.env.SMTP_FROM || `"RoadAware" <${user}>`,
