@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../components/layout/AuthLayout';
 import AuthService from '../../services/auth.service';
@@ -9,6 +9,70 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleLogin = async (response) => {
+    const credential = response.credential;
+    setLoading(true);
+    try {
+      const data = await AuthService.googleLogin(credential);
+      toast.success('Logged in successfully!');
+      if (data.user && data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Google Login failed. Please try again.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initializeGoogleSignIn = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('VITE_GOOGLE_CLIENT_ID is not configured.');
+      return;
+    }
+
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleLogin,
+      });
+
+      const container = document.getElementById('google-login-page-btn');
+      if (container) {
+        container.innerHTML = '';
+        window.google.accounts.id.renderButton(container, {
+          theme: 'outline',
+          size: 'large',
+          width: container.parentElement?.clientWidth || 320,
+          text: 'signin_with',
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!document.getElementById('google-gsi-client')) {
+      const script = document.createElement('script');
+      script.id = 'google-gsi-client';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        initializeGoogleSignIn();
+      };
+      document.head.appendChild(script);
+    } else {
+      const timer = setTimeout(() => {
+        initializeGoogleSignIn();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -34,10 +98,9 @@ const Login = () => {
     <AuthLayout>
       <h2 className="text-3xl font-bold text-white mb-8">Sign in</h2>
       
-      <button className="w-full bg-white text-gray-900 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 mb-6 hover:bg-gray-100 transition-colors">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="google" />
-        Continue with Google
-      </button>
+      <div className="flex justify-center w-full min-h-[44px] mb-6">
+        <div id="google-login-page-btn" className="w-full max-w-[320px] flex justify-center"></div>
+      </div>
 
       <div className="flex items-center gap-4 mb-6">
         <div className="flex-1 h-px bg-white/10"></div>
