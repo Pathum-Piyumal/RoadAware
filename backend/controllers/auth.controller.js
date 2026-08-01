@@ -31,32 +31,40 @@ const sendResetEmail = async (toEmail, code) => {
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      connectionTimeout: 8000, // 8 seconds
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
+    });
 
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || 'noreply@roadaware.com',
-    to: toEmail,
-    subject: 'RoadAware — Password Reset Code',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 32px; border: 1px solid #e5e7eb; border-radius: 12px;">
-        <h2 style="color: #f97316; margin-bottom: 8px;">RoadAware</h2>
-        <h3 style="color: #111; margin-top: 0;">Password Reset Request</h3>
-        <p style="color: #555;">Use the verification code below to reset your password. This code is valid for <strong>15 minutes</strong>.</p>
-        <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
-          <span style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #111;">${code}</span>
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@roadaware.com',
+      to: toEmail,
+      subject: 'RoadAware — Password Reset Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 32px; border: 1px solid #e5e7eb; border-radius: 12px;">
+          <h2 style="color: #f97316; margin-bottom: 8px;">RoadAware</h2>
+          <h3 style="color: #111; margin-top: 0;">Password Reset Request</h3>
+          <p style="color: #555;">Use the verification code below to reset your password. This code is valid for <strong>15 minutes</strong>.</p>
+          <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
+            <span style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #111;">${code}</span>
+          </div>
+          <p style="color: #888; font-size: 13px;">If you did not request this, please ignore this email.</p>
         </div>
-        <p style="color: #888; font-size: 13px;">If you did not request this, please ignore this email.</p>
-      </div>
-    `,
-  });
+      `,
+    });
+  } catch (error) {
+    console.error('📧 Nodemailer Error details:', error);
+    throw new Error(`Failed to send password reset email. SMTP connection failed: ${error.message}`);
+  }
 };
 
 // ─────────────────────────────────────────────
