@@ -17,6 +17,9 @@ const getTransporter = () => {
       ? {
           service: 'gmail',
           auth: { user, pass },
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 8000,
         }
       : {
           host,
@@ -24,6 +27,9 @@ const getTransporter = () => {
           secure: port === 465,
           auth: { user, pass },
           tls: { rejectUnauthorized: false },
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 8000,
         }
   );
 };
@@ -37,7 +43,7 @@ export const sendContactNotificationEmail = async ({ name, email, subject, messa
 
   const contactEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER || 'tharushasangeeth034@gmail.com';
 
-  // 1. Send Notification Email to Admin / Contact Email
+  // 1. Notification Email to Contact Recipient / Admin
   const adminMailOptions = {
     from: process.env.SMTP_FROM || `"RoadAware Contact" <${process.env.SMTP_USER}>`,
     to: contactEmail,
@@ -74,7 +80,7 @@ export const sendContactNotificationEmail = async ({ name, email, subject, messa
     `,
   };
 
-  // 2. Send Receipt Email to the User
+  // 2. Receipt Email to Visitor
   const userMailOptions = {
     from: process.env.SMTP_FROM || `"RoadAware Team" <${process.env.SMTP_USER}>`,
     to: email,
@@ -96,14 +102,22 @@ export const sendContactNotificationEmail = async ({ name, email, subject, messa
   };
 
   try {
-    await Promise.all([
+    // Attempt sending both emails concurrently with fallback
+    const results = await Promise.allSettled([
       transporter.sendMail(adminMailOptions),
       transporter.sendMail(userMailOptions),
     ]);
-    console.log(`📧 Contact emails successfully sent for message from ${email}`);
+
+    results.forEach((res, idx) => {
+      if (res.status === 'rejected') {
+        console.error(`📧 Contact email #${idx + 1} failed:`, res.reason?.message || res.reason);
+      }
+    });
+
+    console.log(`📧 Contact form process finished for ${email}`);
     return true;
   } catch (err) {
-    console.error('📧 Error sending contact notification email:', err);
+    console.error('📧 Error sending contact notification email:', err.message);
     return false;
   }
 };
