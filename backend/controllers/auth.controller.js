@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
 import { User, Session, Activity } from '../models/index.js';
 import { uploadBufferToCloudinary } from '../config/cloudinary.js';
+import { sendWelcomeRegistrationEmail } from '../services/email.service.js';
 
 // ─────────────────────────────────────────────
 //  Token Helpers
@@ -108,6 +109,11 @@ export const register = async (req, res, next) => {
       userId: user.id,
       action: 'Account Registered',
       details: `New citizen account registered with email ${email}.`,
+    });
+
+    // Send Welcome & Registration Success Email (non-blocking)
+    sendWelcomeRegistrationEmail({ name, email }).catch((err) => {
+      console.error('Non-blocking welcome email error:', err.message);
     });
 
     res.status(201).json({
@@ -610,6 +616,11 @@ export const googleLogin = async (req, res, next) => {
         userId: user.id,
         action: 'Account Registered',
         details: `New citizen account registered via Google with email ${email}.`,
+      });
+
+      // Send Welcome & Registration Success Email (non-blocking)
+      sendWelcomeRegistrationEmail({ name, email }).catch((err) => {
+        console.error('Non-blocking welcome email error:', err.message);
       });
     }
 
