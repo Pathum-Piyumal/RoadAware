@@ -8,6 +8,8 @@ import {
   updateUserRole,
   getSettings,
   updateSettings,
+  getContactMessages,
+  deleteContactMessage,
 } from '../controllers/admin.controller.js';
 import { protect, adminOnly } from '../middleware/auth.middleware.js';
 import { reportStatusUpdateValidation } from '../validations/report.validation.js';
@@ -25,6 +27,9 @@ router.get('/reports/export', exportReportsCSV);
 router.get('/users', getUsers);
 router.put('/users/:id/status', toggleUserStatus);
 router.put('/users/:id/role', updateUserRole);
+
+router.get('/messages', getContactMessages);
+router.delete('/messages/:id', deleteContactMessage);
 
 router.get('/settings', getSettings);
 router.put('/settings', updateSettings);

@@ -9,6 +9,7 @@ import {
   Activity,
   sequelize,
   ReportUpdate,
+  Contact,
 } from '../models/index.js';
 
 export const getAdminReports = async (req, res, next) => {
@@ -110,6 +111,8 @@ export const getAdminReports = async (req, res, next) => {
           title: json.title,
           description: json.description,
           location: json.locationName,
+          latitude: json.latitude,
+          longitude: json.longitude,
           type: json.category ? json.category.name : 'Other',
           severity: json.severity.toUpperCase(),
           status: json.status === 'in_progress' ? 'IN PROGRESS' : json.status.toUpperCase(),
@@ -450,6 +453,71 @@ export const updateSettings = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Settings updated successfully.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getContactMessages = async (req, res, next) => {
+  try {
+    const { search, page = 1, limit = 50 } = req.query;
+
+    const where = {};
+    if (search) {
+      const cleanSearch = search.trim();
+      where[Op.or] = [
+        { name: { [Op.like]: `%${cleanSearch}%` } },
+        { email: { [Op.like]: `%${cleanSearch}%` } },
+        { subject: { [Op.like]: `%${cleanSearch}%` } },
+        { message: { [Op.like]: `%${cleanSearch}%` } },
+      ];
+    }
+
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { count, rows } = await Contact.findAndCountAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset,
+    });
+
+    res.json({
+      success: true,
+      count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      messages: rows,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteContactMessage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const contact = await Contact.findByPk(id);
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact message not found.',
+      });
+    }
+
+    await contact.destroy();
+
+    await Activity.create({
+      userId: req.user.id,
+      action: 'Message Deleted',
+      details: `Deleted contact message #${id} from ${contact.email}.`,
+    });
+
+    res.json({
+      success: true,
+      message: 'Contact message deleted successfully.',
     });
   } catch (error) {
     next(error);

@@ -44,6 +44,7 @@ import Categories from './pages/admin/Categories';
 import MapMonitoring from './pages/admin/MapMonitoring';
 import Settings from './pages/admin/Settings';
 import AdminProfile from './pages/admin/Profile';
+import Messages from './pages/admin/Messages';
 // Public Pages
 import Home from './pages/public/Home';
 import HazardDetails from './pages/public/HazardDetails';
@@ -145,6 +146,7 @@ function AppContent() {
             <Route path="profile" element={<AdminProfile />} />
             <Route path="reports" element={<Reports />} />
             <Route path="users" element={<Users />} />
+            <Route path="messages" element={<Messages />} />
             <Route path="stats" element={<Stats />} />
             <Route path="categories" element={<Categories />} />
             <Route path="map" element={<MapMonitoring />} />

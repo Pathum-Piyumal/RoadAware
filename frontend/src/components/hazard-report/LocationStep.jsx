@@ -39,8 +39,21 @@ const LocationPicker = ({ onLocationChange }) => {
 const LocationStep = ({ formData, updateData }) => {
   const location = formData.location;
   
-  const onLocationChange = (loc) => {
-    updateData({ location: loc, address: 'Map Location' });
+  const onLocationChange = async (loc) => {
+    updateData({ location: loc, address: 'Fetching location address...' });
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${loc.lat}&lon=${loc.lng}`);
+      const data = await res.json();
+      if (data && data.display_name) {
+        const parts = data.display_name.split(', ');
+        const shortAddress = parts.length > 3 ? parts.slice(0, 4).join(', ') : data.display_name;
+        updateData({ location: loc, address: shortAddress });
+        return;
+      }
+    } catch (err) {
+      console.error('Reverse geocoding error:', err);
+    }
+    updateData({ location: loc, address: `Location (${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)})` });
   };
 
   const [loading, setLoading] = useState(false);
