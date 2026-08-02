@@ -21,10 +21,10 @@ const Analytics = () => {
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={areaChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
-                <XAxis dataKey="name" stroke="var(--admin-text-muted)" />
-                <YAxis stroke="var(--admin-text-muted)" />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--admin-card)', borderColor: 'var(--admin-border)', color: 'var(--admin-text)' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-admin-border)" />
+                <XAxis dataKey="name" stroke="var(--color-admin-text-muted)" />
+                <YAxis stroke="var(--color-admin-text-muted)" />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--color-admin-card-solid)', borderColor: 'var(--color-admin-border)', borderRadius: '12px', color: 'var(--color-admin-text)' }} />
                 <Line type="monotone" dataKey="resolutions" stroke="#10B981" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
@@ -36,10 +36,10 @@ const Analytics = () => {
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hazardTypeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
-                <XAxis dataKey="name" stroke="var(--admin-text-muted)" />
-                <YAxis stroke="var(--admin-text-muted)" />
-                <Tooltip cursor={{ fill: 'var(--admin-bg)' }} contentStyle={{ backgroundColor: 'var(--admin-card)', borderColor: 'var(--admin-border)', color: 'var(--admin-text)' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-admin-border)" />
+                <XAxis dataKey="name" stroke="var(--color-admin-text-muted)" />
+                <YAxis stroke="var(--color-admin-text-muted)" />
+                <Tooltip cursor={{ fill: 'var(--color-admin-sidebar-active)' }} contentStyle={{ backgroundColor: 'var(--color-admin-card-solid)', borderColor: 'var(--color-admin-border)', borderRadius: '12px', color: 'var(--color-admin-text)' }} />
                 <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

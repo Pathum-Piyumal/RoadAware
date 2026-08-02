@@ -178,12 +178,12 @@ const Dashboard = () => {
                     <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
-                <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-admin-border)" />
+                <XAxis dataKey="name" stroke="var(--color-admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--color-admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'var(--color-admin-card-solid)', borderColor: 'var(--color-admin-border)', borderRadius: '12px', color: 'var(--color-admin-text)' }}
+                  itemStyle={{ color: 'var(--color-admin-text)' }}
                 />
                 <Area type="monotone" dataKey="reports" stroke="#3B82F6" strokeWidth={2} fillOpacity={1} fill="url(#colorReports)" />
                 <Area type="monotone" dataKey="resolutions" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorRes)" />
@@ -216,8 +216,8 @@ const Dashboard = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'var(--color-admin-card-solid)', borderColor: 'var(--color-admin-border)', borderRadius: '12px', color: 'var(--color-admin-text)' }}
+                  itemStyle={{ color: 'var(--color-admin-text)' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -226,7 +226,7 @@ const Dashboard = () => {
             {statusData.map((item) => (
               <div key={item.name} className="flex items-center gap-2 text-xs text-admin-text">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-                <span>{item.name} <strong style={{ color: '#fff', marginLeft: '4px' }}>{item.value}</strong></span>
+                <span>{item.name} <strong className="text-admin-text ml-1">{item.value}</strong></span>
               </div>
             ))}
           </div>
@@ -244,12 +244,12 @@ const Dashboard = () => {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hazardTypeData} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
-                <XAxis type="number" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis dataKey="name" type="category" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} width={100} />
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-admin-border)" />
+                <XAxis type="number" stroke="var(--color-admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis dataKey="name" type="category" stroke="var(--color-admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} width={100} />
                 <Tooltip
-                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                  contentStyle={{ backgroundColor: '#1E293B', borderColor: '#334155', color: '#fff' }}
+                  cursor={{ fill: 'rgba(59,130,246,0.05)' }}
+                  contentStyle={{ backgroundColor: 'var(--color-admin-card-solid)', borderColor: 'var(--color-admin-border)', borderRadius: '12px', color: 'var(--color-admin-text)' }}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16}>
                   {hazardTypeData.map((entry, index) => (
@@ -273,7 +273,7 @@ const Dashboard = () => {
                 <div className="flex justify-between items-center text-sm text-admin-text">
                   <div>
                     <span className="font-semibold text-admin-text-muted mr-2 inline-block w-4">{idx + 1}</span>
-                    <span style={{ color: '#fff', fontSize: '0.875rem' }}>{spot.name}</span>
+                    <span className="text-admin-text text-sm font-medium">{spot.name}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-admin-text">{spot.count}</span>
