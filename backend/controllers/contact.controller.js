@@ -1,4 +1,5 @@
 import { Contact } from '../models/index.js';
+import { sendContactNotificationEmail } from '../services/email.service.js';
 
 export const createContactSubmission = async (req, res, next) => {
   try {
@@ -18,6 +19,11 @@ export const createContactSubmission = async (req, res, next) => {
       message,
     });
 
+    // Send email notification asynchronously
+    sendContactNotificationEmail({ name, email, subject, message }).catch((err) => {
+      console.error('Failed to send contact email notification:', err);
+    });
+
     res.status(201).json({
       success: true,
       message: 'Your message has been received. Thank you!',
@@ -27,3 +33,4 @@ export const createContactSubmission = async (req, res, next) => {
     next(error);
   }
 };
+

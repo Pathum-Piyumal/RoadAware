@@ -18,11 +18,11 @@ const ScrollReveal = ({ children, delay = 0 }) => {
         }
       });
     }, { threshold: 0.05 });
-    
+
     if (domRef.current) {
       observer.observe(domRef.current);
     }
-    
+
     return () => {
       if (domRef.current) {
         observer.unobserve(domRef.current);
@@ -77,7 +77,7 @@ export default function Contact() {
       <section className="relative pt-40 pb-40 overflow-hidden bg-[#050505] text-white">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -mr-64 -mt-64" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[100px] -ml-64 -mb-64" />
-        
+
         <div className="max-w-7xl mx-auto px-6 relative z-10 text-center animate-fade-in-up">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-8">
             <MessageSquare size={14} className="fill-current" /> Contact Us
@@ -87,7 +87,7 @@ export default function Contact() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Conversation.</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Have a question about our platform or want to partner with us? 
+            Have a question about our platform or want to partner with us?
             Our team is here to help you move forward.
           </p>
         </div>
@@ -96,20 +96,20 @@ export default function Contact() {
       {/* Contact Cards & Form */}
       <section className="max-w-7xl mx-auto px-6 -mt-24 relative z-20">
         <div className="grid lg:grid-cols-12 gap-8">
-          
+
           {/* Info Side */}
           <div className="lg:col-span-4 space-y-6">
             <ScrollReveal>
               <div className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-2xl shadow-gray-200/50">
                 <h3 className="text-2xl font-black text-gray-900 mb-8">Our Offices</h3>
-                
+
                 <div className="space-y-10">
                   <div className="group">
                     <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform">
                       <Mail size={24} />
                     </div>
                     <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-1">Email Us</h4>
-                    <a href="mailto:hello@roadaware.com" className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">hello@roadaware.com</a>
+                    <a href="mailto:tharushasangeeth034@gmail.com" className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">tharushasangeeth034@gmail.com</a>
                   </div>
 
                   <div className="group">
@@ -159,7 +159,7 @@ export default function Contact() {
                     <ShieldCheck size={14} className="text-green-500" /> Secure Encryption
                   </div>
                 </div>
-                
+
                 {isSubmitted ? (
                   <div className="py-20 text-center animate-in fade-in zoom-in duration-500">
                     <div className="w-24 h-24 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-green-100">
@@ -169,7 +169,7 @@ export default function Contact() {
                     <p className="text-gray-500 text-lg max-w-sm mx-auto mb-10 leading-relaxed">
                       We've sent a confirmation to your email. Our team will reach out shortly.
                     </p>
-                    <button 
+                    <button
                       onClick={() => setIsSubmitted(false)}
                       className="px-10 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition-all"
                     >
