@@ -121,3 +121,95 @@ export const sendContactNotificationEmail = async ({ name, email, subject, messa
     return false;
   }
 };
+
+export const sendWelcomeRegistrationEmail = async ({ name, email }) => {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn('⚠️ SMTP credentials missing (SMTP_USER/SMTP_PASS). Welcome email skipped.');
+    return false;
+  }
+
+  const welcomeMailOptions = {
+    from: process.env.SMTP_FROM || `"RoadAware Team" <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: `Welcome to RoadAware, ${name}! 🎉 Registration Successful`,
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+        
+        {/* Header Branding */}
+        <div style="text-align: center; margin-bottom: 28px;">
+          <div style="display: inline-block; background-color: #f97316; color: #ffffff; font-weight: 900; font-size: 24px; padding: 12px 24px; border-radius: 14px; letter-spacing: -0.5px;">
+            RoadAware
+          </div>
+        </div>
+
+        <h1 style="color: #0f172a; margin-top: 0; font-size: 24px; font-weight: 800; text-align: center;">Welcome to the RoadAware Community! 🎉</h1>
+        
+        <p style="color: #334155; font-size: 16px; line-height: 1.6; margin-top: 20px;">
+          Hello <strong>${name}</strong>,
+        </p>
+        
+        <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+          Your account registration was <strong>successful</strong>! We are thrilled to welcome you to <strong>RoadAware</strong> — Sri Lanka's community-driven road hazard monitoring and safety platform.
+        </p>
+
+        {/* Feature Cards Grid */}
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 24px; border-radius: 16px; margin: 24px 0;">
+          <h3 style="margin: 0 0 16px 0; color: #1e293b; font-size: 15px; font-weight: 700;">What you can do with your account:</h3>
+          
+          <div style="margin-bottom: 14px; display: flex; align-items: flex-start;">
+            <span style="font-size: 18px; margin-right: 10px;">🚨</span>
+            <div>
+              <strong style="color: #0f172a; font-size: 14px;">Report Road Hazards</strong>
+              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Snap photos, tag GPS coordinates, and alert municipal authorities to potholes, broken streetlights, or debris.</p>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 14px; display: flex; align-items: flex-start;">
+            <span style="font-size: 18px; margin-right: 10px;">📍</span>
+            <div>
+              <strong style="color: #0f172a; font-size: 14px;">Interactive Live Map</strong>
+              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Explore real-time hazard hotspots, view resolution status, and stay safe on your daily commutes.</p>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: flex-start;">
+            <span style="font-size: 18px; margin-right: 10px;">🏆</span>
+            <div>
+              <strong style="color: #0f172a; font-size: 14px;">Community Leaderboard</strong>
+              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Earn points, upvote critical hazard reports, and unlock community observer badges.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <div style="text-align: center; margin: 32px 0 24px 0;">
+          <a href="${process.env.FRONTEND_URL || 'https://roadaware.vercel.app'}" style="background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 15px; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+            Explore Your Dashboard 🚀
+          </a>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 28px 0 20px 0;" />
+
+        <p style="color: #94a3b8; font-size: 12px; text-align: center; margin: 0;">
+          If you have any questions or need help, feel free to contact us at <a href="mailto:tharushasangeeth034@gmail.com" style="color: #2563eb; text-decoration: none;">tharushasangeeth034@gmail.com</a>.
+        </p>
+        <p style="color: #64748b; font-size: 13px; text-align: center; margin-top: 16px;">
+          Best regards,<br /><strong style="color: #0f172a;">The RoadAware Team</strong>
+        </p>
+      </div>
+    `,
+  };
+
+  try {
+    const result = await Promise.race([
+      transporter.sendMail(welcomeMailOptions),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Welcome email sending timed out')), 8000))
+    ]);
+    console.log(`📧 Registration Welcome Email successfully sent to ${email}`);
+    return true;
+  } catch (err) {
+    console.error(`📧 Error/Timeout sending welcome email to ${email}:`, err.message);
+    return false;
+  }
+};
