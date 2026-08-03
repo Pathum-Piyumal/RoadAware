@@ -1,215 +1,266 @@
 import nodemailer from 'nodemailer';
 
-const getTransporter = () => {
+/**
+ * Core send email function.
+ * Tries Brevo REST API first (most reliable for cloud hosts like Render).
+ * Falls back to Nodemailer SMTP (if BREVO_API_KEY is missing or fails).
+ */
+export const sendMail = async ({ to, subject, html, replyTo, senderName }) => {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const fromEmail = process.env.SMTP_USER || 'tharushasangeeth034@gmail.com';
+  const fromName = senderName || 'RoadAware';
+
+  // 1. Try Brevo REST API if API Key is available (Bypasses all cloud SMTP port restrictions)
+  if (brevoApiKey) {
+    try {
+      const payload = {
+        sender: { name: fromName, email: fromEmail },
+        to: Array.isArray(to) ? to.map((e) => ({ email: e })) : [{ email: to }],
+        subject,
+        htmlContent: html,
+      };
+
+      if (replyTo) {
+        payload.replyTo = { email: replyTo };
+      }
+
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log(`📧 Email successfully sent via Brevo API to ${to} (Message ID: ${data.messageId})`);
+        return true;
+      } else {
+        console.warn('⚠️ Brevo API request failed:', data.message || data);
+      }
+    } catch (err) {
+      console.error('⚠️ Brevo API exception:', err.message);
+    }
+  }
+
+  // 2. Fallback to Nodemailer SMTP
   const user = process.env.SMTP_USER;
   const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
   const port = parseInt(process.env.SMTP_PORT) || 587;
 
   if (!user || !pass) {
-    return null;
-  }
-
-  const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
-
-  return nodemailer.createTransport(
-    isGmail
-      ? {
-          service: 'gmail',
-          auth: { user, pass },
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 8000,
-        }
-      : {
-          host,
-          port,
-          secure: port === 465,
-          auth: { user, pass },
-          tls: { rejectUnauthorized: false },
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 8000,
-        }
-  );
-};
-
-export const sendContactNotificationEmail = async ({ name, email, subject, message }) => {
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.warn('⚠️ SMTP credentials missing (SMTP_USER/SMTP_PASS). Email skipped.');
+    console.warn('⚠️ Neither BREVO_API_KEY nor SMTP credentials (SMTP_USER/SMTP_PASS) are available.');
     return false;
   }
 
-  const contactEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER || 'tharushasangeeth034@gmail.com';
-
-  // 1. Notification Email to Contact Recipient / Admin
-  const adminMailOptions = {
-    from: process.env.SMTP_FROM || `"RoadAware Contact" <${process.env.SMTP_USER}>`,
-    to: contactEmail,
-    replyTo: email,
-    subject: `[RoadAware Contact Form] ${subject}`,
-    html: `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
-        <h2 style="color: #2563eb; margin-top: 0; font-size: 22px;">📩 New Contact Form Submission</h2>
-        <p style="color: #475569; font-size: 14px; margin-bottom: 20px;">You received a new inquiry from the RoadAware contact page:</p>
-        
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; color: #64748b; font-weight: bold; width: 120px;">Sender Name:</td>
-            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">${name}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; color: #64748b; font-weight: bold;">Sender Email:</td>
-            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;"><a href="mailto:${email}" style="color: #2563eb; text-decoration: none;">${email}</a></td>
-          </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 10px 0; color: #64748b; font-weight: bold;">Subject:</td>
-            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">${subject}</td>
-          </tr>
-        </table>
-
-        <div style="background-color: #f8fafc; border-left: 4px solid #2563eb; padding: 16px; border-radius: 8px; margin-top: 16px;">
-          <h4 style="margin: 0 0 8px 0; color: #334155; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Message Details:</h4>
-          <p style="margin: 0; color: #1e293b; white-space: pre-wrap; line-height: 1.6; font-size: 14px;">${message}</p>
-        </div>
-
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-        <p style="font-size: 12px; color: #94a3b8; margin: 0;">You can reply directly to this email to get in touch with ${name} (${email}).</p>
-      </div>
-    `,
-  };
-
-  // 2. Receipt Email to Visitor
-  const userMailOptions = {
-    from: process.env.SMTP_FROM || `"RoadAware Team" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: `We received your message: ${subject}`,
-    html: `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
-        <h2 style="color: #2563eb; margin-top: 0; font-size: 22px;">Thank You for Reaching Out!</h2>
-        <p style="color: #334155; font-size: 15px; line-height: 1.6;">Hello <strong>${name}</strong>,</p>
-        <p style="color: #475569; font-size: 14px; line-height: 1.6;">We have received your message regarding <strong>"${subject}"</strong>. Our support team is reviewing your inquiry and will respond shortly.</p>
-        
-        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; margin: 20px 0;">
-          <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Your Copy:</p>
-          <p style="margin: 0; color: #334155; font-size: 14px; white-space: pre-wrap; line-height: 1.5;">${message}</p>
-        </div>
-
-        <p style="color: #64748b; font-size: 13px; margin-top: 24px;">Best regards,<br /><strong style="color: #0f172a;">RoadAware Support Team</strong></p>
-      </div>
-    `,
-  };
-
   try {
-    // Attempt sending both emails concurrently with fallback
-    const results = await Promise.allSettled([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(userMailOptions),
-    ]);
+    const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
+    const transporter = nodemailer.createTransport(
+      isGmail
+        ? {
+            service: 'gmail',
+            auth: { user, pass },
+            connectionTimeout: 8000,
+            greetingTimeout: 8000,
+            socketTimeout: 8000,
+          }
+        : {
+            host,
+            port,
+            secure: port === 465,
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false },
+            connectionTimeout: 8000,
+            greetingTimeout: 8000,
+            socketTimeout: 8000,
+          }
+    );
 
-    results.forEach((res, idx) => {
-      if (res.status === 'rejected') {
-        console.error(`📧 Contact email #${idx + 1} failed:`, res.reason?.message || res.reason);
-      }
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || `"${fromName}" <${user}>`,
+      to,
+      replyTo,
+      subject,
+      html,
     });
 
-    console.log(`📧 Contact form process finished for ${email}`);
+    console.log(`📧 Email successfully sent via Nodemailer SMTP to ${to}`);
     return true;
   } catch (err) {
-    console.error('📧 Error sending contact notification email:', err.message);
+    console.error('❌ Nodemailer SMTP Error:', err.message);
+    throw err;
+  }
+};
+
+/**
+ * Send Password Reset Code Email
+ */
+export const sendResetEmail = async (toEmail, code) => {
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; background-color: #f97316; color: #ffffff; font-weight: 900; font-size: 24px; padding: 10px 22px; border-radius: 12px; letter-spacing: -0.5px;">
+          RoadAware
+        </div>
+      </div>
+      <h2 style="color: #0f172a; margin-top: 0; font-size: 22px; text-align: center; font-weight: 800;">Password Reset Code</h2>
+      <p style="color: #475569; font-size: 14px; line-height: 1.6; text-align: center;">
+        Use the verification code below to reset your password. This code is valid for <strong>15 minutes</strong>.
+      </p>
+      <div style="background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
+        <span style="font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #2563eb; font-family: monospace;">${code}</span>
+      </div>
+      <p style="color: #64748b; font-size: 13px; text-align: center; margin-bottom: 24px;">
+        If you did not request a password reset, please ignore this email.
+      </p>
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0 16px 0;" />
+      <p style="color: #94a3b8; font-size: 12px; text-align: center; margin: 0;">
+        RoadAware Support Team
+      </p>
+    </div>
+  `;
+
+  return await sendMail({
+    to: toEmail,
+    subject: 'RoadAware — Password Reset Code',
+    html,
+    senderName: 'RoadAware Security',
+  });
+};
+
+/**
+ * Send Contact Form Notification Email
+ */
+export const sendContactNotificationEmail = async ({ name, email, subject, message }) => {
+  const contactEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER || 'tharushasangeeth034@gmail.com';
+
+  const adminHtml = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <h2 style="color: #2563eb; margin-top: 0; font-size: 22px;">📩 New Contact Form Submission</h2>
+      <p style="color: #475569; font-size: 14px; margin-bottom: 20px;">You received a new inquiry from the RoadAware contact page:</p>
+      
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 10px 0; color: #64748b; font-weight: bold; width: 120px;">Sender Name:</td>
+          <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">${name}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 10px 0; color: #64748b; font-weight: bold;">Sender Email:</td>
+          <td style="padding: 10px 0; color: #0f172a; font-weight: 600;"><a href="mailto:${email}" style="color: #2563eb; text-decoration: none;">${email}</a></td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 10px 0; color: #64748b; font-weight: bold;">Subject:</td>
+          <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">${subject}</td>
+        </tr>
+      </table>
+
+      <div style="background-color: #f8fafc; border-left: 4px solid #2563eb; padding: 16px; border-radius: 8px; margin-top: 16px;">
+        <h4 style="margin: 0 0 8px 0; color: #334155; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Message Details:</h4>
+        <p style="margin: 0; color: #1e293b; white-space: pre-wrap; line-height: 1.6; font-size: 14px;">${message}</p>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+      <p style="font-size: 12px; color: #94a3b8; margin: 0;">You can reply directly to this email to get in touch with ${name} (${email}).</p>
+    </div>
+  `;
+
+  const userHtml = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <h2 style="color: #2563eb; margin-top: 0; font-size: 22px;">Thank You for Reaching Out!</h2>
+      <p style="color: #334155; font-size: 15px; line-height: 1.6;">Hello <strong>${name}</strong>,</p>
+      <p style="color: #475569; font-size: 14px; line-height: 1.6;">We have received your message regarding <strong>"${subject}"</strong>. Our support team is reviewing your inquiry and will respond shortly.</p>
+      
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; margin: 20px 0;">
+        <p style="margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Your Copy:</p>
+        <p style="margin: 0; color: #334155; font-size: 14px; white-space: pre-wrap; line-height: 1.5;">${message}</p>
+      </div>
+
+      <p style="color: #64748b; font-size: 13px; margin-top: 24px;">Best regards,<br /><strong style="color: #0f172a;">RoadAware Support Team</strong></p>
+    </div>
+  `;
+
+  try {
+    await Promise.allSettled([
+      sendMail({ to: contactEmail, subject: `[RoadAware Contact Form] ${subject}`, html: adminHtml, replyTo: email, senderName: 'RoadAware Contact' }),
+      sendMail({ to: email, subject: `We received your message: ${subject}`, html: userHtml, senderName: 'RoadAware Support' }),
+    ]);
+    console.log(`📧 Contact form emails sent for ${email}`);
+    return true;
+  } catch (err) {
+    console.error('📧 Contact form email sending failed:', err.message);
     return false;
   }
 };
 
+/**
+ * Send Welcome Email on Registration
+ */
 export const sendWelcomeRegistrationEmail = async ({ name, email }) => {
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.warn('⚠️ SMTP credentials missing (SMTP_USER/SMTP_PASS). Welcome email skipped.');
-    return false;
-  }
-
-  const welcomeMailOptions = {
-    from: process.env.SMTP_FROM || `"RoadAware Team" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: `Welcome to RoadAware, ${name}! 🎉 Registration Successful`,
-    html: `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
-        
-        {/* Header Branding */}
-        <div style="text-align: center; margin-bottom: 28px;">
-          <div style="display: inline-block; background-color: #f97316; color: #ffffff; font-weight: 900; font-size: 24px; padding: 12px 24px; border-radius: 14px; letter-spacing: -0.5px;">
-            RoadAware
-          </div>
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+      <div style="text-align: center; margin-bottom: 28px;">
+        <div style="display: inline-block; background-color: #f97316; color: #ffffff; font-weight: 900; font-size: 24px; padding: 12px 24px; border-radius: 14px; letter-spacing: -0.5px;">
+          RoadAware
         </div>
-
-        <h1 style="color: #0f172a; margin-top: 0; font-size: 24px; font-weight: 800; text-align: center;">Welcome to the RoadAware Community! 🎉</h1>
-        
-        <p style="color: #334155; font-size: 16px; line-height: 1.6; margin-top: 20px;">
-          Hello <strong>${name}</strong>,
-        </p>
-        
-        <p style="color: #475569; font-size: 15px; line-height: 1.6;">
-          Your account registration was <strong>successful</strong>! We are thrilled to welcome you to <strong>RoadAware</strong> — Sri Lanka's community-driven road hazard monitoring and safety platform.
-        </p>
-
-        {/* Feature Cards Grid */}
-        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 24px; border-radius: 16px; margin: 24px 0;">
-          <h3 style="margin: 0 0 16px 0; color: #1e293b; font-size: 15px; font-weight: 700;">What you can do with your account:</h3>
-          
-          <div style="margin-bottom: 14px; display: flex; align-items: flex-start;">
-            <span style="font-size: 18px; margin-right: 10px;">🚨</span>
-            <div>
-              <strong style="color: #0f172a; font-size: 14px;">Report Road Hazards</strong>
-              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Snap photos, tag GPS coordinates, and alert municipal authorities to potholes, broken streetlights, or debris.</p>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 14px; display: flex; align-items: flex-start;">
-            <span style="font-size: 18px; margin-right: 10px;">📍</span>
-            <div>
-              <strong style="color: #0f172a; font-size: 14px;">Interactive Live Map</strong>
-              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Explore real-time hazard hotspots, view resolution status, and stay safe on your daily commutes.</p>
-            </div>
-          </div>
-
-          <div style="display: flex; align-items: flex-start;">
-            <span style="font-size: 18px; margin-right: 10px;">🏆</span>
-            <div>
-              <strong style="color: #0f172a; font-size: 14px;">Community Leaderboard</strong>
-              <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Earn points, upvote critical hazard reports, and unlock community observer badges.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Button */}
-        <div style="text-align: center; margin: 32px 0 24px 0;">
-          <a href="${process.env.FRONTEND_URL || 'https://roadaware.vercel.app'}" style="background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 15px; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
-            Explore Your Dashboard 🚀
-          </a>
-        </div>
-
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 28px 0 20px 0;" />
-
-        <p style="color: #94a3b8; font-size: 12px; text-align: center; margin: 0;">
-          If you have any questions or need help, feel free to contact us at <a href="mailto:tharushasangeeth034@gmail.com" style="color: #2563eb; text-decoration: none;">tharushasangeeth034@gmail.com</a>.
-        </p>
-        <p style="color: #64748b; font-size: 13px; text-align: center; margin-top: 16px;">
-          Best regards,<br /><strong style="color: #0f172a;">The RoadAware Team</strong>
-        </p>
       </div>
-    `,
-  };
+
+      <h1 style="color: #0f172a; margin-top: 0; font-size: 24px; font-weight: 800; text-align: center;">Welcome to the RoadAware Community! 🎉</h1>
+      
+      <p style="color: #334155; font-size: 16px; line-height: 1.6; margin-top: 20px;">
+        Hello <strong>${name}</strong>,
+      </p>
+      
+      <p style="color: #475569; font-size: 15px; line-height: 1.6;">
+        Your account registration was <strong>successful</strong>! We are thrilled to welcome you to <strong>RoadAware</strong> — Sri Lanka's community-driven road hazard monitoring and safety platform.
+      </p>
+
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 24px; border-radius: 16px; margin: 24px 0;">
+        <h3 style="margin: 0 0 16px 0; color: #1e293b; font-size: 15px; font-weight: 700;">What you can do with your account:</h3>
+        
+        <div style="margin-bottom: 14px;">
+          <strong style="color: #0f172a; font-size: 14px;">🚨 Report Road Hazards</strong>
+          <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Snap photos, tag GPS coordinates, and alert municipal authorities to potholes, broken streetlights, or debris.</p>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <strong style="color: #0f172a; font-size: 14px;">📍 Interactive Live Map</strong>
+          <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Explore real-time hazard hotspots, view resolution status, and stay safe on your daily commutes.</p>
+        </div>
+
+        <div>
+          <strong style="color: #0f172a; font-size: 14px;">🏆 Community Leaderboard</strong>
+          <p style="margin: 2px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;">Earn points, upvote critical hazard reports, and unlock community observer badges.</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 32px 0 24px 0;">
+        <a href="${process.env.FRONTEND_URL || 'https://roadaware.vercel.app'}" style="background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 15px; padding: 14px 32px; border-radius: 12px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          Explore Your Dashboard 🚀
+        </a>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 28px 0 20px 0;" />
+
+      <p style="color: #94a3b8; font-size: 12px; text-align: center; margin: 0;">
+        If you have any questions or need help, feel free to contact us at <a href="mailto:tharushasangeeth034@gmail.com" style="color: #2563eb; text-decoration: none;">tharushasangeeth034@gmail.com</a>.
+      </p>
+      <p style="color: #64748b; font-size: 13px; text-align: center; margin-top: 16px;">
+        Best regards,<br /><strong style="color: #0f172a;">The RoadAware Team</strong>
+      </p>
+    </div>
+  `;
 
   try {
-    const result = await Promise.race([
-      transporter.sendMail(welcomeMailOptions),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Welcome email sending timed out')), 8000))
-    ]);
-    console.log(`📧 Registration Welcome Email successfully sent to ${email}`);
+    await sendMail({ to: email, subject: `Welcome to RoadAware, ${name}! 🎉 Registration Successful`, html, senderName: 'RoadAware Team' });
+    console.log(`📧 Welcome email sent to ${email}`);
     return true;
   } catch (err) {
-    console.error(`📧 Error/Timeout sending welcome email to ${email}:`, err.message);
+    console.error(`📧 Error sending welcome email to ${email}:`, err.message);
     return false;
   }
 };
