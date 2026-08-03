@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Shield, User, MessageCircle, ChevronDown, 
-  ArrowRight, ArrowLeft, LifeBuoy, Zap, FileText, X, CheckCircle2, Sparkles, Mail, Tag, FileCheck, AlertCircle
+  ArrowRight, ArrowLeft, LifeBuoy, Zap, FileText, X, CheckCircle2, Sparkles, Mail, Tag, FileCheck, AlertCircle, Lock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
+import { useAuthModal } from '../../context/AuthModalContext';
+import AuthService from '../../services/auth.service';
 
 const KNOWLEDGE_BASE = {
   "Getting Started": [
@@ -111,6 +113,9 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 };
 
 export default function HelpCenter() {
+  const { openLogin } = useAuthModal();
+  const currentUser = AuthService.getCurrentUser();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFaq, setActiveFaq] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -118,7 +123,12 @@ export default function HelpCenter() {
 
   // Live Support Desk States
   const [isSupportOpen, setIsSupportOpen] = useState(false);
-  const [ticketForm, setTicketForm] = useState({ name: '', email: '', category: 'General Inquiry', message: '' });
+  const [ticketForm, setTicketForm] = useState({
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    category: 'General Inquiry',
+    message: ''
+  });
   const [ticketSubmitted, setTicketSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -157,14 +167,32 @@ export default function HelpCenter() {
   };
 
   const handleOpenSupport = () => {
+    if (!currentUser) {
+      toast.error('Please log in first to open a support desk ticket.');
+      openLogin();
+      return;
+    }
+
     setIsSupportOpen(true);
     setTicketSubmitted(false);
     setErrorMsg('');
-    setTicketForm({ name: '', email: '', category: 'General Inquiry', message: '' });
+    setTicketForm({
+      name: currentUser?.name || '',
+      email: currentUser?.email || '',
+      category: 'General Inquiry',
+      message: ''
+    });
   };
 
   const handleSupportSubmit = async (e) => {
     e.preventDefault();
+
+    if (!currentUser) {
+      toast.error('Please log in first to submit a support ticket.');
+      openLogin();
+      return;
+    }
+
     if (!ticketForm.name || !ticketForm.email || !ticketForm.message) {
       setErrorMsg('Please fill in all required fields (Name, Email, Message).');
       return;

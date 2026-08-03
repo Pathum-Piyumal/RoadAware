@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import CareersService from '../../services/careers.service';
+import { useAuthModal } from '../../context/AuthModalContext';
+import AuthService from '../../services/auth.service';
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -67,10 +69,13 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 };
 
 export default function Careers() {
+  const { openLogin } = useAuthModal();
+  const currentUser = AuthService.getCurrentUser();
+
   const [selectedJob, setSelectedJob] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
     phone: '',
     portfolio: '',
     coverLetter: '',
@@ -124,14 +129,33 @@ export default function Careers() {
   ];
 
   const handleApplyClick = (job) => {
+    if (!currentUser) {
+      toast.error('Please log in first to apply for a job position.');
+      openLogin();
+      return;
+    }
+
     setSelectedJob(job);
     setSubmitted(false);
     setErrorMsg('');
     setCvFile(null);
-    setFormData({ name: '', email: '', phone: '', portfolio: '', coverLetter: '', cv: null });
+    setFormData({
+      name: currentUser?.name || '',
+      email: currentUser?.email || '',
+      phone: '',
+      portfolio: '',
+      coverLetter: '',
+      cv: null
+    });
   };
 
   const handleSpontaneousApply = () => {
+    if (!currentUser) {
+      toast.error('Please log in first to submit your CV.');
+      openLogin();
+      return;
+    }
+
     setSelectedJob({
       title: "General Application / Spontaneous",
       department: "General Talent Pool",
@@ -141,7 +165,14 @@ export default function Careers() {
     setSubmitted(false);
     setErrorMsg('');
     setCvFile(null);
-    setFormData({ name: '', email: '', phone: '', portfolio: '', coverLetter: '', cv: null });
+    setFormData({
+      name: currentUser?.name || '',
+      email: currentUser?.email || '',
+      phone: '',
+      portfolio: '',
+      coverLetter: '',
+      cv: null
+    });
   };
 
   const handleClose = () => {
@@ -176,6 +207,13 @@ export default function Careers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!currentUser) {
+      toast.error('Please log in first to submit your job application.');
+      openLogin();
+      return;
+    }
+
     if (!formData.name || !formData.email || !formData.coverLetter) {
       setErrorMsg('Please fill in all required fields (Name, Email, Cover Letter).');
       return;

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mail, MapPin, Phone, MessageSquare, Send, ArrowRight, Globe, Clock, ShieldCheck } from 'lucide-react';
+import { Mail, MapPin, Phone, MessageSquare, Send, ArrowRight, Globe, Clock, ShieldCheck, Lock } from 'lucide-react';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
+import { useAuthModal } from '../../context/AuthModalContext';
+import AuthService from '../../services/auth.service';
 
 // Viewport Scroll Reveal Component with Delay Staggering & Gentle 16px Offset
 const ScrollReveal = ({ children, delay = 0 }) => {
@@ -46,19 +49,45 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 };
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const { openLogin } = useAuthModal();
+  const currentUser = AuthService.getCurrentUser();
+
+  const [formData, setFormData] = useState({
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    subject: '',
+    message: ''
+  });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        name: currentUser.name || prev.name,
+        email: currentUser.email || prev.email,
+      }));
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if user is logged in
+    if (!currentUser) {
+      toast.error('Please log in first to send a contact message.');
+      openLogin();
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
     try {
       await api.post('/contact', formData);
       setIsSubmitted(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: currentUser?.name || '', email: currentUser?.email || '', subject: '', message: '' });
     } catch (err) {
       console.error('Failed to submit contact request:', err);
       setError(err.response?.data?.message || 'Failed to send message. Please try again.');
@@ -153,12 +182,27 @@ export default function Contact() {
           <div className="lg:col-span-8">
             <ScrollReveal delay={150}>
               <div className="bg-white p-10 md:p-16 rounded-[40px] border border-gray-100 shadow-2xl shadow-gray-200/50">
-                <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-black text-gray-900">Send a Message</h2>
                   <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-xs font-bold text-gray-400">
                     <ShieldCheck size={14} className="text-green-500" /> Secure Encryption
                   </div>
                 </div>
+
+                {!currentUser && (
+                  <div className="mb-8 p-4 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-800 text-xs font-semibold flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <Lock size={18} className="text-amber-600 shrink-0" />
+                      <span>You must be logged in to send a contact message to RoadAware support.</span>
+                    </div>
+                    <button 
+                      onClick={openLogin}
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl transition-all shrink-0"
+                    >
+                      Log In First
+                    </button>
+                  </div>
+                )}
 
                 {isSubmitted ? (
                   <div className="py-20 text-center animate-in fade-in zoom-in duration-500">
