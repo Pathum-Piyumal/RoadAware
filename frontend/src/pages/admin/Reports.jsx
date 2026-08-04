@@ -250,13 +250,13 @@ const Reports = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" className="p-8 text-center text-admin-text-muted">
+                <td colSpan="7" className="p-8 text-center text-admin-text-muted">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                 </td>
               </tr>
             ) : reports.length === 0 ? (
               <tr>
-                <td colSpan="6" className="p-8 text-center text-admin-text-muted">
+                <td colSpan="7" className="p-8 text-center text-admin-text-muted">
                   No hazard reports found matching the criteria.
                 </td>
               </tr>
@@ -275,7 +275,7 @@ const Reports = () => {
                     </div>
                   </td>
                   <td className="p-4 text-sm text-admin-text">
-                    <span className={`px-2 py-0.5 rounded text-[0.65rem] font-bold uppercase tracking-wider border border-current text-${getSeverityClass(report.severity) === 'critical' ? 'red' : getSeverityClass(report.severity) === 'high' ? 'amber' : getSeverityClass(report.severity) === 'medium' ? 'blue' : 'emerald'}-500 bg-${getSeverityClass(report.severity) === 'critical' ? 'red' : getSeverityClass(report.severity) === 'high' ? 'amber' : getSeverityClass(report.severity) === 'medium' ? 'blue' : 'emerald'}-500/10`}>
+                    <span className={`px-2 py-0.5 rounded text-[0.65rem] uppercase border ${getSeverityColor(report.severity)}`}>
                       {report.severity}
                     </span>
                   </td>

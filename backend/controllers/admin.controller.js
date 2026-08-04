@@ -77,7 +77,7 @@ export const getAdminReports = async (req, res, next) => {
       order = [
         [
           sequelize.literal(
-            "CASE priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END"
+            "CASE `HazardReport`.`priority` WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END"
           ),
           'ASC',
         ],
@@ -87,7 +87,7 @@ export const getAdminReports = async (req, res, next) => {
       order = [
         [
           sequelize.literal(
-            "CASE priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END"
+            "CASE `HazardReport`.`priority` WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END"
           ),
           'DESC',
         ],
