@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
 import { User, Session, Activity } from '../models/index.js';
 import { uploadBufferToCloudinary } from '../config/cloudinary.js';
+import { sendWelcomeRegistrationEmail, sendResetEmail } from '../services/email.service.js';
 
 // ─────────────────────────────────────────────
 //  Token Helpers
@@ -14,63 +14,6 @@ const generateToken = (userId) => {
     process.env.JWT_SECRET || 'roadaware_super_secret_key_2026',
     { expiresIn: '1d' }
   );
-};
-
-// ─────────────────────────────────────────────
-//  Email Helper (Nodemailer)
-// ─────────────────────────────────────────────
-const sendResetEmail = async (toEmail, code) => {
-  const user = process.env.SMTP_USER;
-  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-
-  if (!user || !pass) {
-    const err = new Error('SMTP_USER or SMTP_PASS environment variable is missing on the server.');
-    err.statusCode = 400;
-    throw err;
-  }
-
-  try {
-    const isGmail = host.includes('gmail') || user.endsWith('@gmail.com');
-    const port = parseInt(process.env.SMTP_PORT) || 465;
-
-    const transporter = nodemailer.createTransport(
-      isGmail
-        ? {
-            service: 'gmail',
-            auth: { user, pass },
-          }
-        : {
-            host,
-            port,
-            secure: port === 465,
-            auth: { user, pass },
-            tls: { rejectUnauthorized: false },
-          }
-    );
-
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || `"RoadAware" <${user}>`,
-      to: toEmail,
-      subject: 'RoadAware — Password Reset Code',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 32px; border: 1px solid #e5e7eb; border-radius: 12px;">
-          <h2 style="color: #f97316; margin-bottom: 8px;">RoadAware</h2>
-          <h3 style="color: #111; margin-top: 0;">Password Reset Request</h3>
-          <p style="color: #555;">Use the verification code below to reset your password. This code is valid for <strong>15 minutes</strong>.</p>
-          <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
-            <span style="font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #111;">${code}</span>
-          </div>
-          <p style="color: #888; font-size: 13px;">If you did not request this, please ignore this email.</p>
-        </div>
-      `,
-    });
-  } catch (error) {
-    console.error('📧 Nodemailer Error details:', error);
-    const err = new Error(`Failed to send email: ${error.message}`);
-    err.statusCode = 500;
-    throw err;
-  }
 };
 
 // ─────────────────────────────────────────────
@@ -108,6 +51,11 @@ export const register = async (req, res, next) => {
       userId: user.id,
       action: 'Account Registered',
       details: `New citizen account registered with email ${email}.`,
+    });
+
+    // Send Welcome & Registration Success Email (non-blocking)
+    sendWelcomeRegistrationEmail({ name, email }).catch((err) => {
+      console.error('Non-blocking welcome email error:', err.message);
     });
 
     res.status(201).json({
@@ -610,6 +558,11 @@ export const googleLogin = async (req, res, next) => {
         userId: user.id,
         action: 'Account Registered',
         details: `New citizen account registered via Google with email ${email}.`,
+      });
+
+      // Send Welcome & Registration Success Email (non-blocking)
+      sendWelcomeRegistrationEmail({ name, email }).catch((err) => {
+        console.error('Non-blocking welcome email error:', err.message);
       });
     }
 

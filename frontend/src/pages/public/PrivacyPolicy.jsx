@@ -172,7 +172,7 @@ export default function PrivacyPolicy() {
                   If you have questions about this policy or wish to exercise your data rights.
                 </p>
                 <a href="mailto:privacy@roadaware.com" className="px-8 py-4 bg-[#050505] text-white font-bold rounded-2xl hover:bg-blue-600 transition-all flex items-center gap-2 whitespace-nowrap shadow-xl">
-                  privacy@roadaware.com <ArrowRight size={18} />
+                  tharushasangeeth034@gmail.com <ArrowRight size={18} />
                 </a>
               </div>
             </div>

@@ -7,7 +7,8 @@ import {
   AlertTriangle, 
   Map, 
   Settings,
-  Bell
+  Bell,
+  MessageSquare
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setSidebarOpen }) => {
@@ -15,6 +16,7 @@ const Sidebar = ({ isOpen, setSidebarOpen }) => {
     { name: 'Dashboard', to: '/admin', icon: LayoutDashboard, exact: true },
     { name: 'Reports', to: '/admin/reports', icon: FileText },
     { name: 'Users', to: '/admin/users', icon: Users },
+    { name: 'Contact Messages', to: '/admin/messages', icon: MessageSquare },
     { name: 'Analytics', to: '/admin/stats', icon: BarChart3 },
     { name: 'Hazard Categories', to: '/admin/categories', icon: AlertTriangle },
     { name: 'Map Monitoring', to: '/admin/map', icon: Map },

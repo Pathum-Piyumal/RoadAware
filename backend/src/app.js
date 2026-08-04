@@ -13,6 +13,7 @@ import statsRoutes from '../routes/stats.routes.js';
 import categoryRoutes from '../routes/category.routes.js';
 import commentRoutes from '../routes/comment.routes.js';
 import contactRoutes from '../routes/contact.routes.js';
+import careersRoutes from '../routes/careers.routes.js';
 
 // Import Error Handler
 import { errorHandler } from '../middleware/error.middleware.js';
@@ -60,6 +61,7 @@ app.use('/api/reports/:id/comments', commentRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/careers', careersRoutes);
 
 // Health Check
 app.get('/api/health', async (req, res) => {

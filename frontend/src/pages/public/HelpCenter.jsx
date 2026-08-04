@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Shield, User, MessageCircle, ChevronDown, 
-  ArrowRight, ArrowLeft, LifeBuoy, Zap, FileText, X, CheckCircle2, Sparkles, Mail, Tag, FileCheck
+  ArrowRight, ArrowLeft, LifeBuoy, Zap, FileText, X, CheckCircle2, Sparkles, Mail, Tag, FileCheck, AlertCircle, Lock
 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import api from '../../services/api';
+import { useAuthModal } from '../../context/AuthModalContext';
+import AuthService from '../../services/auth.service';
 
 const KNOWLEDGE_BASE = {
   "Getting Started": [
@@ -109,6 +113,9 @@ const ScrollReveal = ({ children, delay = 0 }) => {
 };
 
 export default function HelpCenter() {
+  const { openLogin } = useAuthModal();
+  const currentUser = AuthService.getCurrentUser();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFaq, setActiveFaq] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -116,9 +123,16 @@ export default function HelpCenter() {
 
   // Live Support Desk States
   const [isSupportOpen, setIsSupportOpen] = useState(false);
-  const [ticketForm, setTicketForm] = useState({ name: '', email: '', category: 'General Inquiry', message: '' });
+  const [ticketForm, setTicketForm] = useState({
+    name: currentUser?.name || '',
+    email: currentUser?.email || '',
+    category: 'General Inquiry',
+    message: ''
+  });
   const [ticketSubmitted, setTicketSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const categories = [
     { title: "Getting Started", icon: Zap, count: 3, bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" },
@@ -153,16 +167,54 @@ export default function HelpCenter() {
   };
 
   const handleOpenSupport = () => {
+    if (!currentUser) {
+      toast.error('Please log in first to open a support desk ticket.');
+      openLogin();
+      return;
+    }
+
     setIsSupportOpen(true);
     setTicketSubmitted(false);
-    setTicketForm({ name: '', email: '', category: 'General Inquiry', message: '' });
+    setErrorMsg('');
+    setTicketForm({
+      name: currentUser?.name || '',
+      email: currentUser?.email || '',
+      category: 'General Inquiry',
+      message: ''
+    });
   };
 
-  const handleSupportSubmit = (e) => {
+  const handleSupportSubmit = async (e) => {
     e.preventDefault();
-    const generatedId = `RA-${Math.floor(Math.random() * 9000) + 1000}`;
-    setTicketId(generatedId);
-    setTicketSubmitted(true);
+
+    if (!currentUser) {
+      toast.error('Please log in first to submit a support ticket.');
+      openLogin();
+      return;
+    }
+
+    if (!ticketForm.name || !ticketForm.email || !ticketForm.message) {
+      setErrorMsg('Please fill in all required fields (Name, Email, Message).');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      const response = await api.post('/contact/support-ticket', ticketForm);
+      const generatedId = response.data.ticketId || `RA-${Math.floor(Math.random() * 9000) + 1000}`;
+      setTicketId(generatedId);
+      setTicketSubmitted(true);
+      toast.success('Support ticket submitted & emailed successfully!');
+    } catch (error) {
+      console.error('Support ticket error:', error);
+      const msg = error.response?.data?.message || 'Failed to submit support ticket. Please try again.';
+      setErrorMsg(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -377,6 +429,13 @@ export default function HelpCenter() {
                   </div>
                 </div>
 
+                {errorMsg && (
+                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle size={16} className="shrink-0" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
+
                 <div className="space-y-4 pt-4 border-t border-slate-100">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Full Name</label>
@@ -434,9 +493,10 @@ export default function HelpCenter() {
 
                 <button 
                   type="submit"
-                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2"
+                  disabled={loading}
+                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Ticket <ArrowRight size={18} />
+                  {loading ? 'Submitting & Emailing Ticket...' : 'Submit Ticket'} {!loading && <ArrowRight size={18} />}
                 </button>
               </form>
             ) : (
@@ -445,13 +505,13 @@ export default function HelpCenter() {
                   <FileCheck size={32} />
                 </div>
                 
-                <h3 className="text-2xl font-black text-slate-900 mb-1">Ticket Submitted Successfully!</h3>
+                <h3 className="text-2xl font-black text-slate-900 mb-1">Ticket Submitted & Emailed!</h3>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold tracking-wider mb-6 uppercase">
                   <Tag size={12} /> Ticket ID: {ticketId}
                 </span>
 
                 <p className="text-sm text-slate-500 leading-relaxed max-w-sm mb-8">
-                  We have logged your issue under ID <strong className="text-slate-800">{ticketId}</strong>. A copies copy of this ticket log has been cached. Our support desk will contact you via <strong className="text-slate-800">{ticketForm.email}</strong> shortly.
+                  Your ticket details have been sent to our company support desk and a confirmation receipt has been sent to <strong className="text-slate-800">{ticketForm.email}</strong>. Our team will get back to you shortly.
                 </p>
                 
                 <button 
