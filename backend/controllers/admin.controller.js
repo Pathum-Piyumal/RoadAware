@@ -10,10 +10,11 @@ import {
   sequelize,
   ReportUpdate,
 } from '../models/index.js';
+import { sendStatusUpdateEmail } from '../services/email.service.js';
 
 export const getAdminReports = async (req, res, next) => {
   try {
-    const { search, type, status, severity, sort, page = 1, limit = 10 } = req.query;
+    const { search, type, status, severity, priority, sort, page = 1, limit = 10 } = req.query;
 
     const where = {};
 
@@ -60,12 +61,37 @@ export const getAdminReports = async (req, res, next) => {
       where.severity = severity.toLowerCase();
     }
 
+    // Priority filter
+    if (priority && priority !== 'All priorities') {
+      where.priority = priority.toLowerCase();
+    }
+
     // Sorting
     let order = [['createdAt', 'DESC']];
     if (sort === 'Oldest first') {
       order = [['createdAt', 'ASC']];
     } else if (sort === 'Most upvoted') {
       order = [[sequelize.literal('upvotesCount'), 'DESC']];
+    } else if (sort === 'Highest priority') {
+      order = [
+        [
+          sequelize.literal(
+            "CASE priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END"
+          ),
+          'ASC',
+        ],
+        ['createdAt', 'DESC'],
+      ];
+    } else if (sort === 'Lowest priority') {
+      order = [
+        [
+          sequelize.literal(
+            "CASE priority WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 WHEN 'low' THEN 4 ELSE 5 END"
+          ),
+          'DESC',
+        ],
+        ['createdAt', 'DESC'],
+      ];
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -110,8 +136,11 @@ export const getAdminReports = async (req, res, next) => {
           title: json.title,
           description: json.description,
           location: json.locationName,
+          latitude: json.latitude,
+          longitude: json.longitude,
           type: json.category ? json.category.name : 'Other',
-          severity: json.severity.toUpperCase(),
+          severity: json.severity ? json.severity.toUpperCase() : 'LOW',
+          priority: (json.priority || json.severity || 'medium').toUpperCase(),
           status: json.status === 'in_progress' ? 'IN PROGRESS' : json.status.toUpperCase(),
           upvotes: parseInt(json.upvotesCount || 0),
           time: json.createdAt,
@@ -129,11 +158,14 @@ export const getAdminReports = async (req, res, next) => {
 export const updateReportStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // reported, in_progress, resolved, rejected
+    const { status, comment } = req.body; // reported, in_progress, resolved, rejected
     const cleanId = id.replace('HZ-', '');
 
     const report = await HazardReport.findByPk(cleanId, {
-      include: [{ model: HazardCategory, as: 'category' }],
+      include: [
+        { model: HazardCategory, as: 'category' },
+        { model: User, as: 'reporter', attributes: ['id', 'name', 'email'] },
+      ],
     });
     if (!report) {
       return res.status(404).json({
@@ -150,8 +182,7 @@ export const updateReportStatus = async (req, res, next) => {
     await ReportUpdate.create({
       reportId: cleanId,
       status: report.status,
-      comment: req.body.comment ||
-        `Status updated from "${oldStatus}" to "${report.status}".`,
+      comment: comment || `Status updated from "${oldStatus}" to "${report.status}".`,
       updatedBy: req.user.id,
     });
 
@@ -165,9 +196,66 @@ export const updateReportStatus = async (req, res, next) => {
       severity: report.severity,
     });
 
+    // ── Status Change Email Dispatch via Brevo / SMTP ─────────────────
+    if (report.reporter && report.reporter.email) {
+      sendStatusUpdateEmail({
+        reporterName: report.reporter.name,
+        reporterEmail: report.reporter.email,
+        hazardId: report.id,
+        title: report.title,
+        location: report.locationName,
+        categoryName: report.category ? report.category.name : 'Hazard',
+        oldStatus,
+        newStatus: report.status,
+        comment: comment || null,
+      }).catch((emailErr) => {
+        console.error('⚠️ Failed sending status update email dispatch:', emailErr);
+      });
+    }
+
     res.json({
       success: true,
-      message: `Report status updated to ${status}.`,
+      message: `Report status updated to ${status}. Email dispatch sent if user email is registered.`,
+      report,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateReportPriority = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { priority } = req.body; // low, medium, high, critical
+    const cleanId = id.replace('HZ-', '');
+
+    const report = await HazardReport.findByPk(cleanId, {
+      include: [{ model: HazardCategory, as: 'category' }],
+    });
+    if (!report) {
+      return res.status(404).json({
+        success: false,
+        message: 'Hazard report not found.',
+      });
+    }
+
+    const oldPriority = report.priority || 'medium';
+    report.priority = priority.toLowerCase();
+    await report.save();
+
+    // Log Activity
+    await Activity.create({
+      userId: req.user.id,
+      action: 'Priority Updated',
+      details: `Updated report HZ-${report.id} priority from "${oldPriority}" to "${report.priority}".`,
+      type: report.category ? report.category.name.toLowerCase() : 'other',
+      status: report.status,
+      severity: report.severity,
+    });
+
+    res.json({
+      success: true,
+      message: `Report priority updated to ${priority.toUpperCase()}.`,
       report,
     });
   } catch (error) {
@@ -177,7 +265,7 @@ export const updateReportStatus = async (req, res, next) => {
 
 export const exportReportsCSV = async (req, res, next) => {
   try {
-    const { search, type, status, severity } = req.query;
+    const { search, type, status, severity, priority } = req.query;
 
     const where = {};
     if (search) {
@@ -209,6 +297,9 @@ export const exportReportsCSV = async (req, res, next) => {
     if (severity && severity !== 'All severities') {
       where.severity = severity.toLowerCase();
     }
+    if (priority && priority !== 'All priorities') {
+      where.priority = priority.toLowerCase();
+    }
 
     const reports = await HazardReport.findAll({
       where,
@@ -222,7 +313,7 @@ export const exportReportsCSV = async (req, res, next) => {
     });
 
     // Write manual CSV string to avoid json2csv dependencies issues
-    const csvHeaders = 'ID,Title,Type,Location,Severity,Status,Upvotes,Reported At,Reporter\n';
+    const csvHeaders = 'ID,Title,Type,Location,Severity,Priority,Status,Upvotes,Reported At,Reporter\n';
     const csvRows = reports
       .map((r) => {
         const id = `HZ-${r.id}`;
@@ -230,12 +321,13 @@ export const exportReportsCSV = async (req, res, next) => {
         const categoryName = r.category ? r.category.name : 'Other';
         const location = `"${r.locationName.replace(/"/g, '""')}"`;
         const sev = r.severity.toUpperCase();
+        const prio = (r.priority || r.severity || 'medium').toUpperCase();
         const stat = r.status.toUpperCase().replace('_', ' ');
         const upvotes = r.upvotes ? r.upvotes.length : 0;
         const time = r.createdAt.toISOString();
         const reporterName = r.reporter ? r.reporter.name : 'Anonymous';
 
-        return `${id},${title},${categoryName},${location},${sev},${stat},${upvotes},${time},${reporterName}`;
+        return `${id},${title},${categoryName},${location},${sev},${prio},${stat},${upvotes},${time},${reporterName}`;
       })
       .join('\n');
 

@@ -27,6 +27,10 @@ const HazardReport = sequelize.define('HazardReport', {
     type: DataTypes.ENUM('low', 'medium', 'high', 'critical'),
     defaultValue: 'low',
   },
+  priority: {
+    type: DataTypes.ENUM('low', 'medium', 'high', 'critical'),
+    defaultValue: 'medium',
+  },
   status: {
     type: DataTypes.ENUM('reported', 'in_progress', 'resolved', 'rejected'),
     defaultValue: 'reported',
