@@ -1,25 +1,56 @@
 import { useRef } from 'react';
-import { Camera, X, FileText, Upload, AlertTriangle, Type, ShieldAlert } from 'lucide-react';
+import { Camera, X, FileText, Upload, AlertTriangle, Type, ShieldAlert, Plus } from 'lucide-react';
 
 const DetailsStep = ({ formData, updateData }) => {
   const fileInputRef = useRef(null);
 
+  const currentImages = formData.images || (formData.image ? [formData.image] : []);
+  const currentImageFiles = formData.imageFiles || (formData.imageFile ? [formData.imageFile] : []);
+
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const selectedFiles = Array.from(e.target.files);
+    if (!selectedFiles.length) return;
+
+    const availableSlots = 5 - currentImageFiles.length;
+    if (availableSlots <= 0) return;
+
+    const filesToUpload = selectedFiles.slice(0, availableSlots);
+    const newPreviews = [];
+    const newFiles = [...currentImageFiles, ...filesToUpload];
+
+    let processedCount = 0;
+    filesToUpload.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateData({ image: reader.result, imageFile: file }); // base64 preview + real File
+        newPreviews.push(reader.result);
+        processedCount++;
+        if (processedCount === filesToUpload.length) {
+          const updatedPreviews = [...currentImages, ...newPreviews];
+          updateData({
+            images: updatedPreviews,
+            imageFiles: newFiles,
+            image: updatedPreviews[0] || null,
+            imageFile: newFiles[0] || null,
+          });
+        }
       };
       reader.readAsDataURL(file);
-    }
-  };
+    });
 
-  const removeImage = () => {
-    updateData({ image: null, imageFile: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const removeImageAt = (indexToRemove) => {
+    const updatedPreviews = currentImages.filter((_, idx) => idx !== indexToRemove);
+    const updatedFiles = currentImageFiles.filter((_, idx) => idx !== indexToRemove);
+    updateData({
+      images: updatedPreviews,
+      imageFiles: updatedFiles,
+      image: updatedPreviews[0] || null,
+      imageFile: updatedFiles[0] || null,
+    });
   };
 
   const severityOptions = [
@@ -60,7 +91,7 @@ const DetailsStep = ({ formData, updateData }) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="text-xl font-semibold mb-2">Add details and photos</h2>
-      <p className="text-gray-500 mb-8">Provide clear information to help teams prioritize the fix.</p>
+      <p className="text-gray-500 mb-8">Provide clear information and up to 5 photos to help teams prioritize the fix.</p>
 
       <div className="space-y-6">
         {/* Title Area */}
@@ -146,42 +177,67 @@ const DetailsStep = ({ formData, updateData }) => {
           </div>
         </div>
 
-        {/* Image Upload Area */}
+        {/* Multi-Image Upload Area (Up to 5 Photos) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <Camera size={18} className="text-orange-500" />
-            Hazard Photo
-          </label>
-          
-          {formData.image ? (
-            <div className="relative rounded-2xl overflow-hidden border-2 border-orange-100 shadow-sm group">
-              <img src={formData.image} alt="Hazard preview" className="w-full h-48 object-cover" />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <button
-                  onClick={removeImage}
-                  className="bg-white/90 p-2 rounded-full text-red-500 hover:bg-white transition-colors"
-                >
-                  <X size={24} />
-                </button>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Camera size={18} className="text-orange-500" />
+              Hazard Photos
+            </label>
+            <span className="text-xs font-semibold text-slate-400">
+              {currentImages.length} / 5 photos selected
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {currentImages.map((imgSrc, idx) => (
+              <div key={idx} className="relative rounded-2xl overflow-hidden border-2 border-orange-100 shadow-sm group aspect-square">
+                <img src={imgSrc} alt={`Hazard preview ${idx + 1}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => removeImageAt(idx)}
+                    className="bg-white/90 p-2 rounded-full text-red-500 hover:bg-white transition-colors cursor-pointer"
+                    title="Remove photo"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <span className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                  #{idx + 1}
+                </span>
               </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full h-48 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 hover:bg-orange-50 hover:border-orange-200 transition-all group"
-            >
-              <div className="p-4 rounded-full bg-white shadow-sm group-hover:scale-110 transition-transform mb-3">
-                <Upload className="text-gray-400 group-hover:text-orange-500" size={24} />
-              </div>
-              <span className="text-sm font-medium text-gray-600 group-hover:text-orange-700">Click to upload photo</span>
-              <span className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
-            </button>
-          )}
+            ))}
+
+            {currentImages.length < 5 && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50 hover:bg-orange-50 hover:border-orange-200 transition-all group cursor-pointer ${
+                  currentImages.length === 0 ? 'col-span-2 sm:col-span-3 md:col-span-5 h-40' : 'aspect-square'
+                }`}
+              >
+                <div className="p-3 rounded-full bg-white shadow-sm group-hover:scale-110 transition-transform mb-1">
+                  {currentImages.length === 0 ? (
+                    <Upload className="text-gray-400 group-hover:text-orange-500" size={24} />
+                  ) : (
+                    <Plus className="text-gray-400 group-hover:text-orange-500" size={20} />
+                  )}
+                </div>
+                <span className="text-xs font-semibold text-gray-600 group-hover:text-orange-700">
+                  {currentImages.length === 0 ? 'Click to upload photos (up to 5)' : 'Add Photo'}
+                </span>
+                <span className="text-[10px] text-gray-400 mt-0.5">PNG, JPG up to 5MB</span>
+              </button>
+            )}
+          </div>
+
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
             accept="image/*"
+            multiple
             className="hidden"
           />
         </div>

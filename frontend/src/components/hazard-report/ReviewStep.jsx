@@ -81,13 +81,26 @@ const ReviewStep = ({ formData, isSubmitting, isSuccess }) => {
             <Camera size={20} />
           </div>
           <div className="flex-grow">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Photo</p>
-            {formData.image ? (
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Hazard Photos</p>
+              {formData.images && formData.images.length > 0 && (
+                <span className="text-[11px] font-bold text-slate-500">{formData.images.length} photo{formData.images.length > 1 ? 's' : ''}</span>
+              )}
+            </div>
+            {formData.images && formData.images.length > 0 ? (
+              <div className="mt-2 grid grid-cols-3 sm:grid-cols-5 gap-2">
+                {formData.images.map((imgSrc, idx) => (
+                  <div key={idx} className="h-16 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
+                    <img src={imgSrc} alt={`Hazard preview ${idx + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : formData.image ? (
               <div className="mt-2 w-24 h-16 rounded-lg overflow-hidden border border-gray-200">
                 <img src={formData.image} alt="Hazard preview" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <p className="text-gray-500 italic">No photo provided</p>
+              <p className="text-gray-500 italic text-sm mt-1">No photos attached</p>
             )}
           </div>
         </div>

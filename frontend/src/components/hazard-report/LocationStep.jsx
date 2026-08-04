@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Navigation, Loader2 } from 'lucide-react';
+import { MapPin, Navigation, Loader2, AlertTriangle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import api from '../../services/api';
 
 // Fix for default marker icon in Leaflet + React
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -38,7 +39,32 @@ const LocationPicker = ({ onLocationChange }) => {
 
 const LocationStep = ({ formData, updateData }) => {
   const location = formData.location;
+  const [nearbyHazard, setNearbyHazard] = useState(null);
   
+  useEffect(() => {
+    if (location && location.lat && location.lng) {
+      const checkNearby = async () => {
+        try {
+          const res = await api.get('/reports/nearby', {
+            params: {
+              latitude: location.lat,
+              longitude: location.lng,
+              categoryId: formData.categoryId || undefined,
+            },
+          });
+          if (res.data?.nearbyReports?.length > 0) {
+            setNearbyHazard(res.data.nearbyReports[0]);
+          } else {
+            setNearbyHazard(null);
+          }
+        } catch (err) {
+          console.error('Failed to check nearby reports:', err);
+        }
+      };
+      checkNearby();
+    }
+  }, [location, formData.categoryId]);
+
   const onLocationChange = async (loc) => {
     updateData({ location: loc, address: 'Fetching location address...' });
     try {
@@ -141,6 +167,25 @@ const LocationStep = ({ formData, updateData }) => {
             <span>
               Coordinates: {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
             </span>
+          </div>
+        )}
+
+        {nearbyHazard && (
+          <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl flex items-start gap-3 text-amber-900 shadow-sm animate-in fade-in">
+            <div className="p-2 bg-amber-100 text-amber-700 rounded-xl mt-0.5 shrink-0">
+              <AlertTriangle size={20} />
+            </div>
+            <div className="flex-grow text-xs leading-relaxed">
+              <div className="flex items-center justify-between font-bold text-sm mb-0.5">
+                <span>Active Hazard Reported Nearby</span>
+                <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-extrabold uppercase">
+                  Nearby (~80m)
+                </span>
+              </div>
+              <p className="text-amber-800">
+                A <strong>{nearbyHazard.category?.name || formData.type || 'Hazard'}</strong> ("{nearbyHazard.title}") is already active at this location. Submitting will automatically merge your report as an <strong>Upvote</strong> to boost repair priority!
+              </p>
+            </div>
           </div>
         )}
       </div>
