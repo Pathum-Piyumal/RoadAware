@@ -518,3 +518,82 @@ export const sendSupportDeskInquiryEmail = async ({ name, email, category, messa
     return false;
   }
 };
+
+export const sendStatusUpdateEmail = async ({
+  reporterName,
+  reporterEmail,
+  hazardId,
+  title,
+  location,
+  categoryName,
+  oldStatus,
+  newStatus,
+  comment,
+}) => {
+  if (!reporterEmail) return false;
+
+  const formattedOld = (oldStatus || '').toUpperCase().replace('_', ' ');
+  const formattedNew = (newStatus || '').toUpperCase().replace('_', ' ');
+
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'resolved': return '#10b981'; // emerald/green
+      case 'in_progress':
+      case 'in progress': return '#3b82f6'; // blue
+      case 'rejected': return '#ef4444'; // red
+      default: return '#f59e0b'; // amber
+    }
+  };
+
+  const statusColor = getStatusColor(newStatus);
+
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 28px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; color: #1e293b;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #2563eb; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">RoadAware</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Citizen Road Safety & Hazard Management Platform</p>
+      </div>
+
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+        <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+          Hazard Status Update • HZ-${hazardId}
+        </div>
+        <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 20px;">${title}</h2>
+        
+        <div style="margin-top: 12px;">
+          <span style="font-size: 12px; padding: 4px 10px; border-radius: 6px; background-color: #e2e8f0; color: #475569; font-weight: 600; text-transform: uppercase;">
+            ${formattedOld}
+          </span>
+          <span style="font-size: 16px; color: #94a3b8; margin: 0 6px;">➔</span>
+          <span style="font-size: 12px; padding: 4px 12px; border-radius: 6px; background-color: ${statusColor}15; color: ${statusColor}; border: 1px solid ${statusColor}40; font-weight: 700; text-transform: uppercase;">
+            ${formattedNew}
+          </span>
+        </div>
+      </div>
+
+      <p style="font-size: 15px; color: #334155; line-height: 1.6;">Hello <strong>${reporterName || 'Citizen'}</strong>,</p>
+      <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+        The status of your reported hazard <strong>"${title}"</strong> (HZ-${hazardId}) located at <em>${location || 'N/A'}</em> has been updated by road maintenance authorities.
+      </p>
+
+      ${comment ? `
+        <div style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 8px; margin: 20px 0;">
+          <h4 style="margin: 0 0 6px 0; color: #1e40af; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Admin Note / Progress Update:</h4>
+          <p style="margin: 0; color: #1e293b; font-size: 14px; line-height: 1.5; white-space: pre-wrap;">${comment}</p>
+        </div>
+      ` : ''}
+
+      <div style="border-top: 1px solid #e2e8f0; margin-top: 28px; padding-top: 20px; font-size: 12px; color: #94a3b8; text-align: center;">
+        <p style="margin: 0 0 6px 0;">Thank you for making our community roads safer!</p>
+        <p style="margin: 0;">RoadAware Operations Team &copy; ${new Date().getFullYear()}</p>
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: reporterEmail,
+    subject: `[RoadAware] Status Updated: ${title} is now ${formattedNew}`,
+    html,
+    senderName: 'RoadAware Alert',
+  });
+};

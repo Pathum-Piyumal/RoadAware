@@ -40,9 +40,16 @@ const Reports = () => {
   const [typeFilter, setTypeFilter] = useState('All types');
   const [statusFilter, setStatusFilter] = useState('All statuses');
   const [severityFilter, setSeverityFilter] = useState('All severities');
+  const [priorityFilter, setPriorityFilter] = useState('All priorities');
   const [sortOrder, setSortOrder] = useState('Newest first');
   const [selectedReport, setSelectedReport] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+
+  // Status Change Modal State
+  const [statusModalReport, setStatusModalReport] = useState(null);
+  const [pendingStatus, setPendingStatus] = useState('');
+  const [statusComment, setStatusComment] = useState('');
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     const querySearch = searchParams.get('search');
@@ -60,6 +67,7 @@ const Reports = () => {
           type: typeFilter,
           status: statusFilter,
           severity: severityFilter,
+          priority: priorityFilter,
           sort: sortOrder,
           limit: 100
         }
@@ -77,18 +85,54 @@ const Reports = () => {
 
   useEffect(() => {
     fetchReports();
-  }, [searchTerm, typeFilter, statusFilter, severityFilter, sortOrder]);
+  }, [searchTerm, typeFilter, statusFilter, severityFilter, priorityFilter, sortOrder]);
 
-  const handleStatusChange = async (reportId, newStatus) => {
+  const handlePriorityChange = async (reportId, newPriority) => {
     try {
-      const response = await api.put(`/admin/reports/${reportId}/status`, { status: newStatus });
+      const response = await api.put(`/admin/reports/${reportId}/priority`, { priority: newPriority });
       if (response.data.success) {
-        toast.success(`Report status updated to ${newStatus}`);
+        toast.success(`Priority updated to ${newPriority.toUpperCase()} for ${reportId}`);
         fetchReports();
+        if (selectedReport && selectedReport.id === reportId) {
+          setSelectedReport(prev => ({ ...prev, priority: newPriority.toUpperCase() }));
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to update priority.');
+      console.error(error);
+    }
+  };
+
+  const openStatusModal = (report, targetStatus) => {
+    if (report.status === targetStatus) return;
+    setStatusModalReport(report);
+    setPendingStatus(targetStatus);
+    setStatusComment('');
+  };
+
+  const submitStatusChange = async (e) => {
+    if (e) e.preventDefault();
+    if (!statusModalReport || !pendingStatus) return;
+
+    setUpdatingStatus(true);
+    try {
+      const response = await api.put(`/admin/reports/${statusModalReport.id}/status`, {
+        status: pendingStatus,
+        comment: statusComment.trim()
+      });
+      if (response.data.success) {
+        toast.success(`Status updated to ${pendingStatus} & Brevo email dispatched!`);
+        setStatusModalReport(null);
+        fetchReports();
+        if (selectedReport && selectedReport.id === statusModalReport.id) {
+          setSelectedReport(prev => ({ ...prev, status: pendingStatus }));
+        }
       }
     } catch (error) {
       toast.error('Failed to update status.');
       console.error(error);
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -99,7 +143,8 @@ const Reports = () => {
           search: searchTerm,
           type: typeFilter,
           status: statusFilter,
-          severity: severityFilter
+          severity: severityFilter,
+          priority: priorityFilter
         },
         responseType: 'blob'
       });
@@ -127,7 +172,7 @@ const Reports = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
         <div>
           <h1 className="text-2xl font-bold text-admin-text tracking-tight m-0">Reports</h1>
-          <p className="text-admin-text-muted text-sm mt-1 mb-0">Manage, triage, and resolve hazard reports.</p>
+          <p className="text-admin-text-muted text-sm mt-1 mb-0">Prioritize hazards, manage status changes, and send automated email updates.</p>
         </div>
         <button 
           onClick={handleExportCSV}
@@ -156,11 +201,19 @@ const Reports = () => {
           <option>Construction</option>
           <option>Flood</option>
         </select>
+        <select className={selectClasses} value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+          <option>All priorities</option>
+          <option>Critical</option>
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
         <select className={selectClasses} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option>All statuses</option>
           <option>Reported</option>
           <option>In Progress</option>
           <option>Resolved</option>
+          <option>Rejected</option>
         </select>
         <select className={selectClasses} value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}>
           <option>All severities</option>
@@ -171,6 +224,8 @@ const Reports = () => {
         </select>
         <select className={`${selectClasses} ml-auto`} value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
           <option>Newest first</option>
+          <option>Highest priority</option>
+          <option>Lowest priority</option>
           <option>Oldest first</option>
           <option>Most upvoted</option>
         </select>
@@ -185,6 +240,7 @@ const Reports = () => {
             <tr>
               <th className="p-4 text-xs font-semibold uppercase tracking-wider text-admin-text-muted border-b border-admin-border bg-admin-bg/50">Report</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-wider text-admin-text-muted border-b border-admin-border bg-admin-bg/50">Severity</th>
+              <th className="p-4 text-xs font-semibold uppercase tracking-wider text-admin-text-muted border-b border-admin-border bg-admin-bg/50">Admin Priority</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-wider text-admin-text-muted border-b border-admin-border bg-admin-bg/50">Status</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-wider text-admin-text-muted border-b border-admin-border bg-admin-bg/50">Upvotes</th>
               <th className="p-4 text-xs font-semibold uppercase tracking-wider text-admin-text-muted border-b border-admin-border bg-admin-bg/50">Reported</th>
@@ -206,7 +262,7 @@ const Reports = () => {
               </tr>
             ) : (
               reports.map((report) => (
-                <tr key={report.id} className="border-b border-admin-border last:border-0 hover:bg-admin-bg transition-colors">
+                <tr key={report.id} className="border-b border-admin-border last:border-0 hover:bg-admin-bg/50 transition-colors">
                   <td className="p-4 text-sm text-admin-text">
                     <div className="flex items-center gap-3">
                       <div className="text-amber-500 shrink-0">
@@ -223,16 +279,30 @@ const Reports = () => {
                       {report.severity}
                     </span>
                   </td>
+                  {/* Admin Priority Selector */}
+                  <td className="p-4 text-sm text-admin-text">
+                    <select
+                      className={`px-2 py-1 rounded text-xs border cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 ${getPriorityColor(report.priority)}`}
+                      value={report.priority || 'MEDIUM'}
+                      onChange={(e) => handlePriorityChange(report.id, e.target.value)}
+                    >
+                      <option value="CRITICAL" className="bg-admin-card text-red-500 font-bold">⚡ CRITICAL</option>
+                      <option value="HIGH" className="bg-admin-card text-orange-500 font-semibold">🔥 HIGH</option>
+                      <option value="MEDIUM" className="bg-admin-card text-sky-500">🔵 MEDIUM</option>
+                      <option value="LOW" className="bg-admin-card text-slate-400">🟢 LOW</option>
+                    </select>
+                  </td>
+                  {/* Status Dropdown Trigger */}
                   <td className="p-4 text-sm text-admin-text">
                     <select 
                       className={`${selectClasses} !py-1 !pl-2 !pr-8 border-transparent bg-transparent hover:border-admin-border focus:border-blue-500 focus:bg-admin-input-bg`}
                       value={report.status}
-                      onChange={(e) => handleStatusChange(report.id, e.target.value)}
+                      onChange={(e) => openStatusModal(report, e.target.value)}
                     >
-                      <option value="REPORTED">Reported</option>
-                      <option value="IN PROGRESS">In Progress</option>
-                      <option value="RESOLVED">Resolved</option>
-                      <option value="REJECTED">Rejected</option>
+                      <option value="REPORTED">REPORTED</option>
+                      <option value="IN PROGRESS">IN PROGRESS</option>
+                      <option value="RESOLVED">RESOLVED</option>
+                      <option value="REJECTED">REJECTED</option>
                     </select>
                   </td>
                   <td className="p-4 text-sm text-admin-text font-semibold flex items-center gap-1.5"><Heart size={14} className="text-red-500 fill-red-500" /> {report.upvotes}</td>

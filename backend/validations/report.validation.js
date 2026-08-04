@@ -16,3 +16,11 @@ export const reportStatusUpdateValidation = [
     .isIn(['reported', 'in_progress', 'resolved', 'rejected'])
     .withMessage('Invalid report status.'),
 ];
+
+export const reportPriorityUpdateValidation = [
+  body('priority')
+    .customSanitizer((val) => (typeof val === 'string' ? val.toLowerCase() : val))
+    .isIn(['low', 'medium', 'high', 'critical'])
+    .withMessage('Invalid report priority level.'),
+];
+

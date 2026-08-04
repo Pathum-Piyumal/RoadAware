@@ -71,6 +71,14 @@ const startServer = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
     console.log('✔ Migration: report_updates table verified/created.');
+
+    const reportsTableDesc = await queryInterface.describeTable('hazard_reports');
+    if (!reportsTableDesc.priority) {
+      await sequelize.query(
+        "ALTER TABLE `hazard_reports` ADD COLUMN `priority` ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium';"
+      );
+      console.log('✔ Migration: added priority column to hazard_reports table.');
+    }
     // ─────────────────────────────────────────────────────────────────────────
 
     // Start server
