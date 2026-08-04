@@ -63,6 +63,16 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/careers', careersRoutes);
 
+// Root Welcome Route
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to RoadAware API Server',
+    status: 'Online',
+    healthCheck: '/api/health',
+  });
+});
+
 // Health Check
 app.get('/api/health', async (req, res) => {
   try {
