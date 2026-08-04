@@ -324,6 +324,8 @@ export function HazardMapContent() {
   const [viewMode, setViewMode] = useState('grid');
   const [isHeatmap, setIsHeatmap] = useState(false);
   const [selectedHazard, setSelectedHazard] = useState(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const currentUser = AuthService.getCurrentUser();
 
@@ -373,12 +375,14 @@ export function HazardMapContent() {
   }
 
   const handleOpenPanel = async (hazard) => {
+    setSelectedImageIndex(0);
     // Show basic marker properties first with details loading flag
     setSelectedHazard({
       ...hazard,
       loadingDetails: true,
       description: '',
       imageUrl: null,
+      images: [],
       hasUpvoted: false
     });
 
@@ -398,6 +402,7 @@ export function HazardMapContent() {
           upvotes: data.report.upvotes?.length || 0,
           time: new Date(data.report.createdAt).toLocaleDateString(),
           imageUrl: data.report.images?.[0]?.imageUrl || null,
+          images: data.report.images || [],
           reporter: data.report.reporter,
           hasUpvoted: currentUser ? data.report.upvotes?.some(up => up.userId === currentUser.id) : false,
           loadingDetails: false
@@ -414,6 +419,7 @@ export function HazardMapContent() {
 
   const handleClosePanel = () => {
     setSelectedHazard(null);
+    setSelectedImageIndex(0);
   };
 
   const handleUpvoteToggleInList = (id, upvoted) => {
@@ -698,14 +704,61 @@ export function HazardMapContent() {
                 </div>
               ) : (
                 <>
-                  {/* Cover Photo */}
-                  <div className="h-64 w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
-                    <img 
-                      src={selectedHazard.imageUrl || getCategoryFallbackImage(selectedHazard.type)} 
-                      alt={selectedHazard.title} 
-                      className="w-full h-full object-cover" 
-                    />
-                  </div>
+                  {(() => {
+                    const drawerImages = selectedHazard.images && selectedHazard.images.length > 0
+                      ? selectedHazard.images.map(img => typeof img === 'string' ? img : img.imageUrl)
+                      : [selectedHazard.imageUrl || getCategoryFallbackImage(selectedHazard.type)];
+                    
+                    const activeImage = drawerImages[selectedImageIndex] || drawerImages[0];
+
+                    return (
+                      <>
+                        {/* Cover Photo */}
+                        <div 
+                          className="h-64 w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm relative group cursor-pointer bg-slate-900"
+                          onClick={() => setPreviewImage(activeImage)}
+                        >
+                          <img 
+                            src={activeImage} 
+                            alt={selectedHazard.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                          />
+                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-2">
+                            <Eye size={18} /> Click to Enlarge
+                          </div>
+                        </div>
+
+                        {/* Thumbnail Selector Strip */}
+                        {drawerImages.length > 1 && (
+                          <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3">
+                            <div className="flex items-center justify-between mb-2 px-1">
+                              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                                Evidence Photos ({drawerImages.length})
+                              </span>
+                              <span className="text-[10px] font-semibold text-slate-400">Click to switch</span>
+                            </div>
+                            <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
+                              {drawerImages.map((imgUrl, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => setSelectedImageIndex(idx)}
+                                  className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                                    selectedImageIndex === idx ? 'border-blue-600 scale-105 shadow-md shadow-blue-500/20' : 'border-transparent opacity-70 hover:opacity-100'
+                                  }`}
+                                >
+                                  <img src={imgUrl} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                                  <span className="absolute bottom-0.5 right-0.5 bg-black/70 text-white text-[8px] font-bold px-1 rounded">
+                                    #{idx + 1}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
 
                   {/* Metadata */}
                   <div className="grid grid-cols-2 gap-4">
@@ -767,6 +820,29 @@ export function HazardMapContent() {
             </div>
           </div>
         </>
+      )}
+
+      {/* Lightbox Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl border border-white/20 shadow-2xl bg-black">
+            <button 
+              type="button"
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-4 right-4 z-10 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors cursor-pointer border-none"
+            >
+              <X size={20} />
+            </button>
+            <img 
+              src={previewImage} 
+              alt="Hazard Evidence Preview" 
+              className="max-w-full max-h-[85vh] object-contain block mx-auto"
+            />
+          </div>
+        </div>
       )}
     </div>
   );
