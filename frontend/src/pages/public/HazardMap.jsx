@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, Component } from 'react';
-import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2, AlertTriangle, Droplets, Lightbulb, AlertCircle, PawPrint, Construction, HelpCircle, Milestone } from 'lucide-react';
+import { Search, ChevronDown, Map, Grid, Filter, Flame, MapPin, Clock, X, Loader2, AlertTriangle, Droplets, Lightbulb, AlertCircle, PawPrint, Construction, HelpCircle, Milestone, Eye, Image as ImageIcon } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
