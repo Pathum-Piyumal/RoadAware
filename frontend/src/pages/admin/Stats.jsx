@@ -48,7 +48,7 @@ const Stats = () => {
         <div className="bg-admin-card rounded-xl border border-admin-border p-6 shadow-sm">
           <h2 className="text-base font-semibold text-admin-text mb-4 mt-0">Resolution Time Trend</h2>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={200}>
               <LineChart data={areaChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
                 <XAxis
@@ -68,7 +68,7 @@ const Stats = () => {
         <div className="bg-admin-card rounded-xl border border-admin-border p-6 shadow-sm">
           <h2 className="text-base font-semibold text-admin-text mb-4 mt-0">Hazards Distribution</h2>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={200}>
               <BarChart data={hazardTypeData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" />
                 <XAxis

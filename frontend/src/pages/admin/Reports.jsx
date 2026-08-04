@@ -21,6 +21,22 @@ const Reports = () => {
   const getStatusClass = (status) => (status || '').toLowerCase().replace(' ', '-');
   const getSeverityClass = (severity) => (severity || '').toLowerCase();
 
+  const getSeverityColor = (sev) => {
+    const s = (sev || '').toLowerCase();
+    if (s === 'critical') return 'text-red-500 bg-red-500/10 border-red-500/30 font-bold';
+    if (s === 'high') return 'text-amber-500 bg-amber-500/10 border-amber-500/30 font-semibold';
+    if (s === 'medium') return 'text-blue-500 bg-blue-500/10 border-blue-500/30';
+    return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30';
+  };
+
+  const getPriorityColor = (prio) => {
+    const p = (prio || '').toLowerCase();
+    if (p === 'critical') return 'text-red-500 bg-red-500/15 border-red-500/40 font-bold';
+    if (p === 'high') return 'text-amber-500 bg-amber-500/15 border-amber-500/40 font-semibold';
+    if (p === 'medium') return 'text-sky-500 bg-sky-500/15 border-sky-500/40 font-medium';
+    return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30 font-normal';
+  };
+
   const getGoogleMapsUrl = (report) => {
     if (!report) return '#';
     const lat = parseFloat(report.latitude);
@@ -354,7 +370,7 @@ const Reports = () => {
               <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-admin-bg/60 border border-admin-border">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Severity:</span>
-                  <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border border-current text-${getSeverityClass(selectedReport.severity) === 'critical' ? 'red' : getSeverityClass(selectedReport.severity) === 'high' ? 'amber' : getSeverityClass(selectedReport.severity) === 'medium' ? 'blue' : 'emerald'}-500 bg-${getSeverityClass(selectedReport.severity) === 'critical' ? 'red' : getSeverityClass(selectedReport.severity) === 'high' ? 'amber' : getSeverityClass(selectedReport.severity) === 'medium' ? 'blue' : 'emerald'}-500/10`}>
+                  <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border ${getSeverityColor(selectedReport.severity)}`}>
                     {selectedReport.severity}
                   </span>
                 </div>

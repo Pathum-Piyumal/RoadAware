@@ -166,7 +166,7 @@ const Dashboard = () => {
             <p className="text-xs text-admin-text-muted mt-1 mb-0">Last 14 days</p>
           </div>
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={180}>
               <AreaChart data={areaChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorReports" x1="0" y1="0" x2="0" y2="1">
@@ -199,7 +199,7 @@ const Dashboard = () => {
             <p className="text-xs text-admin-text-muted mt-1 mb-0">All reports</p>
           </div>
           <div className="h-[14rem] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={180}>
               <PieChart>
                 <Pie
                   data={statusData}
@@ -242,7 +242,7 @@ const Dashboard = () => {
             <p className="text-xs text-admin-text-muted mt-1 mb-0">All time</p>
           </div>
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={180}>
               <BarChart data={hazardTypeData} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-admin-border)" />
                 <XAxis type="number" stroke="var(--color-admin-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
