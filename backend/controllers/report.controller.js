@@ -16,6 +16,51 @@ export const createReport = async (req, res, next) => {
       });
     }
 
+    // ── Grid Proximity Duplicate Detection (~90m bounds, delta = 0.0008) ──────
+    const targetLat = parseFloat(latitude);
+    const targetLng = parseFloat(longitude);
+    const delta = 0.0008;
+
+    const existingDuplicate = await HazardReport.findOne({
+      where: {
+        categoryId,
+        status: ['reported', 'in_progress'],
+        latitude: {
+          [Op.between]: [targetLat - delta, targetLat + delta],
+        },
+        longitude: {
+          [Op.between]: [targetLng - delta, targetLng + delta],
+        },
+      },
+      include: [
+        { model: HazardCategory, as: 'category', attributes: ['id', 'name'] },
+      ],
+    });
+
+    if (existingDuplicate) {
+      // Auto-add upvote for user on existing report
+      await ReportUpvote.findOrCreate({
+        where: { reportId: existingDuplicate.id, userId },
+      });
+
+      // Log Activity for auto-upvote merge
+      await Activity.create({
+        userId,
+        action: 'Upvote Added (Merged Duplicate)',
+        details: `Auto-upvoted existing report HZ-${existingDuplicate.id} at ${locationName} due to proximity duplicate detection.`,
+        type: category.name.toLowerCase(),
+        status: existingDuplicate.status,
+        severity,
+      });
+
+      return res.status(200).json({
+        success: true,
+        duplicate: true,
+        message: 'A similar active hazard already exists at this location. Your vote has been automatically added to boost its repair priority!',
+        report: existingDuplicate,
+      });
+    }
+
     const report = await HazardReport.create({
       title,
       description,
@@ -28,15 +73,33 @@ export const createReport = async (req, res, next) => {
       status: 'reported',
     });
 
-    let imageUrl = '';
-    if (req.file) {
-      imageUrl = await uploadBufferToCloudinary(req.file.buffer, 'reports');
+    let uploadedImages = [];
+    let filesToProcess = [];
 
-      await ReportImage.create({
-        reportId: report.id,
-        imageUrl,
-      });
+    if (req.files) {
+      if (Array.isArray(req.files)) {
+        filesToProcess = req.files;
+      } else {
+        if (req.files.images) filesToProcess.push(...req.files.images);
+        if (req.files.image) filesToProcess.push(...req.files.image);
+      }
+    } else if (req.file) {
+      filesToProcess = [req.file];
     }
+
+    // Limit to max 5 files
+    filesToProcess = filesToProcess.slice(0, 5);
+
+    for (const file of filesToProcess) {
+      const imgUrl = await uploadBufferToCloudinary(file.buffer, 'reports');
+      const reportImg = await ReportImage.create({
+        reportId: report.id,
+        imageUrl: imgUrl,
+      });
+      uploadedImages.push(reportImg);
+    }
+
+    const firstImageUrl = uploadedImages.length > 0 ? uploadedImages[0].imageUrl : '';
 
     // Log Activity
     await Activity.create({
@@ -61,7 +124,8 @@ export const createReport = async (req, res, next) => {
       message: 'Hazard report submitted successfully.',
       report: {
         ...report.toJSON(),
-        imageUrl,
+        imageUrl: firstImageUrl,
+        images: uploadedImages,
       },
     });
   } catch (error) {
@@ -380,3 +444,52 @@ export const getLeaderboard = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getNearbyReports = async (req, res, next) => {
+  try {
+    const { latitude, longitude, categoryId } = req.query;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({
+        success: false,
+        message: 'Latitude and Longitude parameters are required.',
+      });
+    }
+
+    const targetLat = parseFloat(latitude);
+    const targetLng = parseFloat(longitude);
+    const delta = 0.0008; // approx 80-90 meters
+
+    const whereClause = {
+      status: ['reported', 'in_progress'],
+      latitude: {
+        [Op.between]: [targetLat - delta, targetLat + delta],
+      },
+      longitude: {
+        [Op.between]: [targetLng - delta, targetLng + delta],
+      },
+    };
+
+    if (categoryId) {
+      whereClause.categoryId = categoryId;
+    }
+
+    const nearbyReports = await HazardReport.findAll({
+      where: whereClause,
+      include: [
+        { model: HazardCategory, as: 'category', attributes: ['id', 'name', 'color'] },
+        { model: ReportImage, as: 'images', attributes: ['id', 'imageUrl'] },
+        { model: ReportUpvote, as: 'upvotes', attributes: ['id', 'userId'] },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json({
+      success: true,
+      nearbyReports,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

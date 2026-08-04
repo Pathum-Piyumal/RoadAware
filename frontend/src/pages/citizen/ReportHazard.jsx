@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle2, ThumbsUp } from 'lucide-react';
 import Step1Details from '../../components/hazard-report/DetailsStep';
 import Step2Location from '../../components/hazard-report/LocationStep';
 import Step3Review from '../../components/hazard-report/ReviewStep';
@@ -9,6 +9,7 @@ const ReportHazard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isDuplicateMerged, setIsDuplicateMerged] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -20,8 +21,10 @@ const ReportHazard = () => {
     location: null,
     address: '',
     city: '',
-    image: null,      // base64 preview (for ReviewStep display)
-    imageFile: null,  // actual File object (for upload)
+    image: null,        // base64 preview for backward compatibility
+    imageFile: null,    // single File for backward compatibility
+    images: [],         // array of base64 previews (up to 5)
+    imageFiles: [],     // array of File objects (up to 5)
   });
 
   const totalSteps = 3;
@@ -58,11 +61,21 @@ const ReportHazard = () => {
       data.append('latitude', formData.location?.lat || 0);
       data.append('longitude', formData.location?.lng || 0);
       data.append('locationName', formData.address || 'Unknown Location');
-      if (formData.imageFile) {
+
+      if (formData.imageFiles && formData.imageFiles.length > 0) {
+        formData.imageFiles.forEach(file => {
+          data.append('images', file);
+        });
+        // Also set legacy field for single file compatibility
+        data.append('image', formData.imageFiles[0]);
+      } else if (formData.imageFile) {
         data.append('image', formData.imageFile);
       }
 
-      await HazardService.createReport(data);
+      const res = await HazardService.createReport(data);
+      if (res.data?.duplicate) {
+        setIsDuplicateMerged(true);
+      }
       setIsSuccess(true);
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to submit report. Please try again.';
@@ -165,12 +178,18 @@ const ReportHazard = () => {
           </>
         ) : (
           <div className="text-center py-16 animate-fade-in-up">
-            <div className="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 border border-green-100 shadow-lg shadow-green-100/30 scale-100 animate-float">
-              <CheckCircle2 size={48} />
+            <div className={`w-24 h-24 ${isDuplicateMerged ? 'bg-amber-50 text-amber-500 border-amber-100 shadow-amber-100/30' : 'bg-green-50 text-green-500 border-green-100 shadow-green-100/30'} rounded-full flex items-center justify-center mx-auto mb-8 border shadow-lg scale-100 animate-float`}>
+              {isDuplicateMerged ? <ThumbsUp size={48} /> : <CheckCircle2 size={48} />}
             </div>
-            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Report Submitted!</h2>
+            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">
+              {isDuplicateMerged ? 'Vote Added to Existing Report!' : 'Report Submitted!'}
+            </h2>
             <p className="text-slate-500 mb-10 max-w-md mx-auto leading-relaxed text-sm">
-              Thank you for contributing to safer roads. Local public work authorities have been alerted with precise coordinates and will start review operations.
+              {isDuplicateMerged ? (
+                'An active hazard report already exists at this location. Your submission was automatically merged as an Upvote to boost repair priority!'
+              ) : (
+                'Thank you for contributing to safer roads. Local public work authorities have been alerted with precise coordinates and will start review operations.'
+              )}
             </p>
             <button
               onClick={() => window.location.href = '/my-reports'}
