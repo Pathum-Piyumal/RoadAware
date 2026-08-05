@@ -376,9 +376,16 @@ const Reports = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Status:</span>
-                  <span className="text-xs font-bold px-2.5 py-1 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-wider">
-                    {selectedReport.status}
-                  </span>
+                  <select 
+                    className={`${selectClasses} !py-1 !pl-2 !pr-8 border-blue-500/30 bg-blue-500/10 text-blue-500 font-bold uppercase text-xs rounded cursor-pointer`}
+                    value={selectedReport.status}
+                    onChange={(e) => openStatusModal(selectedReport, e.target.value)}
+                  >
+                    <option value="REPORTED" className="bg-admin-card text-admin-text">REPORTED</option>
+                    <option value="IN PROGRESS" className="bg-admin-card text-admin-text">IN PROGRESS</option>
+                    <option value="RESOLVED" className="bg-admin-card text-admin-text">RESOLVED</option>
+                    <option value="REJECTED" className="bg-admin-card text-admin-text">REJECTED</option>
+                  </select>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-admin-text-muted uppercase tracking-wider">Community Upvotes:</span>
@@ -484,7 +491,7 @@ const Reports = () => {
         </div>
       )}
 
-      {/* Image Lightbox Preview Modal */}
+              {/* Image Lightbox Preview Modal */}
       {previewImage && (
         <div 
           className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-in-out]"
@@ -502,6 +509,81 @@ const Reports = () => {
               alt="Report Evidence Preview" 
               className="max-w-full max-h-[85vh] object-contain block mx-auto"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Status Change Confirmation Modal */}
+      {statusModalReport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-in-out]">
+          <div className="bg-admin-card border border-admin-border rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-[slideUp_0.3s_ease-out]">
+            <div className="flex items-center justify-between p-6 border-b border-admin-border bg-admin-card">
+              <div>
+                <h2 className="text-lg font-bold text-admin-text m-0">Update Report Status</h2>
+                <p className="text-xs text-admin-text-muted m-0 mt-1">
+                  Report ID: <span className="font-semibold text-admin-text">{statusModalReport.id}</span>
+                </p>
+              </div>
+              <button 
+                onClick={() => setStatusModalReport(null)}
+                className="p-2 hover:bg-admin-bg rounded-lg text-admin-text-muted hover:text-admin-text transition-colors cursor-pointer border-none bg-transparent"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={submitStatusChange} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-admin-text-muted uppercase tracking-wider mb-2">
+                  Status Transition
+                </label>
+                <div className="p-3 bg-admin-bg rounded-xl border border-admin-border text-sm font-bold text-blue-500 uppercase tracking-wider flex items-center justify-between">
+                  <span className="text-admin-text-muted">{statusModalReport.status}</span>
+                  <span>➔</span>
+                  <span className="text-blue-500">{pendingStatus}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-admin-text-muted uppercase tracking-wider mb-2">
+                  Status Note / Progress Update for Citizen (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="e.g. Work crew dispatched to repair the road hazard..."
+                  value={statusComment}
+                  onChange={(e) => setStatusComment(e.target.value)}
+                  className="w-full bg-admin-input-bg border border-admin-border rounded-xl p-3 text-sm text-admin-text transition-all focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none box-border"
+                />
+                <p className="text-[0.75rem] text-admin-text-muted mt-1.5 mb-0">
+                  💡 This update note will be sent directly to the citizen reporter via automated email notification.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-admin-border">
+                <button
+                  type="button"
+                  onClick={() => setStatusModalReport(null)}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold border border-admin-border text-admin-text hover:bg-admin-bg transition-colors cursor-pointer bg-transparent"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={updatingStatus}
+                  className="px-5 py-2 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer border-none shadow-md flex items-center gap-2 disabled:opacity-50"
+                >
+                  {updatingStatus ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Updating & Sending Email...
+                    </>
+                  ) : (
+                    'Confirm Status Update'
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

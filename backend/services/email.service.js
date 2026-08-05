@@ -590,7 +590,7 @@ export const sendStatusUpdateEmail = async ({
     </div>
   `;
 
-  return await sendEmail({
+  return await sendMail({
     to: reporterEmail,
     subject: `[RoadAware] Status Updated: ${title} is now ${formattedNew}`,
     html,
